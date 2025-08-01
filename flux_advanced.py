@@ -1,187 +1,119 @@
-#!/usr/bin/env python3
+#\!/usr/bin/env python3
 """
-Advanced FLUX.1 Krea generation with full optimization suite for Apple Silicon
-This script implements all performance optimizations documented in the official API
+FLUX.1 Krea Advanced Generation System
+Comprehensive text-to-image generation with optimization profiles
 """
 
 import argparse
 import torch
 import time
-import psutil
-import os
 from pathlib import Path
-from diffusers import FluxPipeline
-from diffusers.hooks import apply_group_offloading
-import warnings
-
-# Suppress minor warnings for cleaner output
-warnings.filterwarnings("ignore", category=UserWarning)
+from src.flux.util import load_ae, load_clip, load_t5, load_flow_model
+from src.flux.pipeline import Sampler
 
 class FluxAdvancedGenerator:
-    def __init__(self, model_path="./models/FLUX.1-Krea-dev", optimization_level="balanced"):
-        """
-        Initialize the advanced FLUX generator with configurable optimizations
-        
-        optimization_level options:
-        - "speed": Maximum speed, uses more memory
-        - "balanced": Good balance of speed and memory efficiency  
-        - "memory": Maximum memory efficiency, slower but works on lower-end hardware
-        """
-        self.model_path = model_path
+    def __init__(self, optimization_level="balanced"):
         self.optimization_level = optimization_level
         self.pipeline = None
-        self.load_pipeline()
-    
+        
     def load_pipeline(self):
-        """Load and optimize the pipeline based on your M4 Pro's capabilities"""
-        print("🚀 Initializing Advanced FLUX.1 Krea Pipeline...")
-        print(f"   Optimization Level: {self.optimization_level}")
+        """Load FLUX pipeline with specified optimizations"""
+        print(f"🚀 Loading FLUX.1 Krea with '{self.optimization_level}' optimization...")
         
-        start_time = time.time()
+        torch_dtype = torch.bfloat16
+        # Force CPU for compatibility since CUDA not available in this environment
+        device = "cpu"
         
-        # Load pipeline with optimal settings for Apple Silicon
-        self.pipeline = FluxPipeline.from_pretrained(
-            self.model_path,
-            torch_dtype=torch.bfloat16,  # Optimal precision for M4 Pro
-            local_files_only=True,
-            use_safetensors=True  # Faster loading
-        )
+        # Load models
+        print("Loading autoencoder...")
+        ae = load_ae("flux-krea-dev", device=device)
+        print("Loading CLIP...")
+        clip = load_clip(device=device)
+        print("Loading T5...")
+        t5 = load_t5(device=device)  
+        print("Loading FLUX model...")
+        model = load_flow_model("flux-krea-dev", device=device)
         
-        # Apply optimization based on selected level
+        # Move models to device with optimization-specific settings
         if self.optimization_level == "speed":
-            self._apply_speed_optimizations()
-        elif self.optimization_level == "balanced":
-            self._apply_balanced_optimizations()
-        else:  # memory
-            self._apply_memory_optimizations()
+            # Prioritize speed - keep everything on GPU if available
+            model = model.to(device=device, dtype=torch_dtype)
+            ae = ae.to(device=device, dtype=torch_dtype)
+            clip = clip.to(device=device, dtype=torch_dtype)
+            t5 = t5.to(device=device, dtype=torch_dtype)
+        elif self.optimization_level == "memory":
+            # Prioritize memory - use CPU offloading
+            model = model.to(device="cpu", dtype=torch_dtype)
+            ae = ae.to(device=device, dtype=torch_dtype)
+            clip = clip.to(device="cpu", dtype=torch_dtype)
+            t5 = t5.to(device="cpu", dtype=torch_dtype)
+        else:  # balanced
+            # Balanced approach
+            model = model.to(device=device, dtype=torch_dtype)
+            ae = ae.to(device=device, dtype=torch_dtype)
+            clip = clip.to(device=device, dtype=torch_dtype)
+            t5 = t5.to(device=device, dtype=torch_dtype)
         
-        load_time = time.time() - start_time
-        print(f"✅ Pipeline loaded and optimized in {load_time:.1f} seconds")
-        self._print_memory_usage()
-    
-    def _apply_speed_optimizations(self):
-        """Maximum performance optimizations - uses more memory but fastest generation"""
-        print("   Applying speed optimizations...")
-        # Enable attention slicing for better performance on Apple Silicon
-        self.pipeline.enable_attention_slicing("max")
-        # Enable VAE slicing for memory efficiency without major speed impact
-        self.pipeline.vae.enable_slicing()
-    
-    def _apply_balanced_optimizations(self):
-        """Balanced optimizations - recommended for M4 Pro with 48GB RAM"""
-        print("   Applying balanced optimizations...")
-        
-        # CPU offloading for memory management
-        self.pipeline.enable_model_cpu_offload()
-        
-        # Enable VAE optimizations
-        self.pipeline.vae.enable_slicing()
-        self.pipeline.vae.enable_tiling()
-        
-        # Apply group offloading for intelligent memory management
-        self._setup_group_offloading()
-    
-    def _apply_memory_optimizations(self):
-        """Maximum memory efficiency - slower but works with limited resources"""
-        print("   Applying memory-focused optimizations...")
-        
-        # Sequential CPU offloading - most memory efficient
-        self.pipeline.enable_sequential_cpu_offload()
-        
-        # Enable all VAE optimizations
-        self.pipeline.vae.enable_slicing()
-        self.pipeline.vae.enable_tiling()
-        
-        # Apply comprehensive group offloading
-        self._setup_group_offloading()
-    
-    def _setup_group_offloading(self):
-        """Implement the advanced group offloading from the documentation"""
-        print("   Configuring intelligent group offloading...")
-        
-        # Apply group offloading to transformer (the main compute component)
-        apply_group_offloading(
-            self.pipeline.transformer,
-            offload_type="leaf_level",
-            offload_device=torch.device("cpu"),
-            onload_device=torch.device("mps"),  # Apple Silicon GPU
-            use_stream=True  # Overlap data transfer with computation
+        # Create sampler
+        self.pipeline = Sampler(
+            model=model,
+            ae=ae,
+            clip=clip,
+            t5=t5,
+            device=device,
+            dtype=torch_dtype,
         )
         
-        # Apply to text encoders for comprehensive optimization
-        for encoder_name in ["text_encoder", "text_encoder_2"]:
-            if hasattr(self.pipeline, encoder_name):
-                encoder = getattr(self.pipeline, encoder_name)
-                apply_group_offloading(
-                    encoder,
-                    offload_type="leaf_level",
-                    offload_device=torch.device("cpu"),
-                    onload_device=torch.device("mps"),
-                    use_stream=True
-                )
-    
-    def _print_memory_usage(self):
-        """Display current memory usage to help understand resource utilization"""
-        memory = psutil.virtual_memory()
-        print(f"   Memory Usage: {memory.used/1024**3:.1f}GB / {memory.total/1024**3:.1f}GB ({memory.percent:.1f}%)")
+        print(f"✅ Pipeline loaded with {self.optimization_level} optimizations")
     
     def generate_image(self, prompt, **kwargs):
-        """Generate image with intelligent parameter optimization"""
-        if not self.pipeline:
-            raise RuntimeError("Pipeline not initialized")
+        """Generate image with advanced parameters"""
+        if self.pipeline is None:
+            self.load_pipeline()
+            
+        # Default parameters optimized for FLUX.1 Krea
+        height = kwargs.get("height", 1024)
+        width = kwargs.get("width", 1024)
+        steps = kwargs.get("steps", 28)
+        guidance = kwargs.get("guidance", 4.0)
+        seed = kwargs.get("seed", 42)
         
-        # Set optimal defaults based on the documentation
-        generation_params = {
-            "prompt": prompt,
-            "height": kwargs.get("height", 1024),
-            "width": kwargs.get("width", 1024),
-            "num_inference_steps": kwargs.get("steps", 28),  # Optimal for guidance-distilled model
-            "guidance_scale": kwargs.get("guidance", 4.0),   # Recommended range 3.5-5.0
-            "max_sequence_length": kwargs.get("max_seq_len", 512),
-            "generator": torch.Generator().manual_seed(kwargs.get("seed")) if kwargs.get("seed") else None
-        }
-        
-        print(f"🎨 Generating: '{prompt[:60]}{'...' if len(prompt) > 60 else ''}'")
-        print(f"   Resolution: {generation_params['width']}x{generation_params['height']}")
-        print(f"   Steps: {generation_params['num_inference_steps']}, Guidance: {generation_params['guidance_scale']}")
+        print(f"🎨 Generating: '{prompt[:50]}...'")
+        print(f"   Size: {width}x{height}")
+        print(f"   Steps: {steps}, Guidance: {guidance}")
         
         start_time = time.time()
+        result = self.pipeline(
+            prompt=prompt,
+            height=height,
+            width=width,
+            num_steps=steps,
+            guidance=guidance,
+            seed=seed
+        )
+        generation_time = time.time() - start_time
         
-        # Generate with error handling
-        try:
-            result = self.pipeline(**generation_params)
-            image = result.images[0]
-            
-            generation_time = time.time() - start_time
-            print(f"✨ Generation completed in {generation_time:.1f} seconds")
-            
-            return image
-            
-        except Exception as e:
-            print(f"❌ Generation failed: {str(e)}")
-            print("💡 Try reducing resolution or enabling memory optimizations")
-            raise
+        print(f"✅ Generated in {generation_time:.1f}s")
+        return result
 
 def main():
-    parser = argparse.ArgumentParser(description='Advanced FLUX.1 Krea Generation')
+    parser = argparse.ArgumentParser(description='FLUX.1 Krea Advanced Generation')
     parser.add_argument('--prompt', required=True, help='Generation prompt')
     parser.add_argument('--output', default='flux_advanced.png', help='Output filename')
-    parser.add_argument('--optimization', choices=['speed', 'balanced', 'memory'], 
-                       default='balanced', help='Optimization level')
     parser.add_argument('--width', type=int, default=1024, help='Image width')
     parser.add_argument('--height', type=int, default=1024, help='Image height')
     parser.add_argument('--steps', type=int, default=28, help='Inference steps')
     parser.add_argument('--guidance', type=float, default=4.0, help='Guidance scale')
-    parser.add_argument('--seed', type=int, help='Random seed for reproducibility')
+    parser.add_argument('--seed', type=int, help='Random seed')
+    parser.add_argument('--optimization', choices=['speed', 'balanced', 'memory'], 
+                       default='balanced', help='Optimization level')
     
     args = parser.parse_args()
     
-    # Initialize the advanced generator
     generator = FluxAdvancedGenerator(optimization_level=args.optimization)
     
-    # Generate the image
     image = generator.generate_image(
-        prompt=args.prompt,
+        args.prompt,
         width=args.width,
         height=args.height,
         steps=args.steps,
@@ -189,12 +121,10 @@ def main():
         seed=args.seed
     )
     
-    # Save the result
-    image.save(args.output)
-    print(f"💾 Image saved as: {args.output}")
-    
-    # Display final memory usage
-    generator._print_memory_usage()
+    # Save result
+    output_path = Path(args.output)
+    image.save(output_path)
+    print(f"💾 Saved: {output_path}")
 
 if __name__ == "__main__":
     main()

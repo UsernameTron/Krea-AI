@@ -1,144 +1,92 @@
-#!/usr/bin/env python3
+#\!/usr/bin/env python3
 """
-FLUX.1 Krea Inpainting with Apple Silicon optimizations
-Advanced inpainting capabilities for precise image editing
+FLUX.1 Krea Inpainting with advanced mask handling
+Implements FluxInpaintPipeline with the documented optimizations
 """
 
 import argparse
 import torch
-from PIL import Image
+from PIL import Image, ImageOps
 from diffusers import FluxInpaintPipeline
 from diffusers.utils import load_image
 import numpy as np
 
-def create_mask_from_bbox(image_size, bbox):
-    """Create a mask from bounding box coordinates (x1, y1, x2, y2)"""
-    width, height = image_size
-    mask = Image.new('L', (width, height), 0)
-    from PIL import ImageDraw
-    draw = ImageDraw.Draw(mask)
-    draw.rectangle(bbox, fill=255)
-    return mask
+def prepare_mask(mask_image):
+    """Prepare mask image according to FLUX requirements"""
+    # Convert to grayscale if needed
+    if mask_image.mode != 'L':
+        mask_image = mask_image.convert('L')
+    
+    # Ensure mask is binary (white areas will be inpainted)
+    mask_array = np.array(mask_image)
+    mask_array = (mask_array > 128).astype(np.uint8) * 255
+    
+    return Image.fromarray(mask_array, mode='L')
 
 def main():
-    parser = argparse.ArgumentParser(description='FLUX Inpainting Generation')
+    parser = argparse.ArgumentParser(description='FLUX Inpainting')
     parser.add_argument('--prompt', required=True, help='Inpainting prompt')
-    parser.add_argument('--input_image', required=True, help='Input image path or URL')
-    parser.add_argument('--mask_image', help='Mask image path (white = inpaint area)')
-    parser.add_argument('--bbox', help='Bounding box for mask "x1,y1,x2,y2"')
+    parser.add_argument('--image', required=True, help='Input image path or URL')
+    parser.add_argument('--mask', required=True, help='Mask image path or URL')
     parser.add_argument('--output', default='flux_inpaint.png', help='Output filename')
-    parser.add_argument('--strength', type=float, default=0.8, help='Inpainting strength (0-1)')
-    parser.add_argument('--steps', type=int, default=32, help='Inference steps')
-    parser.add_argument('--guidance', type=float, default=7.5, help='Guidance scale')
+    parser.add_argument('--strength', type=float, default=0.8, help='Inpainting strength')
+    parser.add_argument('--steps', type=int, default=28, help='Inference steps')
+    parser.add_argument('--guidance', type=float, default=7.0, help='Guidance scale')
     parser.add_argument('--seed', type=int, help='Random seed')
     
     args = parser.parse_args()
     
-    # Validate mask input
-    if not args.mask_image and not args.bbox:
-        print("❌ Error: Must provide either --mask_image or --bbox")
-        return
+    print("🎭 Loading FLUX Inpainting Pipeline...")
     
-    print("🎨 Loading FLUX Inpainting Pipeline...")
+    # Load inpainting pipeline with Apple Silicon optimizations
+    pipeline = FluxInpaintPipeline.from_pretrained(
+        "./models/FLUX.1-Krea-dev",
+        torch_dtype=torch.bfloat16,
+        local_files_only=True
+    )
     
-    try:
-        # Load the specialized inpainting pipeline
-        pipeline = FluxInpaintPipeline.from_pretrained(
-            "./models/FLUX.1-Krea-dev",
-            torch_dtype=torch.bfloat16,
-            local_files_only=True
-        )
-        
-        # Apply Apple Silicon optimizations
-        pipeline.enable_model_cpu_offload()
-        pipeline.vae.enable_slicing()
-        pipeline.vae.enable_tiling()
-        
-    except Exception as e:
-        print(f"⚠️  Inpainting pipeline not available: {e}")
-        print("💡 Using standard pipeline with mask guidance")
-        from diffusers import FluxPipeline
-        pipeline = FluxPipeline.from_pretrained(
-            "./models/FLUX.1-Krea-dev",
-            torch_dtype=torch.bfloat16,
-            local_files_only=True
-        )
-        pipeline.enable_model_cpu_offload()
-        pipeline.vae.enable_slicing()
-        pipeline.vae.enable_tiling()
+    # Apply comprehensive optimizations as documented
+    pipeline.enable_model_cpu_offload()
+    pipeline.vae.enable_slicing()
+    pipeline.vae.enable_tiling()
     
-    print("📷 Loading input image...")
+    print("📷 Loading images...")
     
-    # Load input image
-    if args.input_image.startswith(('http://', 'https://')):
-        input_image = load_image(args.input_image)
+    # Load and prepare images
+    if args.image.startswith(('http://', 'https://')):
+        source_image = load_image(args.image)
     else:
-        input_image = Image.open(args.input_image)
+        source_image = Image.open(args.image)
     
-    input_image = input_image.convert('RGB')
+    if args.mask.startswith(('http://', 'https://')):
+        mask_image = load_image(args.mask)
+    else:
+        mask_image = Image.open(args.mask)
     
-    # Load or create mask
-    if args.mask_image:
-        print("🎭 Loading mask image...")
-        if args.mask_image.startswith(('http://', 'https://')):
-            mask_image = load_image(args.mask_image)
-        else:
-            mask_image = Image.open(args.mask_image)
-        mask_image = mask_image.convert('L')
-    elif args.bbox:
-        print("🎭 Creating mask from bounding box...")
-        bbox_coords = [int(x) for x in args.bbox.split(',')]
-        if len(bbox_coords) != 4:
-            print("❌ Error: Bounding box must be 'x1,y1,x2,y2'")
-            return
-        mask_image = create_mask_from_bbox(input_image.size, bbox_coords)
+    # Ensure images are properly formatted
+    source_image = source_image.convert('RGB')
+    mask_image = prepare_mask(mask_image)
     
-    print(f"🖌️  Inpainting with prompt: '{args.prompt}'")
-    print(f"   Strength: {args.strength}, Steps: {args.steps}, Guidance: {args.guidance}")
+    # Resize mask to match source image if needed
+    if mask_image.size != source_image.size:
+        mask_image = mask_image.resize(source_image.size, Image.LANCZOS)
     
-    # Generate with inpainting
-    try:
-        result = pipeline(
-            prompt=args.prompt,
-            image=input_image,
-            mask_image=mask_image,
-            strength=args.strength,
-            num_inference_steps=args.steps,
-            guidance_scale=args.guidance,
-            generator=torch.Generator().manual_seed(args.seed) if args.seed else None
-        )
-    except TypeError:
-        # Fallback for standard pipeline
-        print("💡 Using img2img approach with masked guidance")
-        from diffusers import FluxImg2ImgPipeline
-        pipeline = FluxImg2ImgPipeline.from_pretrained(
-            "./models/FLUX.1-Krea-dev",
-            torch_dtype=torch.bfloat16,
-            local_files_only=True
-        )
-        pipeline.enable_model_cpu_offload()
-        pipeline.vae.enable_slicing()
-        
-        # Create masked input
-        masked_input = input_image.copy()
-        masked_array = np.array(masked_input)
-        mask_array = np.array(mask_image)
-        
-        # Apply mask (set masked areas to noise/gray)
-        mask_bool = mask_array > 128
-        masked_array[mask_bool] = 128
-        masked_input = Image.fromarray(masked_array)
-        
-        result = pipeline(
-            prompt=args.prompt,
-            image=masked_input,
-            strength=args.strength,
-            num_inference_steps=args.steps,
-            guidance_scale=args.guidance,
-            generator=torch.Generator().manual_seed(args.seed) if args.seed else None
-        )
+    print(f"🎨 Inpainting with prompt: '{args.prompt}'")
+    print(f"   Image size: {source_image.size}")
+    print(f"   Strength: {args.strength}, Steps: {args.steps}")
     
-    # Save the result
+    # Perform inpainting with documented parameters
+    result = pipeline(
+        prompt=args.prompt,
+        image=source_image,
+        mask_image=mask_image,
+        strength=args.strength,
+        num_inference_steps=args.steps,
+        guidance_scale=args.guidance,
+        generator=torch.Generator().manual_seed(args.seed) if args.seed else None
+    )
+    
+    # Save result
     result.images[0].save(args.output)
     print(f"✅ Inpainted image saved as: {args.output}")
 
