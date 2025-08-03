@@ -34,8 +34,15 @@ class FluxBenchmark:
         # Setup models
         start_time = time.time()
         torch_dtype = torch.bfloat16
-        # Force CPU for compatibility since CUDA not available in this environment
-        device = "cpu"
+        # Smart device detection with fallbacks
+        if torch.cuda.is_available():
+            device = "cuda"
+        elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+            device = "mps"  # Apple Silicon GPU
+        else:
+            device = "cpu"
+        
+        print(f"Benchmarking on device: {device}")
         
         # Load models
         ae = load_ae("flux-krea-dev", device=device)

@@ -1,4 +1,4 @@
-#\!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 FLUX.1 Krea Inpainting with advanced mask handling
 Implements FluxInpaintPipeline with the documented optimizations
@@ -7,9 +7,22 @@ Implements FluxInpaintPipeline with the documented optimizations
 import argparse
 import torch
 from PIL import Image, ImageOps
-from diffusers import FluxInpaintPipeline
-from diffusers.utils import load_image
 import numpy as np
+from pathlib import Path
+
+# Use custom FLUX implementation for consistency
+from src.flux.util import load_ae, load_clip, load_t5, load_flow_model
+from src.flux.pipeline import Sampler
+from flux_exceptions import ModelNotFoundError, handle_common_errors
+
+# Fallback to diffusers if available
+try:
+    from diffusers import FluxInpaintPipeline
+    from diffusers.utils import load_image
+    DIFFUSERS_AVAILABLE = True
+except ImportError:
+    DIFFUSERS_AVAILABLE = False
+    print("⚠️  Diffusers not available, using custom implementation")
 
 def prepare_mask(mask_image):
     """Prepare mask image according to FLUX requirements"""

@@ -1,0 +1,154 @@
+{
+  "test_summary": {
+    "total_tests": 11,
+    "passed": 11,
+    "failed": 0,
+    "warnings": 0,
+    "duration_seconds": 8.428958,
+    "start_time": "2025-08-03T13:05:41.143096",
+    "end_time": "2025-08-03T13:05:49.572054"
+  },
+  "test_results": {
+    "Syntax Validation": {
+      "status": "PASS",
+      "message": "All 9 Python files compile successfully",
+      "details": {
+        "flux_advanced.py": "PASS",
+        "flux_benchmark.py": "PASS",
+        "flux_inpaint.py": "PASS",
+        "flux_web_ui.py": "PASS",
+        "flux_workflow.py": "PASS",
+        "flux_exceptions.py": "PASS",
+        "flux_model_validator.py": "PASS",
+        "flux_auth.py": "PASS",
+        "launch_web_ui.py": "PASS"
+      },
+      "timestamp": "2025-08-03T13:05:41.328154"
+    },
+    "Import System": {
+      "status": "PASS",
+      "message": "All custom modules import successfully",
+      "details": {
+        "flux_exceptions": "PASS",
+        "flux_auth": "PASS",
+        "flux_model_validator": "PASS"
+      },
+      "timestamp": "2025-08-03T13:05:41.406236"
+    },
+    "Dependencies": {
+      "status": "PASS",
+      "message": "All 6 required packages available",
+      "details": {
+        "torch": {
+          "status": "PASS",
+          "version": "2.7.1"
+        },
+        "PIL": {
+          "status": "PASS",
+          "version": "11.3.0"
+        },
+        "numpy": {
+          "status": "PASS",
+          "version": "2.2.6"
+        },
+        "gradio": {
+          "status": "PASS",
+          "version": "5.39.0"
+        },
+        "huggingface_hub": {
+          "status": "PASS",
+          "version": "0.34.3"
+        },
+        "psutil": {
+          "status": "PASS",
+          "version": "7.0.0"
+        }
+      },
+      "timestamp": "2025-08-03T13:05:42.414847"
+    },
+    "Device Detection": {
+      "status": "PASS",
+      "message": "Device detection working, primary device: mps",
+      "details": {
+        "cuda_available": false,
+        "mps_available": true,
+        "expected_device": "mps",
+        "torch_version": "2.7.1"
+      },
+      "timestamp": "2025-08-03T13:05:42.425385"
+    },
+    "Authentication System": {
+      "status": "PASS",
+      "message": "Authenticated as UsernameTron with model access",
+      "details": {
+        "authenticated": true,
+        "username": "UsernameTron",
+        "model_access": true,
+        "access_message": "Access confirmed to black-forest-labs/FLUX.1-Krea-dev"
+      },
+      "timestamp": "2025-08-03T13:05:42.594677"
+    },
+    "Model Validation": {
+      "status": "PASS",
+      "message": "Models available via HuggingFace",
+      "details": {
+        "local_models": {
+          "status": false,
+          "message": "Missing model files: ['flux1-krea-dev.safetensors', 'ae.safetensors']"
+        },
+        "hf_availability": {
+          "status": true,
+          "message": "HuggingFace repository accessible"
+        },
+        "hf_authentication": {
+          "status": true,
+          "message": "Access confirmed to black-forest-labs/FLUX.1-Krea-dev"
+        }
+      },
+      "timestamp": "2025-08-03T13:05:42.719862"
+    },
+    "Advanced Generation": {
+      "status": "PASS",
+      "message": "Script loads and shows proper help",
+      "details": {
+        "help_length": 715
+      },
+      "timestamp": "2025-08-03T13:05:44.450814"
+    },
+    "Web UI Startup": {
+      "status": "PASS",
+      "message": "Web UI imports successfully (Gradio 5.39.0)",
+      "details": {
+        "gradio_version": "5.39.0"
+      },
+      "timestamp": "2025-08-03T13:05:47.311174"
+    },
+    "Benchmark System": {
+      "status": "PASS",
+      "message": "Benchmark system imports successfully",
+      "details": null,
+      "timestamp": "2025-08-03T13:05:49.034257"
+    },
+    "Workflow System": {
+      "status": "PASS",
+      "message": "Workflow system help command works",
+      "details": null,
+      "timestamp": "2025-08-03T13:05:49.571869"
+    },
+    "Desktop Shortcut": {
+      "status": "PASS",
+      "message": "Desktop shortcut and launcher found",
+      "details": {
+        "shortcut_path": "/Users/cpconnor/Desktop/FLUX Krea Studio.app",
+        "shortcut_exists": true,
+        "launcher_exists": true
+      },
+      "timestamp": "2025-08-03T13:05:49.572048"
+    }
+  },
+  "system_info": {
+    "platform": "darwin",
+    "python_version": "3.13.3 (main, Apr  8 2025, 13:54:08) [Clang 17.0.0 (clang-1700.0.13.3)]",
+    "working_directory": "/Users/cpconnor/Krea AI/flux-krea"
+  }
+}

@@ -1,4 +1,4 @@
-#\!/usr/bin/env python3
+#!/usr/bin/env python3
 """
 FLUX.1 Krea Advanced Generation System
 Comprehensive text-to-image generation with optimization profiles
@@ -10,49 +10,91 @@ import time
 from pathlib import Path
 from src.flux.util import load_ae, load_clip, load_t5, load_flow_model
 from src.flux.pipeline import Sampler
+from flux_exceptions import (
+    ModelNotFoundError, DeviceError, InsufficientMemoryError, 
+    GenerationError, handle_common_errors
+)
+from flux_model_validator import ModelValidator, validate_before_loading
 
 class FluxAdvancedGenerator:
     def __init__(self, optimization_level="balanced"):
         self.optimization_level = optimization_level
         self.pipeline = None
         
+    @handle_common_errors
+    @validate_before_loading("flux-krea-dev")
     def load_pipeline(self):
         """Load FLUX pipeline with specified optimizations"""
         print(f"🚀 Loading FLUX.1 Krea with '{self.optimization_level}' optimization...")
         
         torch_dtype = torch.bfloat16
-        # Force CPU for compatibility since CUDA not available in this environment
-        device = "cpu"
         
-        # Load models
-        print("Loading autoencoder...")
-        ae = load_ae("flux-krea-dev", device=device)
-        print("Loading CLIP...")
-        clip = load_clip(device=device)
-        print("Loading T5...")
-        t5 = load_t5(device=device)  
-        print("Loading FLUX model...")
-        model = load_flow_model("flux-krea-dev", device=device)
+        # Smart device detection with validation
+        try:
+            if torch.cuda.is_available():
+                device = "cuda"
+                # Test CUDA device
+                torch.cuda.empty_cache()
+            elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+                device = "mps"  # Apple Silicon GPU
+            else:
+                device = "cpu"
+                print("⚠️  Using CPU - generation will be slower")
+        except Exception as e:
+            raise DeviceError("auto", f"Device detection failed: {e}")
         
-        # Move models to device with optimization-specific settings
+        print(f"Using device: {device}")
+        
+        # Load models with proper error handling
+        try:
+            print("Loading autoencoder...")
+            ae = load_ae("flux-krea-dev", device=device)
+            print("Loading CLIP...")
+            clip = load_clip(device=device)
+            print("Loading T5...")
+            t5 = load_t5(device=device)  
+            print("Loading FLUX model...")
+            model = load_flow_model("flux-krea-dev", device=device)
+        except FileNotFoundError:
+            raise ModelNotFoundError("flux-krea-dev", "./models/FLUX.1-Krea-dev")
+        except torch.cuda.OutOfMemoryError:
+            raise InsufficientMemoryError("GPU memory insufficient for model loading")
+        
+        # Apply optimization-specific model placement
         if self.optimization_level == "speed":
-            # Prioritize speed - keep everything on GPU if available
-            model = model.to(device=device, dtype=torch_dtype)
-            ae = ae.to(device=device, dtype=torch_dtype)
-            clip = clip.to(device=device, dtype=torch_dtype)
-            t5 = t5.to(device=device, dtype=torch_dtype)
+            # Prioritize speed - keep everything on primary device
+            print("⚡ Speed optimization: All models on primary device")
+            target_device = device
+            model = model.to(device=target_device, dtype=torch_dtype)
+            ae = ae.to(device=target_device, dtype=torch_dtype)
+            clip = clip.to(device=target_device, dtype=torch_dtype)
+            t5 = t5.to(device=target_device, dtype=torch_dtype)
+            
         elif self.optimization_level == "memory":
-            # Prioritize memory - use CPU offloading
-            model = model.to(device="cpu", dtype=torch_dtype)
-            ae = ae.to(device=device, dtype=torch_dtype)
-            clip = clip.to(device="cpu", dtype=torch_dtype)
-            t5 = t5.to(device="cpu", dtype=torch_dtype)
+            # Memory-efficient: Strategic offloading
+            print("🧠 Memory optimization: Strategic model offloading")
+            # Keep smaller, frequently used models on device
+            ae = ae.to(device=device, dtype=torch_dtype)  # Small, used for encoding/decoding
+            # Offload large models that can be moved as needed
+            model = model.to(device="cpu", dtype=torch_dtype)  # Large model
+            clip = clip.to(device="cpu", dtype=torch_dtype)   # Can be offloaded
+            t5 = t5.to(device="cpu", dtype=torch_dtype)       # Large text encoder
+            
         else:  # balanced
-            # Balanced approach
-            model = model.to(device=device, dtype=torch_dtype)
-            ae = ae.to(device=device, dtype=torch_dtype)
-            clip = clip.to(device=device, dtype=torch_dtype)
-            t5 = t5.to(device=device, dtype=torch_dtype)
+            # Balanced: Smart placement based on device capabilities
+            print("⚖️  Balanced optimization: Smart model placement")
+            if device == "cuda":
+                # GPU available - keep most on GPU, offload T5 (largest)
+                model = model.to(device=device, dtype=torch_dtype)
+                ae = ae.to(device=device, dtype=torch_dtype)
+                clip = clip.to(device=device, dtype=torch_dtype)
+                t5 = t5.to(device="cpu", dtype=torch_dtype)  # Offload largest
+            else:
+                # CPU or MPS - keep all on same device for consistency
+                model = model.to(device=device, dtype=torch_dtype)
+                ae = ae.to(device=device, dtype=torch_dtype)
+                clip = clip.to(device=device, dtype=torch_dtype)
+                t5 = t5.to(device=device, dtype=torch_dtype)
         
         # Create sampler
         self.pipeline = Sampler(
