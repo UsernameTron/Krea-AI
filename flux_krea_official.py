@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-FLUX.1 Krea generation using the official method from the documentation
-Based on: https://huggingface.co/black-forest-labs/FLUX.1-Krea-dev
+FLUX.1 Krea [dev] - Official Diffusers Implementation
+Based on the official HuggingFace documentation
 """
 
 import torch
@@ -11,14 +11,14 @@ from pathlib import Path
 from diffusers import FluxPipeline
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate images with FLUX.1 Krea using official method')
+    parser = argparse.ArgumentParser(description='FLUX.1 Krea [dev] Official Generation')
     parser.add_argument('--prompt', required=True, help='Text prompt for image generation')
     parser.add_argument('--output', default='flux-krea-official.png', help='Output filename')
     parser.add_argument('--width', type=int, default=1024, help='Image width')
     parser.add_argument('--height', type=int, default=1024, help='Image height')
-    parser.add_argument('--guidance', type=float, default=4.5, help='Guidance scale')
-    parser.add_argument('--steps', type=int, default=28, help='Number of inference steps')
-    parser.add_argument('--seed', type=int, help='Random seed')
+    parser.add_argument('--guidance', type=float, default=4.5, help='Guidance scale (3.5-5.0 recommended)')
+    parser.add_argument('--steps', type=int, default=28, help='Number of inference steps (28-32 recommended)')
+    parser.add_argument('--seed', type=int, help='Random seed for reproducible results')
     
     args = parser.parse_args()
     
@@ -31,7 +31,7 @@ def main():
     start_time = time.time()
     
     try:
-        print("\n📥 Loading FLUX.1 Krea [dev] model...")
+        print("\n📥 Loading FLUX.1 Krea [dev] from HuggingFace...")
         
         # Official implementation from HuggingFace docs
         pipe = FluxPipeline.from_pretrained(
@@ -39,8 +39,16 @@ def main():
             torch_dtype=torch.bfloat16
         )
         
-        # Enable CPU offloading to save VRAM/RAM
-        pipe.enable_model_cpu_offload()
+        # Enable memory optimizations for Apple Silicon
+        try:
+            pipe.enable_model_cpu_offload()
+        except Exception as e:
+            print(f"Note: CPU offload not available: {e}")
+            # Alternative: use sequential CPU offload
+            try:
+                pipe.enable_sequential_cpu_offload()
+            except:
+                print("Using default memory management")
         
         load_time = time.time() - start_time
         print(f"✅ Model loaded in {load_time:.1f} seconds")
@@ -81,7 +89,7 @@ def main():
         error_str = str(e)
         print(f"\n❌ Error: {e}")
         
-        if "gated" in error_str.lower():
+        if "gated" in error_str.lower() or "access" in error_str.lower():
             print("\n🔒 REPOSITORY ACCESS REQUIRED")
             print("1. Visit: https://huggingface.co/black-forest-labs/FLUX.1-Krea-dev")
             print("2. Click 'Request access to this repository'")
@@ -90,22 +98,16 @@ def main():
             
         elif "401" in error_str or "403" in error_str:
             print("\n🔑 AUTHENTICATION ISSUE")
-            print("1. Check your HuggingFace token is valid")
-            print("2. Run: huggingface-cli login")
+            print("1. Run: huggingface-cli login")
+            print("2. Enter your HuggingFace token")
             print("3. Make sure you've requested access to the model")
-            
-        elif "connection" in error_str.lower() or "network" in error_str.lower():
-            print("\n🌐 NETWORK ISSUE")
-            print("1. Check your internet connection")
-            print("2. Try again in a few minutes")
-            print("3. Consider using a VPN if in a restricted region")
             
         else:
             print("\n🔧 TROUBLESHOOTING STEPS")
-            print("1. Clear cache: rm -rf ~/.cache/huggingface")
-            print("2. Update diffusers: pip install -U diffusers")
-            print("3. Check available disk space")
-            print("4. Restart Python and try again")
+            print("1. Update diffusers: pip install -U diffusers")
+            print("2. Check internet connection")
+            print("3. Clear cache: rm -rf ~/.cache/huggingface")
+            print("4. Restart and try again")
 
 if __name__ == "__main__":
     main()

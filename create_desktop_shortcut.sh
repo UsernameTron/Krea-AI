@@ -10,8 +10,8 @@ DESKTOP_DIR="$HOME/Desktop"
 APP_NAME="FLUX Krea Studio"
 APP_PATH="$DESKTOP_DIR/$APP_NAME.app"
 
-echo "🎨 Creating Desktop Shortcut for FLUX.1 Krea Web GUI"
-echo "=================================================="
+echo "🎨 Creating Desktop Shortcut for FLUX.1 Krea [dev] Official Web UI"
+echo "=============================================================="
 
 # Create the .app bundle structure
 mkdir -p "$APP_PATH/Contents/MacOS"
@@ -73,21 +73,21 @@ fi
 # Change to project directory
 cd "$PROJECT_DIR"
 
-# Check if virtual environment exists
-if [ ! -d "flux_env" ]; then
-    show_dialog "Error: Virtual environment 'flux_env' not found. Please run the setup first."
+# Check if official FLUX script exists
+if [ ! -f "flux_web_ui_official.py" ]; then
+    show_dialog "Error: FLUX.1 Krea official script not found. Please make sure flux_web_ui_official.py exists."
     exit 1
 fi
 
 # Show starting notification
 show_notification "Starting FLUX Krea Studio..."
 
-# Open Terminal and run the launcher
+# Open Terminal and run the official FLUX Krea launcher
 osascript << 'APPLESCRIPT'
 tell application "Terminal"
     activate
-    set currentTab to do script "cd '/Users/cpconnor/Krea AI/flux-krea' && source flux_env/bin/activate && echo '🎨 FLUX.1 Krea Studio Starting...' && echo '🌐 Web interface will open at: http://localhost:7860' && echo '⚠️  First generation may take time to load models' && echo '🛑 Press Ctrl+C to stop the server' && echo '' && sleep 3 && open 'http://localhost:7860' && python launch_web_ui.py"
-    set custom title of currentTab to "FLUX Krea Studio"
+    set currentTab to do script "cd '/Users/cpconnor/Krea AI/flux-krea' && export HF_TOKEN='YOUR_HF_TOKEN_HERE' && echo '🎨 FLUX.1 Krea [dev] - Official Studio' && echo '🌐 Web interface will open at: http://localhost:7860' && echo '⚠️  First generation may take 2-5 minutes (24GB model)' && echo '⚠️  Make sure HF_TOKEN is set with your token' && echo '🛑 Press Ctrl+C to stop the server' && echo '' && sleep 3 && open 'http://localhost:7860' && python flux_web_ui_official.py"
+    set custom title of currentTab to "FLUX.1 Krea Studio"
 end tell
 APPLESCRIPT
 
