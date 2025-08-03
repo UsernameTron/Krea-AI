@@ -48,8 +48,8 @@ configs = {
             scale_factor=0.3611,
             shift_factor=0.1159,
         ),
-        ckpt_path=os.getenv("FLUX"),
-        ae_path=os.getenv("AE"),
+        ckpt_path=os.getenv("FLUX", "./models/FLUX.1-Krea-dev/flux1-krea-dev.safetensors"),
+        ae_path=os.getenv("AE", "./models/FLUX.1-Krea-dev/ae.safetensors"),
         repo_id="black-forest-labs/FLUX.1-Krea-dev",
         repo_id_ae="black-forest-labs/FLUX.1-Krea-dev",
         repo_ae="ae.safetensors",
@@ -64,13 +64,19 @@ def load_from_repo_id(repo_id, checkpoint_name):
 
 def load_flow_model(name: str, device: str | torch.device = "cuda", hf_download: bool = True):
     ckpt_path = configs[name].ckpt_path
-    if (
-        ckpt_path is None
-        and configs[name].repo_id is not None
+    
+    # Check if local file exists first
+    if ckpt_path and os.path.exists(ckpt_path):
+        print(f"Using local model file: {ckpt_path}")
+    elif (
+        configs[name].repo_id is not None
         and configs[name].repo_flow is not None
         and hf_download
     ):
+        print(f"Downloading model from HuggingFace: {configs[name].repo_id}")
         ckpt_path = hf_hub_download(configs[name].repo_id, configs[name].repo_flow)
+    else:
+        raise FileNotFoundError(f"Model file not found at {ckpt_path} and HuggingFace download disabled")
 
     if ckpt_path is not None:
         sd = load_file(ckpt_path, device=str(device))
@@ -98,13 +104,19 @@ def load_clip(device: str | torch.device = "cuda") -> HFEmbedder:
 
 def load_ae(name: str, device: str | torch.device = "cuda", hf_download: bool = True) -> AutoEncoder:
     ckpt_path = configs[name].ae_path
-    if (
-        ckpt_path is None
-        and configs[name].repo_id is not None
+    
+    # Check if local file exists first
+    if ckpt_path and os.path.exists(ckpt_path):
+        print(f"Using local autoencoder file: {ckpt_path}")
+    elif (
+        configs[name].repo_id is not None
         and configs[name].repo_ae is not None
         and hf_download
     ):
+        print(f"Downloading autoencoder from HuggingFace: {configs[name].repo_id_ae}")
         ckpt_path = hf_hub_download(configs[name].repo_id_ae, configs[name].repo_ae)
+    else:
+        raise FileNotFoundError(f"Autoencoder file not found at {ckpt_path} and HuggingFace download disabled")
 
     with torch.device("meta"):
         ae = AutoEncoder(configs[name].ae_params)

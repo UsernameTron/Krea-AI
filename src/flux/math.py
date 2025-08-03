@@ -13,7 +13,7 @@ def rope(pos: Tensor, dim: int, theta: int) -> Tensor:
     assert dim % 2 == 0
 
     b, l = pos.shape
-    scale = torch.arange(0, dim, 2, dtype=torch.float64, device=pos.device) / dim
+    scale = torch.arange(0, dim, 2, dtype=torch.float32, device=pos.device) / dim
     omega = 1.0 / ((theta) ** scale)
     
     out = torch.einsum("...n,d->...nd", pos, omega)

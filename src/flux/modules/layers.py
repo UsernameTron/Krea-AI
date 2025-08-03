@@ -28,10 +28,12 @@ class EmbedND(nn.Module):
 
 class TimestepEmbedding(nn.Module):
     def __init__(self, dim, max_period: int = 10_000,
-                 time_factor: float = 1_000.0, device: str | torch.device = "cuda"):
+                 time_factor: float = 1_000.0, device: str | torch.device = "cpu"):
         super().__init__()
         half = dim // 2
-        freqs = torch.exp(-math.log(max_period) * torch.arange(half, dtype=torch.float32, device=device) / half)
+        # Handle meta device case by using cpu temporarily
+        actual_device = "cpu" if str(device) == "meta" else device
+        freqs = torch.exp(-math.log(max_period) * torch.arange(half, dtype=torch.float32, device=actual_device) / half)
         self.register_buffer("freqs", freqs, persistent=False)
         self.time_factor = time_factor
         self.dim = dim

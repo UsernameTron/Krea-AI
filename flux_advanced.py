@@ -55,8 +55,8 @@ class FluxAdvancedGenerator:
             t5 = load_t5(device=device)  
             print("Loading FLUX model...")
             model = load_flow_model("flux-krea-dev", device=device)
-        except FileNotFoundError:
-            raise ModelNotFoundError("flux-krea-dev", "./models/FLUX.1-Krea-dev")
+        except FileNotFoundError as e:
+            raise ModelNotFoundError("flux-krea-dev", str(e))
         except torch.cuda.OutOfMemoryError:
             raise InsufficientMemoryError("GPU memory insufficient for model loading")
         

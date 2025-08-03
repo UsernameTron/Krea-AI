@@ -21,16 +21,16 @@ def generate(prompt, width, height, guidance, num_steps, seed, output, device):
     
     # Load models
     click.echo("Loading AE...")
-    ae = load_ae("flux-krea-dev")
+    ae = load_ae("flux-krea-dev", device=device)
 
     click.echo("Loading CLIP...")
-    clip = load_clip()
+    clip = load_clip(device=device)
     
     click.echo("Loading T5...")
-    t5 = load_t5()
+    t5 = load_t5(device=device)
     
     click.echo("Loading MMDiT...")
-    model = load_flow_model("flux-krea-dev", device="cpu")
+    model = load_flow_model("flux-krea-dev", device=device)
     model = model.to(device=device, dtype=torch_dtype)
     
     # Move models to device with specified dtype
