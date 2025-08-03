@@ -22,20 +22,43 @@ class ModelValidator:
         ]
     
     def check_local_models(self):
-        """Check if models exist locally"""
-        if not self.local_model_dir.exists():
-            return False, f"Local model directory not found: {self.local_model_dir}"
+        """Check if models exist locally or in HF cache"""
         
-        missing_files = []
-        for file in self.required_files:
-            file_path = self.local_model_dir / file
-            if not file_path.exists():
-                missing_files.append(file)
+        # Check local directory first
+        if self.local_model_dir.exists():
+            missing_files = []
+            for file in self.required_files:
+                if not (self.local_model_dir / file).exists():
+                    missing_files.append(file)
+            
+            if not missing_files:
+                return True, "Local models found"
         
-        if missing_files:
-            return False, f"Missing model files: {missing_files}"
+        # Check HuggingFace cache
+        hf_cache = Path.home() / ".cache" / "huggingface" / "hub"
+        cache_patterns = [
+            "models--black-forest-labs--FLUX.1-Krea-dev",
+            "*FLUX.1-Krea-dev*"
+        ]
         
-        return True, "Local models found"
+        for pattern in cache_patterns:
+            cache_dirs = list(hf_cache.glob(pattern))
+            for cache_dir in cache_dirs:
+                snapshots_dir = cache_dir / "snapshots"
+                if snapshots_dir.exists():
+                    for snapshot in snapshots_dir.iterdir():
+                        if snapshot.is_dir():
+                            # Check if required files exist in this snapshot
+                            has_all_files = True
+                            for file in self.required_files:
+                                if not (snapshot / file).exists():
+                                    has_all_files = False
+                                    break
+                            
+                            if has_all_files:
+                                return True, f"Models found in HuggingFace cache: {snapshot}"
+        
+        return False, f"Missing model files: {self.required_files}"
     
     def check_hf_availability(self):
         """Check if models are available on HuggingFace"""

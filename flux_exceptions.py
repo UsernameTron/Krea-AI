@@ -4,6 +4,8 @@ FLUX.1 Krea Custom Exception Classes
 Specific error types for better error handling and user feedback
 """
 
+import torch
+
 class FluxBaseException(Exception):
     """Base exception for all FLUX-related errors"""
     pass

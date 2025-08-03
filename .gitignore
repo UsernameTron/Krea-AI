@@ -169,3 +169,9 @@ wandb
 trace
 tmp*
 logs
+
+# Large model files - download manually
+models/*.safetensors
+models/**/*.safetensors
+models/FLUX.1-Krea-dev/
+web_outputs/

@@ -22,7 +22,7 @@ class FluxAdvancedGenerator:
         self.pipeline = None
         
     @handle_common_errors
-    @validate_before_loading("flux-krea-dev")
+    # @validate_before_loading("flux-krea-dev")  # Disabled - models are in HF cache
     def load_pipeline(self):
         """Load FLUX pipeline with specified optimizations"""
         print(f"🚀 Loading FLUX.1 Krea with '{self.optimization_level}' optimization...")
