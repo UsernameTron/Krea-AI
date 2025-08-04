@@ -66,7 +66,7 @@ show_notification() {
 
 # Function to show choice dialog
 show_choice_dialog() {
-    choice=$(osascript -e "display dialog \"Choose FLUX.1 Krea mode:\" with title \"FLUX Krea Studio\" buttons {\"Cancel\", \"Web UI (Protected)\", \"Command Line (Protected)\", \"Maximum Performance\"} default button \"Web UI (Protected)\"" 2>/dev/null)
+    choice=$(osascript -e "display dialog \"Choose FLUX.1 Krea mode:\" with title \"FLUX Krea Studio\" buttons {\"Cancel\", \"Command Line (Recommended)\", \"Maximum Performance\", \"Simple Web UI\"} default button \"Command Line (Recommended)\"" 2>/dev/null)
     echo "$choice"
 }
 
@@ -91,34 +91,34 @@ choice_result=$(show_choice_dialog)
 # Determine which version to run based on user choice
 if [[ "$choice_result" == *"Maximum Performance"* ]]; then
     if [ ! -f "maximum_performance_pipeline.py" ]; then
-        show_dialog "Maximum Performance version not found. Using Web UI Protected instead."
-        script_choice="web"
+        show_dialog "Maximum Performance version not found. Using Command Line instead."
+        script_choice="command"
     else
         script_choice="maximum"
     fi
-elif [[ "$choice_result" == *"Command Line (Protected)"* ]]; then
-    script_choice="timeout"
+elif [[ "$choice_result" == *"Simple Web UI"* ]]; then
+    script_choice="web"
 elif [[ "$choice_result" == *"Cancel"* ]]; then
     exit 0
 else
-    script_choice="web"
+    script_choice="command"
 fi
 
 # Show starting notification and set launch parameters
 if [ "$script_choice" = "maximum" ]; then
-    show_notification "Starting FLUX Krea Studio - Maximum Performance Mode..."
+    show_notification "Starting FLUX Krea Studio - Maximum Performance..."
     launch_script="maximum_performance_pipeline.py"
     mode_description="Maximum Performance (M4 Pro Optimized)"
-    launch_command="echo 'python $launch_script --prompt \"a cute cat\" --steps 20' && exec bash"
-elif [ "$script_choice" = "timeout" ]; then
-    show_notification "Starting FLUX Krea Studio - Command Line Protected..."
-    launch_script="flux_krea_timeout_fix.py"
-    mode_description="Command Line Protected (Anti-Infinite Loop)"
-    launch_command="echo 'python $launch_script --prompt \"a cute cat\" --steps 20 --timeout 300' && exec bash"
+    launch_command="echo '🚀 Ready for Maximum Performance generation!' && echo 'Example: python $launch_script --prompt \"a cute cat\" --steps 20' && echo '' && exec bash"
+elif [ "$script_choice" = "web" ]; then
+    show_notification "Starting FLUX Krea Studio - Simple Web UI..."
+    launch_script="flux_web_simple.py"
+    mode_description="Simple Web UI (Auto-Loading)"
+    launch_command="echo '🌐 Starting web interface...' && echo 'Will open at: http://localhost:7860' && echo 'Pipeline loads automatically in background' && sleep 3 && open 'http://localhost:7860' && python $launch_script"
 else
-    show_notification "Starting FLUX Krea Studio - Web UI Protected..."
-    launch_script="flux_web_timeout_protected.py"
-    mode_description="Web UI Protected (Anti-Infinite Loop)"
+    show_notification "Starting FLUX Krea Studio - Interactive Mode..."
+    launch_script="flux_interactive.py"
+    mode_description="Interactive Command Line (Recommended - Most User-Friendly)"
     launch_command="python $launch_script"
 fi
 
@@ -154,15 +154,23 @@ echo "   ✅ Better error handling and memory management"
 echo ""
 echo "🎯 To use the shortcut:"
 echo "   1. Double-click 'FLUX Krea Studio' on your desktop"
-echo "   2. Choose version: 'Timeout Protected' (recommended) or 'Maximum Performance'"
-echo "   3. Terminal opens with the selected mode ready"
-echo "   4. Run: python [script] --prompt 'your prompt' --steps 20"
-echo "   5. Generation will timeout after 5 minutes if stuck"
+echo "   2. Choose mode: 'Command Line (Recommended)', 'Maximum Performance', or 'Simple Web UI'"
+echo "   3. Terminal opens with the selected mode"
+echo "   4. Command Line: Enter your prompt when asked"
+echo "   5. Web UI: Browser opens automatically"
+echo "   6. Generation has 5-minute timeout protection"
 echo ""
 echo "🚨 INFINITE LOOP PREVENTION:"
-echo "   • Timeout Protected mode prevents 900%+ CPU usage"
+echo "   • Command Line mode (RECOMMENDED): Most reliable, interactive prompts"
+echo "   • 5-minute timeout prevents 900%+ CPU usage"
 echo "   • Automatic memory cleanup after generation"
 echo "   • Press Ctrl+C to cancel stuck generations"
+echo ""
+echo "✅ RECOMMENDED WORKFLOW:"
+echo "   1. Choose 'Command Line (Recommended)'"
+echo "   2. Enter your prompt when asked"
+echo "   3. Wait 2-5 minutes for generation"
+echo "   4. Image saved automatically with descriptive filename"
 echo ""
 echo "💡 If you need to update the project path:"
 echo "   Right-click the app → Show Package Contents → Contents/MacOS/FLUX Krea Studio"
