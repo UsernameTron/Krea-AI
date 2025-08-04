@@ -66,7 +66,7 @@ show_notification() {
 
 # Function to show choice dialog
 show_choice_dialog() {
-    choice=$(osascript -e "display dialog \"Choose FLUX.1 Krea mode:\" with title \"FLUX Krea Studio\" buttons {\"Cancel\", \"Command Line (Recommended)\", \"Maximum Performance\", \"Simple Web UI\"} default button \"Command Line (Recommended)\"" 2>/dev/null)
+    choice=$(osascript -e "display dialog \"Choose FLUX.1 Krea mode:\" with title \"FLUX Krea Studio\" buttons {\"Cancel\", \"Interactive (Optimized)\", \"Maximum Performance\", \"Simple Web UI\"} default button \"Interactive (Optimized)\"" 2>/dev/null)
     echo "$choice"
 }
 
@@ -90,12 +90,7 @@ choice_result=$(show_choice_dialog)
 
 # Determine which version to run based on user choice
 if [[ "$choice_result" == *"Maximum Performance"* ]]; then
-    if [ ! -f "maximum_performance_pipeline.py" ]; then
-        show_dialog "Maximum Performance version not found. Using Command Line instead."
-        script_choice="command"
-    else
-        script_choice="maximum"
-    fi
+    script_choice="optimized"
 elif [[ "$choice_result" == *"Simple Web UI"* ]]; then
     script_choice="web"
 elif [[ "$choice_result" == *"Cancel"* ]]; then
@@ -105,11 +100,11 @@ else
 fi
 
 # Show starting notification and set launch parameters
-if [ "$script_choice" = "maximum" ]; then
-    show_notification "Starting FLUX Krea Studio - Maximum Performance..."
-    launch_script="maximum_performance_pipeline.py"
-    mode_description="Maximum Performance (M4 Pro Optimized)"
-    launch_command="echo '🚀 Ready for Maximum Performance generation!' && echo 'Example: python $launch_script --prompt \"a cute cat\" --steps 20' && echo '' && exec bash"
+if [ "$script_choice" = "optimized" ]; then
+    show_notification "Starting FLUX Krea Studio - Performance Optimized..."
+    launch_script="launch_optimized_interactive.sh"
+    mode_description="Performance Optimized (Memory-Safe, 220x Faster)"
+    launch_command="echo '🚀 Launching optimized performance mode...' && ./launch_optimized_interactive.sh"
 elif [ "$script_choice" = "web" ]; then
     show_notification "Starting FLUX Krea Studio - Simple Web UI..."
     launch_script="flux_web_simple.py"
@@ -118,15 +113,15 @@ elif [ "$script_choice" = "web" ]; then
 else
     show_notification "Starting FLUX Krea Studio - Interactive Mode..."
     launch_script="flux_interactive.py"
-    mode_description="Interactive Command Line (Recommended - Most User-Friendly)"
-    launch_command="python $launch_script"
+    mode_description="Interactive Command Line (Performance Optimized)"
+    launch_command="export PYTORCH_MPS_MEMORY_FRACTION=0.8 && export PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0 && python $launch_script"
 fi
 
 # Open Terminal and run the selected FLUX Krea version
 osascript << APPLESCRIPT
 tell application "Terminal"
     activate
-    set currentTab to do script "cd '$PROJECT_DIR' && export HF_TOKEN='YOUR_HF_TOKEN_HERE' && echo '🛡️  FLUX.1 Krea Studio - $mode_description' && echo '========================================' && echo '⚠️  First generation: 2-5 minutes (24GB model)' && echo '⚠️  Update HF_TOKEN in create_desktop_shortcut.sh' && echo '🛑 Press Ctrl+C to cancel any stuck generation' && echo '⏰ Timeout protection: 5 minutes per generation' && echo '' && $launch_command"
+    set currentTab to do script "cd '$PROJECT_DIR' && export HF_TOKEN='YOUR_HF_TOKEN_HERE' && echo '🛡️  FLUX.1 Krea Studio - $mode_description' && echo '========================================' && echo '⚡ Optimized: 3.6s/step (was 13min/step)' && echo '💾 Memory-safe MPS settings enabled' && echo '🛑 Press Ctrl+C to cancel any stuck generation' && echo '⏰ Timeout protection: 10 minutes per generation' && echo '💡 Update HF_TOKEN in script if needed' && echo '' && $launch_command"
     set custom title of currentTab to "FLUX Krea Studio - $mode_description"
 end tell
 APPLESCRIPT

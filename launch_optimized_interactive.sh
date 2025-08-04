@@ -7,9 +7,9 @@ Enables Metal VAE, optimal MPS settings, and comprehensive optimizations
 echo "🚀 FLUX.1 Krea [dev] - Interactive Studio (Performance Optimized)"
 echo "================================================================="
 
-# Set optimal MPS environment variables
-export PYTORCH_MPS_MEMORY_FRACTION=0.95
-export PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.7
+# Set conservative MPS environment variables for 25GB limit
+export PYTORCH_MPS_MEMORY_FRACTION=0.8
+export PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0  # Disable watermark limit
 export PYTORCH_MPS_LOW_WATERMARK_RATIO=0.6
 export PYTORCH_MPS_ALLOCATOR_POLICY=expandable_segments
 export PYTORCH_ENABLE_MPS_FALLBACK=1

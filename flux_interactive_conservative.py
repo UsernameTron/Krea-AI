@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-FLUX.1 Krea [dev] - Interactive Command Line Interface
-User-friendly interactive version for desktop launcher
+FLUX.1 Krea [dev] - Memory-Conservative Interactive Version
+Optimized for systems with tight MPS memory limits (25GB)
 """
 
 import torch
@@ -13,10 +13,10 @@ import os
 from pathlib import Path
 from diffusers import FluxPipeline
 
-# Set conservative MPS environment variables for stability
-os.environ.setdefault('PYTORCH_MPS_MEMORY_FRACTION', '0.8')
+# Set very conservative MPS environment variables
+os.environ.setdefault('PYTORCH_MPS_MEMORY_FRACTION', '0.75')  # Conservative 75%
 os.environ.setdefault('PYTORCH_MPS_HIGH_WATERMARK_RATIO', '0.0')  # Disable limit
-os.environ.setdefault('PYTORCH_MPS_LOW_WATERMARK_RATIO', '0.6')
+os.environ.setdefault('PYTORCH_MPS_LOW_WATERMARK_RATIO', '0.5')
 os.environ.setdefault('PYTORCH_MPS_ALLOCATOR_POLICY', 'expandable_segments')
 os.environ.setdefault('PYTORCH_ENABLE_MPS_FALLBACK', '1')
 
@@ -33,8 +33,8 @@ def clear_screen():
 def print_banner():
     """Print FLUX banner"""
     print("🎨" + "=" * 60 + "🎨")
-    print("       FLUX.1 Krea [dev] - Interactive Studio")
-    print("     🛡️  Timeout Protected  •  🚀 Ready to Generate")
+    print("   FLUX.1 Krea [dev] - Memory-Conservative Studio")
+    print("     🛡️  Timeout Protected  •  💾 Memory Optimized")
     print("🎨" + "=" * 60 + "🎨")
     print()
 
@@ -50,11 +50,11 @@ def get_user_input():
             break
         print("❌ Please enter a prompt!")
     
-    # Quick settings or custom
-    print("\n⚙️  Choose settings:")
-    print("1. 🚀 Quick (768x768, 20 steps) - ~2 minutes")
-    print("2. 🎯 Standard (1024x1024, 28 steps) - ~4 minutes") 
-    print("3. 🎨 High Quality (1280x1024, 32 steps) - ~6 minutes")
+    # Memory-conservative settings only
+    print("\n⚙️  Choose settings (Memory-Conservative):")
+    print("1. 🚀 Quick (512x512, 20 steps) - ~1.5 minutes, ~8GB")
+    print("2. 🎯 Standard (768x768, 25 steps) - ~3 minutes, ~15GB") 
+    print("3. 🎨 Large (1024x1024, 28 steps) - ~5 minutes, ~20GB")
     print("4. ⚙️  Custom settings")
     
     while True:
@@ -64,25 +64,29 @@ def get_user_input():
         print("❌ Please enter 1, 2, 3, or 4!")
     
     if choice == '1':
-        width, height, steps = 768, 768, 20
+        width, height, steps = 512, 512, 20
     elif choice == '2':
-        width, height, steps = 1024, 1024, 28
+        width, height, steps = 768, 768, 25
     elif choice == '3':
-        width, height, steps = 1280, 1024, 32
+        width, height, steps = 1024, 1024, 28
     else:
-        # Custom settings
-        print("\n⚙️  Custom Settings:")
-        width = int(input("   Width (512-1280): ") or "1024")
-        height = int(input("   Height (512-1280): ") or "1024")
-        steps = int(input("   Steps (10-50): ") or "28")
+        # Custom settings with memory warnings
+        print("\n⚙️  Custom Settings (Memory Limited):")
+        width = int(input("   Width (512-1024 recommended): ") or "768")
+        height = int(input("   Height (512-1024 recommended): ") or "768")
+        steps = int(input("   Steps (15-30 recommended): ") or "25")
+        
+        # Memory warning for large sizes
+        if width * height > 1024 * 1024:
+            print("⚠️  Large size may cause memory issues!")
     
     # Seed
     seed_input = input(f"\n🎲 Seed (press Enter for random): ").strip()
     seed = int(seed_input) if seed_input else None
     
     # Timeout
-    timeout_input = input("⏰ Timeout minutes (default 5): ").strip()
-    timeout = int(timeout_input) if timeout_input else 5
+    timeout_input = input("⏰ Timeout minutes (default 10): ").strip()
+    timeout = int(timeout_input) if timeout_input else 10
     
     return {
         'prompt': prompt,
@@ -93,15 +97,15 @@ def get_user_input():
         'timeout': timeout
     }
 
-def _apply_pipeline_optimizations(pipeline):
-    """Apply comprehensive pipeline optimizations"""
+def _apply_conservative_optimizations(pipeline):
+    """Apply memory-conservative optimizations"""
     optimizations_applied = []
     
-    # Clear cache before optimizations
+    # Aggressive memory management
     if torch.backends.mps.is_available():
         torch.mps.empty_cache()
     
-    # Apply memory optimizations
+    # Enable CPU offloading (essential for memory conservation)
     try:
         pipeline.enable_model_cpu_offload()
         optimizations_applied.append("CPU offload")
@@ -109,27 +113,17 @@ def _apply_pipeline_optimizations(pipeline):
         try:
             pipeline.enable_sequential_cpu_offload()
             optimizations_applied.append("Sequential CPU offload")
-        except:
-            optimizations_applied.append("Default memory management")
+        except Exception as e:
+            print(f"⚠️  Warning: Could not enable CPU offload: {e}")
+            optimizations_applied.append("No CPU offload")
     
-    # Enable attention optimizations
+    # Enable all memory-saving features
     try:
-        pipeline.enable_attention_slicing("auto")
-        optimizations_applied.append("Attention slicing")
+        pipeline.enable_attention_slicing("max")  # Maximum slicing
+        optimizations_applied.append("Max attention slicing")
     except:
-        pass
+        optimizations_applied.append("No attention slicing")
     
-    # Enable memory-efficient attention if xformers not available
-    try:
-        # Try PyTorch native memory efficient attention
-        if hasattr(pipeline, 'unet') and hasattr(pipeline.unet, 'set_attn_processor'):
-            from diffusers.models.attention_processor import AttnProcessor2_0
-            pipeline.unet.set_attn_processor(AttnProcessor2_0())
-            optimizations_applied.append("Memory-efficient attention")
-    except Exception as e:
-        pass
-    
-    # Enable VAE optimizations
     try:
         pipeline.enable_vae_slicing()
         optimizations_applied.append("VAE slicing")
@@ -145,6 +139,10 @@ def _apply_pipeline_optimizations(pipeline):
     # Print applied optimizations
     for opt in optimizations_applied:
         print(f"✅ {opt} enabled")
+    
+    # Final cache clear
+    if torch.backends.mps.is_available():
+        torch.mps.empty_cache()
 
 def generate_filename(prompt):
     """Generate descriptive filename from prompt"""
@@ -152,7 +150,7 @@ def generate_filename(prompt):
     clean_prompt = ''.join(c if c.isalnum() or c.isspace() else '' for c in prompt)
     clean_prompt = '_'.join(clean_prompt.split()[:5])  # First 5 words
     timestamp = time.strftime("%Y%m%d_%H%M%S")
-    return f"flux_{clean_prompt}_{timestamp}.png"
+    return f"flux_conservative_{clean_prompt}_{timestamp}.png"
 
 def main():
     # Clear screen and show banner
@@ -163,6 +161,10 @@ def main():
     print("🔍 Environment Check:")
     print(f"   PyTorch: {torch.__version__}")
     print(f"   MPS Available: {'✅' if torch.backends.mps.is_available() else '❌'}")
+    
+    # Memory info
+    if torch.backends.mps.is_available():
+        print(f"   MPS Memory Fraction: {os.environ.get('PYTORCH_MPS_MEMORY_FRACTION', 'default')}")
     
     hf_token = os.getenv('HF_TOKEN')
     if hf_token:
@@ -185,46 +187,28 @@ def main():
         
         input(f"\n✅ Press Enter to start generation (or Ctrl+C to cancel)...")
         
-        print(f"\n📥 Loading FLUX.1 Krea [dev] pipeline...")
+        print(f"\n📥 Loading FLUX.1 Krea [dev] pipeline (Memory-Conservative)...")
         load_start = time.time()
         
-        # Clear MPS cache before loading
+        # Aggressive cache clearing
         if torch.backends.mps.is_available():
             torch.mps.empty_cache()
             
-        # Load pipeline with memory-optimized settings
+        # Load pipeline with maximum memory conservation
         pipeline = FluxPipeline.from_pretrained(
             "black-forest-labs/FLUX.1-Krea-dev",
-            torch_dtype=torch.float16,  # Use fp16 for 2x speed boost
+            torch_dtype=torch.float16,  # fp16 for memory efficiency
             use_safetensors=True,
             low_cpu_mem_usage=True
         )
         
-        # Move to MPS device with optimizations
-        device = "mps" if torch.backends.mps.is_available() else "cpu"
-        if device == "mps":
-            # Clear cache again before moving to device
-            torch.mps.empty_cache()
-            
-        pipeline = pipeline.to(device)
-        
-        # Apply comprehensive optimizations
-        _apply_pipeline_optimizations(pipeline)
-        
-        # Enable Metal VAE if configured
-        if os.getenv('KREA_ENABLE_METAL_VAE') == '1':
-            try:
-                from flux_metal_kernels import M4ProMetalOptimizer
-                metal_optimizer = M4ProMetalOptimizer()
-                pipeline = metal_optimizer.optimize_flux_pipeline_components(pipeline)
-                print("✅ Metal-optimized VAE active")
-            except Exception as e:
-                print(f"⚠️  Metal VAE optimization failed: {e}")
+        # Apply conservative optimizations BEFORE moving to device
+        _apply_conservative_optimizations(pipeline)
         
         load_time = time.time() - load_start
         print(f"✅ Pipeline loaded in {load_time:.1f} seconds")
         
-        print(f"\n🖼️  Generating image...")
+        print(f"\n🖼️  Generating image (Memory-Conservative Mode)...")
         print(f"⏰ Timeout: {params['timeout']} minutes")
         print("🛑 Press Ctrl+C to cancel if needed")
         
@@ -238,16 +222,20 @@ def main():
             # Set up generator
             generator = torch.Generator().manual_seed(params['seed']) if params['seed'] else None
             
-            # Generate with timeout protection
+            # Clear cache before generation
+            if torch.backends.mps.is_available():
+                torch.mps.empty_cache()
+            
+            # Generate with timeout protection and memory management
             with torch.inference_mode():
                 result = pipeline(
                     params['prompt'],
                     height=params['height'],
                     width=params['width'],
-                    guidance_scale=4.5,
+                    guidance_scale=3.5,  # Lower guidance for memory
                     num_inference_steps=params['steps'],
                     generator=generator,
-                    max_sequence_length=256,
+                    max_sequence_length=128,  # Reduced for memory
                     return_dict=True
                 )
             
@@ -265,26 +253,10 @@ def main():
             print(f"💾 Saved as: {output_path.absolute()}")
             print(f"📐 Size: {params['width']}x{params['height']}")
             
-            # Ask if user wants to generate another
-            print(f"\n🔄 Generate another image?")
-            another = input("Press Enter for yes, or 'q' to quit: ").strip().lower()
-            
-            if another != 'q':
-                # Cleanup and restart
-                del pipeline
-                import gc
-                gc.collect()
-                if torch.backends.mps.is_available():
-                    try:
-                        torch.mps.empty_cache()
-                    except:
-                        pass
-                
-                # Restart the process
-                print("\n" + "🔄" * 20)
-                main()
-            else:
-                print("\n👋 Thanks for using FLUX.1 Krea Studio!")
+            # Memory cleanup
+            del result
+            if torch.backends.mps.is_available():
+                torch.mps.empty_cache()
                 
         except TimeoutError:
             signal.alarm(0)
@@ -300,18 +272,19 @@ def main():
         error_msg = str(e)
         print(f"\n❌ Error: {error_msg}")
         
-        if "gated" in error_msg.lower():
+        if "out of memory" in error_msg.lower():
+            print("\n💾 MEMORY SOLUTION:")
+            print("1. Try smaller image size (512x512)")
+            print("2. Reduce steps (15-20)")
+            print("3. Close other applications")
+            print("4. Use: export PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0")
+            
+        elif "gated" in error_msg.lower():
             print("\n🔒 SOLUTION - Repository Access Required:")
             print("1. Visit: https://huggingface.co/black-forest-labs/FLUX.1-Krea-dev")
             print("2. Click 'Request access to this repository'")
             print("3. Accept license agreement")
             print("4. Set HF_TOKEN environment variable")
-            
-        elif "401" in error_msg or "403" in error_msg:
-            print("\n🔑 SOLUTION - HuggingFace Token:")
-            print("1. Go to: https://huggingface.co/settings/tokens")
-            print("2. Create token with 'Read' permissions")
-            print("3. Export: export HF_TOKEN='your_token_here'")
 
 if __name__ == "__main__":
     main()
