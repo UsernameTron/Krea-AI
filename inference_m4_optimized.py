@@ -67,6 +67,7 @@ class M4ProFluxInference:
         os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
         os.environ["OMP_NUM_THREADS"] = "12"  # 8P + 4E cores
         os.environ["MKL_NUM_THREADS"] = "12"
+        # HF_TOKEN should be set in environment before running
         
         # Optimize PyTorch for Apple Silicon
         if self.device == "mps":

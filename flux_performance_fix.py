@@ -51,6 +51,7 @@ class FluxPerformanceFix:
             "MKL_NUM_THREADS": "12",
             "TOKENIZERS_PARALLELISM": "false",  # Prevents tokenizer warnings
             "HF_HUB_DISABLE_PROGRESS_BARS": "1",  # Reduces console clutter
+            # HF_TOKEN should be set in environment before running
         }
         
         for key, value in env_vars.items():

@@ -126,7 +126,7 @@ fi
 osascript << APPLESCRIPT
 tell application "Terminal"
     activate
-    set currentTab to do script "cd '$PROJECT_DIR' && export HF_TOKEN='YOUR_HF_TOKEN_HERE' && echo '🛡️  FLUX.1 Krea Studio - $mode_description' && echo '========================================' && echo '⚠️  First generation: 2-5 minutes (24GB model)' && echo '⚠️  HF_TOKEN required for model access' && echo '🛑 Press Ctrl+C to cancel any stuck generation' && echo '⏰ Timeout protection: 5 minutes per generation' && echo '' && $launch_command"
+    set currentTab to do script "cd '$PROJECT_DIR' && export HF_TOKEN='YOUR_HF_TOKEN_HERE' && echo '🛡️  FLUX.1 Krea Studio - $mode_description' && echo '========================================' && echo '⚠️  First generation: 2-5 minutes (24GB model)' && echo '⚠️  Update HF_TOKEN in create_desktop_shortcut.sh' && echo '🛑 Press Ctrl+C to cancel any stuck generation' && echo '⏰ Timeout protection: 5 minutes per generation' && echo '' && $launch_command"
     set custom title of currentTab to "FLUX Krea Studio - $mode_description"
 end tell
 APPLESCRIPT
