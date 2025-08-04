@@ -36,3 +36,9 @@ psutil
 # Apple MLX for Neural Engine acceleration (optional)
 mlx>=0.19.0
 mlx-lm>=0.19.0
+
+# Core ML for Neural Engine support
+coremltools>=8.0
+
+# Async optimization support
+asyncio-throttle>=1.0.0

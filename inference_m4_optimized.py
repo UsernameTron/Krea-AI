@@ -144,13 +144,28 @@ class M4ProFluxInference:
         
         # Apply memory optimizations
         try:
-            if self.device == "mps":
-                # MPS specific optimizations
-                self.pipeline.enable_model_cpu_offload()
-            else:
-                self.pipeline.enable_model_cpu_offload()
-        except Exception as e:
-            print(f"Note: CPU offload not available: {e}")
+            self.pipeline.enable_model_cpu_offload()
+        except Exception:
+            try:
+                self.pipeline.enable_sequential_cpu_offload()
+            except Exception as e:
+                print(f"Note: CPU offload not available: {e}")
+        
+        # Enable memory-efficient attention and VAE optimizations
+        try:
+            self.pipeline.enable_attention_slicing("auto")
+        except Exception:
+            pass
+            
+        try:
+            self.pipeline.enable_vae_slicing()
+        except Exception:
+            pass
+            
+        try:
+            self.pipeline.enable_vae_tiling()
+        except Exception:
+            pass
     
     def generate_image(self, prompt: str, width: int = 1024, height: int = 1024,
                       guidance: float = 4.5, num_steps: int = 28, 
@@ -327,7 +342,30 @@ def main():
     except KeyboardInterrupt:
         print("\n⏸️  Generation interrupted by user")
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        error_msg = str(e).lower()
+        
+        if "gated" in error_msg or "access denied" in error_msg:
+            print(f"\n❌ Model Access Error: {e}")
+            print("\n🔑 To fix this:")
+            print("1. Go to https://huggingface.co/black-forest-labs/FLUX.1-Krea-dev")
+            print("2. Click 'Request access to this model'")
+            print("3. Set your HuggingFace token: export HF_TOKEN=your_token_here")
+            print("4. Get your token at: https://huggingface.co/settings/tokens")
+        elif "401" in error_msg or "403" in error_msg or "unauthorized" in error_msg:
+            print(f"\n❌ Authentication Error: {e}")
+            print("\n🔑 To fix this:")
+            print("1. Get a HuggingFace token at: https://huggingface.co/settings/tokens")
+            print("2. Set it in your environment: export HF_TOKEN=your_token_here")
+            print("3. Make sure you have access to the model")
+        elif "memory" in error_msg or "out of memory" in error_msg:
+            print(f"\n❌ Memory Error: {e}")
+            print("\n💾 To fix this:")
+            print("1. Try reducing image size (e.g., --width 512 --height 512)")
+            print("2. Try reducing steps (e.g., --steps 20)")
+            print("3. Close other applications to free memory")
+        else:
+            print(f"\n❌ Error: {e}")
+        
         return 1
     
     return 0
