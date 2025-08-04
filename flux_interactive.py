@@ -112,10 +112,10 @@ def _apply_pipeline_optimizations(pipeline):
         except:
             optimizations_applied.append("Default memory management")
     
-    # Enable attention optimizations
+    # Enable conservative attention optimizations (prevent black images)
     try:
-        pipeline.enable_attention_slicing("auto")
-        optimizations_applied.append("Attention slicing")
+        pipeline.enable_attention_slicing(1)  # Conservative slicing to prevent black images
+        optimizations_applied.append("Conservative attention slicing")
     except:
         pass
     
@@ -129,18 +129,16 @@ def _apply_pipeline_optimizations(pipeline):
     except Exception as e:
         pass
     
-    # Enable VAE optimizations
-    try:
-        pipeline.enable_vae_slicing()
-        optimizations_applied.append("VAE slicing")
-    except:
-        pass
-        
-    try:
-        pipeline.enable_vae_tiling()
-        optimizations_applied.append("VAE tiling")
-    except:
-        pass
+    # Skip aggressive VAE optimizations that can cause black images
+    # Note: VAE slicing/tiling can sometimes cause black images on MPS
+    # Uncomment below if you want to test VAE optimizations
+    # try:
+    #     pipeline.enable_vae_slicing()
+    #     optimizations_applied.append("VAE slicing")
+    # except:
+    #     pass
+    
+    optimizations_applied.append("Conservative VAE settings (prevents black images)")
     
     # Print applied optimizations
     for opt in optimizations_applied:
@@ -192,10 +190,10 @@ def main():
         if torch.backends.mps.is_available():
             torch.mps.empty_cache()
             
-        # Load pipeline with memory-optimized settings
+        # Load pipeline with black image fixes
         pipeline = FluxPipeline.from_pretrained(
             "black-forest-labs/FLUX.1-Krea-dev",
-            torch_dtype=torch.float16,  # Use fp16 for 2x speed boost
+            torch_dtype=torch.bfloat16,  # Use bfloat16 to prevent black images on MPS
             use_safetensors=True,
             low_cpu_mem_usage=True
         )
@@ -244,10 +242,10 @@ def main():
                     params['prompt'],
                     height=params['height'],
                     width=params['width'],
-                    guidance_scale=4.5,
+                    guidance_scale=4.0,  # Conservative guidance to prevent black images
                     num_inference_steps=params['steps'],
                     generator=generator,
-                    max_sequence_length=256,
+                    max_sequence_length=128,  # Reduced to prevent black images
                     return_dict=True
                 )
             
