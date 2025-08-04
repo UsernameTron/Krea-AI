@@ -1,32 +1,38 @@
-# FLUX.1 Krea [dev] Official Requirements
-# Based on HuggingFace documentation
-
-# Core diffusers framework (most important)
-diffusers>=0.34.0
-
-# PyTorch with Apple Silicon support (2.7.1+ required for CVE-2025-32434 security fix)
+# Apple Silicon Optimized FLUX.1 Krea Requirements
+# PyTorch with Metal Performance Shaders support
 torch>=2.7.1
 torchvision>=0.22.1
+torchaudio>=2.7.1
+
+# Core diffusers with MPS optimizations
+diffusers>=0.34.0
 
 # HuggingFace ecosystem
 transformers>=4.54.1
 huggingface-hub>=0.34.3
 accelerate>=1.9.0
 
-# Image processing
+# Apple Silicon specific optimizations
+# Install with: pip install --upgrade --force-reinstall torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+# Image processing with Apple optimizations
 Pillow>=11.3.0
 
-# Utilities
+# Memory and compute optimizations
 safetensors>=0.5.3
 numpy>=2.2.0
 tqdm
 
-# For interactive use
+# Interactive use
 click
 jupyter
 
-# Web UI support
+# Web UI with Metal backend support
 gradio>=5.0.0
 
-# System monitoring (optional)
+# System monitoring
 psutil
+
+# Apple MLX for Neural Engine acceleration (optional)
+mlx>=0.19.0
+mlx-lm>=0.19.0
