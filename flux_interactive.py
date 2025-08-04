@@ -13,6 +13,13 @@ import os
 from pathlib import Path
 from diffusers import FluxPipeline
 
+# Set optimal MPS environment variables
+os.environ.setdefault('PYTORCH_MPS_MEMORY_FRACTION', '0.95')
+os.environ.setdefault('PYTORCH_MPS_HIGH_WATERMARK_RATIO', '0.7')
+os.environ.setdefault('PYTORCH_MPS_LOW_WATERMARK_RATIO', '0.6')
+os.environ.setdefault('PYTORCH_MPS_ALLOCATOR_POLICY', 'expandable_segments')
+os.environ.setdefault('PYTORCH_ENABLE_MPS_FALLBACK', '1')
+
 class TimeoutError(Exception):
     pass
 
@@ -86,6 +93,55 @@ def get_user_input():
         'timeout': timeout
     }
 
+def _apply_pipeline_optimizations(pipeline):
+    """Apply comprehensive pipeline optimizations"""
+    optimizations_applied = []
+    
+    # Apply memory optimizations
+    try:
+        pipeline.enable_model_cpu_offload()
+        optimizations_applied.append("CPU offload")
+    except:
+        try:
+            pipeline.enable_sequential_cpu_offload()
+            optimizations_applied.append("Sequential CPU offload")
+        except:
+            optimizations_applied.append("Default memory management")
+    
+    # Enable attention optimizations
+    try:
+        pipeline.enable_attention_slicing("auto")
+        optimizations_applied.append("Attention slicing")
+    except:
+        pass
+    
+    # Enable memory-efficient attention if xformers not available
+    try:
+        # Try PyTorch native memory efficient attention
+        if hasattr(pipeline, 'unet') and hasattr(pipeline.unet, 'set_attn_processor'):
+            from diffusers.models.attention_processor import AttnProcessor2_0
+            pipeline.unet.set_attn_processor(AttnProcessor2_0())
+            optimizations_applied.append("Memory-efficient attention")
+    except Exception as e:
+        pass
+    
+    # Enable VAE optimizations
+    try:
+        pipeline.enable_vae_slicing()
+        optimizations_applied.append("VAE slicing")
+    except:
+        pass
+        
+    try:
+        pipeline.enable_vae_tiling()
+        optimizations_applied.append("VAE tiling")
+    except:
+        pass
+    
+    # Print applied optimizations
+    for opt in optimizations_applied:
+        print(f"✅ {opt} enabled")
+
 def generate_filename(prompt):
     """Generate descriptive filename from prompt"""
     # Clean prompt for filename
@@ -131,34 +187,27 @@ def main():
         # Load pipeline with optimizations
         pipeline = FluxPipeline.from_pretrained(
             "black-forest-labs/FLUX.1-Krea-dev",
-            torch_dtype=torch.bfloat16,
+            torch_dtype=torch.float16,  # Use fp16 for 2x speed boost
             use_safetensors=True,
             low_cpu_mem_usage=True
         )
         
-        # Apply memory optimizations
-        try:
-            pipeline.enable_model_cpu_offload()
-            print("✅ CPU offload enabled")
-        except:
-            try:
-                pipeline.enable_sequential_cpu_offload()
-                print("✅ Sequential CPU offload enabled")
-            except:
-                print("⚠️  Using default memory management")
+        # Move to MPS device with optimizations
+        device = "mps" if torch.backends.mps.is_available() else "cpu"
+        pipeline = pipeline.to(device)
         
-        # Enable memory-efficient features
-        try:
-            pipeline.enable_attention_slicing("auto")
-            print("✅ Attention slicing enabled")
-        except:
-            pass
-            
-        try:
-            pipeline.enable_vae_slicing()
-            print("✅ VAE slicing enabled")
-        except:
-            pass
+        # Apply comprehensive optimizations
+        _apply_pipeline_optimizations(pipeline)
+        
+        # Enable Metal VAE if configured
+        if os.getenv('KREA_ENABLE_METAL_VAE') == '1':
+            try:
+                from flux_metal_kernels import M4ProMetalOptimizer
+                metal_optimizer = M4ProMetalOptimizer()
+                pipeline = metal_optimizer.optimize_flux_pipeline_components(pipeline)
+                print("✅ Metal-optimized VAE active")
+            except Exception as e:
+                print(f"⚠️  Metal VAE optimization failed: {e}")
         
         load_time = time.time() - load_start
         print(f"✅ Pipeline loaded in {load_time:.1f} seconds")
