@@ -80,6 +80,53 @@ class M4ProFluxInference:
         
         print("✅ M4 Pro optimizations applied")
     
+    def _apply_vae_optimizations(self):
+        """Apply VAE memory optimizations"""
+        if self.ae is None:
+            return
+            
+        try:
+            # Enable VAE slicing for memory efficiency
+            if hasattr(self.ae, 'enable_slicing'):
+                self.ae.enable_slicing()
+                print("    ✅ VAE slicing enabled")
+            elif hasattr(self.ae, 'enable_vae_slicing'):
+                self.ae.enable_vae_slicing()
+                print("    ✅ VAE slicing enabled")
+                
+            # Enable VAE tiling for very large images
+            if hasattr(self.ae, 'enable_tiling'):
+                self.ae.enable_tiling()
+                print("    ✅ VAE tiling enabled")
+            elif hasattr(self.ae, 'enable_vae_tiling'):
+                self.ae.enable_vae_tiling()
+                print("    ✅ VAE tiling enabled")
+                
+        except Exception as e:
+            print(f"    ⚠️  VAE optimization warning: {e}")
+    
+    def _apply_attention_optimizations(self):
+        """Apply attention memory optimizations"""
+        if self.model is None:
+            return
+            
+        try:
+            # Enable attention slicing for memory efficiency
+            if hasattr(self.model, 'enable_attention_slicing'):
+                self.model.enable_attention_slicing("auto")
+                print("    ✅ Attention slicing enabled")
+            elif hasattr(self.model, 'enable_sliced_attention'):
+                self.model.enable_sliced_attention()
+                print("    ✅ Attention slicing enabled")
+                
+            # Enable memory efficient attention if available
+            if hasattr(self.model, 'enable_memory_efficient_attention'):
+                self.model.enable_memory_efficient_attention()
+                print("    ✅ Memory efficient attention enabled")
+                
+        except Exception as e:
+            print(f"    ⚠️  Attention optimization warning: {e}")
+    
     def load_models(self, model_name: str = "flux-krea-dev"):
         """Load models with M4 Pro optimizations"""
         print(f"📥 Loading {model_name} with M4 Pro optimizations...")
@@ -97,35 +144,55 @@ class M4ProFluxInference:
         """Load FLUX modules (original implementation)"""
         print("Using FLUX original modules...")
         
-        # Load models to CPU first, then move to device
-        print("  Loading flow model...")
-        self.model = load_flow_model(model_name, device="cpu")
-        
-        print("  Loading autoencoder...")
-        self.ae = load_ae(model_name)
-        
-        print("  Loading CLIP...")
-        self.clip = load_clip()
-        
-        print("  Loading T5...")
-        self.t5 = load_t5()
-        
-        # Move models to device with proper dtype
-        print(f"  Moving models to {self.device}...")
-        self.ae = self.ae.to(device=self.device, dtype=self.dtype)
-        self.clip = self.clip.to(device=self.device, dtype=self.dtype)
-        self.t5 = self.t5.to(device=self.device, dtype=self.dtype)
-        self.model = self.model.to(device=self.device, dtype=self.dtype)
-        
-        # Create sampler
-        self.sampler = Sampler(
-            model=self.model,
-            ae=self.ae,
-            clip=self.clip,
-            t5=self.t5,
-            device=self.device,
-            dtype=self.dtype,
-        )
+        try:
+            # Load models to CPU first, then move to device
+            print("  Loading flow model...")
+            self.model = load_flow_model(model_name, device="cpu")
+            
+            print("  Loading autoencoder...")
+            self.ae = load_ae(model_name)
+            
+            print("  Loading CLIP...")
+            self.clip = load_clip()
+            
+            print("  Loading T5...")
+            self.t5 = load_t5()
+            
+            # Move models to device with proper dtype
+            print(f"  Moving models to {self.device}...")
+            self.ae = self.ae.to(device=self.device, dtype=self.dtype)
+            self.clip = self.clip.to(device=self.device, dtype=self.dtype)
+            self.t5 = self.t5.to(device=self.device, dtype=self.dtype)
+            self.model = self.model.to(device=self.device, dtype=self.dtype)
+            
+            # Apply memory optimizations to autoencoder
+            print("  Applying VAE optimizations...")
+            self._apply_vae_optimizations()
+            
+            # Apply attention optimizations to main model
+            print("  Applying attention optimizations...")
+            self._apply_attention_optimizations()
+            
+            # Create sampler
+            self.sampler = Sampler(
+                model=self.model,
+                ae=self.ae,
+                clip=self.clip,
+                t5=self.t5,
+                device=self.device,
+                dtype=self.dtype,
+            )
+            
+        except Exception as e:
+            error_msg = str(e).lower()
+            if any(keyword in error_msg for keyword in ["gated", "access denied", "401", "403", "unauthorized", "token"]):
+                print(f"\n❌ HuggingFace Access Error: {e}")
+                print("\n🔑 Authentication Required:")
+                print("1. Get a HuggingFace token: https://huggingface.co/settings/tokens")
+                print("2. Request model access: https://huggingface.co/black-forest-labs/FLUX.1-Krea-dev")
+                print("3. Set token: export HF_TOKEN=your_token_here")
+                print("4. Or use: huggingface-cli login")
+            raise
     
     def _load_diffusers_pipeline(self, model_name: str):
         """Load diffusers pipeline (fallback)"""
@@ -344,27 +411,52 @@ def main():
     except Exception as e:
         error_msg = str(e).lower()
         
-        if "gated" in error_msg or "access denied" in error_msg:
-            print(f"\n❌ Model Access Error: {e}")
-            print("\n🔑 To fix this:")
-            print("1. Go to https://huggingface.co/black-forest-labs/FLUX.1-Krea-dev")
-            print("2. Click 'Request access to this model'")
-            print("3. Set your HuggingFace token: export HF_TOKEN=your_token_here")
+        # Enhanced HuggingFace authentication error handling
+        if any(keyword in error_msg for keyword in ["gated", "access denied", "repository is gated"]):
+            print(f"\n❌ Model Access Restricted: {e}")
+            print("\n🔒 This model requires explicit access approval:")
+            print("1. Visit: https://huggingface.co/black-forest-labs/FLUX.1-Krea-dev")
+            print("2. Click 'Request access to this model' and wait for approval")
+            print("3. Once approved, set your token: export HF_TOKEN=your_token_here")
             print("4. Get your token at: https://huggingface.co/settings/tokens")
-        elif "401" in error_msg or "403" in error_msg or "unauthorized" in error_msg:
+            print("5. Alternative: Run 'huggingface-cli login' and follow prompts")
+        elif any(keyword in error_msg for keyword in ["401", "403", "unauthorized", "authentication", "token"]):
             print(f"\n❌ Authentication Error: {e}")
-            print("\n🔑 To fix this:")
-            print("1. Get a HuggingFace token at: https://huggingface.co/settings/tokens")
-            print("2. Set it in your environment: export HF_TOKEN=your_token_here")
-            print("3. Make sure you have access to the model")
-        elif "memory" in error_msg or "out of memory" in error_msg:
+            print("\n🔑 HuggingFace token required:")
+            print("1. Create account at: https://huggingface.co/join")
+            print("2. Generate token at: https://huggingface.co/settings/tokens")
+            print("3. Set environment variable: export HF_TOKEN=your_token_here")
+            print("4. Alternative: Run 'huggingface-cli login'")
+            print("5. Ensure token has 'read' permissions")
+        elif any(keyword in error_msg for keyword in ["connection", "network", "timeout", "dns"]):
+            print(f"\n❌ Network Error: {e}")
+            print("\n🌐 Connection troubleshooting:")
+            print("1. Check internet connection")
+            print("2. Try again in a few minutes (server may be busy)")
+            print("3. Check if HuggingFace is accessible: https://status.huggingface.co")
+            print("4. Try using a VPN if access is restricted in your region")
+        elif any(keyword in error_msg for keyword in ["memory", "out of memory", "oom", "cuda out of memory"]):
             print(f"\n❌ Memory Error: {e}")
-            print("\n💾 To fix this:")
-            print("1. Try reducing image size (e.g., --width 512 --height 512)")
-            print("2. Try reducing steps (e.g., --steps 20)")
-            print("3. Close other applications to free memory")
+            print("\n💾 Memory optimization suggestions:")
+            print("1. Reduce image size: --width 512 --height 512")
+            print("2. Reduce inference steps: --steps 20")
+            print("3. Use CPU offloading: --use-diffusers (enables automatic offloading)")
+            print("4. Close other applications to free memory")
+            print("5. For M4 Pro: Ensure you have at least 16GB unified memory")
+        elif any(keyword in error_msg for keyword in ["module", "import", "no module named"]):
+            print(f"\n❌ Missing Dependencies: {e}")
+            print("\n📦 Installation required:")
+            print("1. Install requirements: pip install -r requirements_flux_krea.txt")
+            print("2. Or use uv: uv sync")
+            print("3. Ensure you're in the correct environment")
+            print("4. Try: pip install --upgrade torch torchvision torchaudio")
         else:
-            print(f"\n❌ Error: {e}")
+            print(f"\n❌ Unexpected Error: {e}")
+            print("\n🔍 General troubleshooting:")
+            print("1. Check that all requirements are installed")
+            print("2. Verify HuggingFace token is set correctly")
+            print("3. Ensure sufficient system resources")
+            print("4. Try the --use-diffusers flag for fallback implementation")
         
         return 1
     
