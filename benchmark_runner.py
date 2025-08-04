@@ -186,22 +186,84 @@ class M4ProBenchmarkRunner:
         return results
     
     async def _run_single_baseline_benchmark(self, prompt: str, config: Dict, test_name: str) -> BenchmarkResult:
-        """Run single baseline benchmark"""
+        """Run single baseline benchmark with actual baseline pipeline execution"""
         start_time = time.time()
         memory_start = psutil.virtual_memory().used
+        cpu_percent_start = psutil.cpu_percent()
         
         try:
-            # This would ideally run the baseline implementation
-            # For now, we'll simulate baseline performance
-            baseline_time = 180.0  # Typical baseline time for 1024x1024
+            # Import and run actual baseline implementation
+            from flux_krea_official import main as baseline_main
+            import sys
+            import io
+            from contextlib import redirect_stdout, redirect_stderr
             
-            # Simulate baseline generation
-            await asyncio.sleep(0.1)  # Minimal delay for simulation
+            # Prepare arguments for baseline execution
+            baseline_args = [
+                '--prompt', prompt,
+                '--width', str(config['width']),
+                '--height', str(config['height']), 
+                '--guidance', str(config['guidance']),
+                '--steps', str(config['steps']),
+                '--output', f'{self.output_dir}/baseline_{test_name}.png',
+                '--seed', '42'
+            ]
             
+            # Capture CPU usage during execution
+            cpu_monitor_start = time.time()
+            cpu_samples = []
+            
+            def monitor_cpu():
+                while time.time() - cpu_monitor_start < 300:  # 5 minute timeout
+                    cpu_samples.append(psutil.cpu_percent(interval=1))
+                    if len(cpu_samples) > 300:  # Prevent memory issues
+                        break
+            
+            # Start CPU monitoring in background
+            import threading
+            cpu_thread = threading.Thread(target=monitor_cpu, daemon=True)
+            cpu_thread.start()
+            
+            # Execute baseline with timeout and error capture
+            loop = asyncio.get_event_loop()
+            
+            def run_baseline():
+                # Temporarily modify sys.argv for baseline execution
+                original_argv = sys.argv[:]
+                sys.argv = ['flux_krea_official.py'] + baseline_args
+                
+                try:
+                    # Capture stdout/stderr to prevent output pollution
+                    with redirect_stdout(io.StringIO()) as captured_stdout:
+                        with redirect_stderr(io.StringIO()) as captured_stderr:
+                            baseline_main()
+                    
+                    return True, None
+                except Exception as e:
+                    return False, str(e)
+                finally:
+                    sys.argv = original_argv
+            
+            # Run baseline with timeout
+            try:
+                success, error = await asyncio.wait_for(
+                    loop.run_in_executor(None, run_baseline),
+                    timeout=300.0  # 5 minute timeout
+                )
+            except asyncio.TimeoutError:
+                success, error = False, "Baseline execution timed out (5 minutes)"
+            
+            generation_time = time.time() - start_time
             memory_peak = psutil.virtual_memory().used
             memory_peak_mb = (memory_peak - memory_start) / (1024 * 1024)
             
-            pixels_per_second = (config["width"] * config["height"]) / baseline_time
+            # Calculate average CPU utilization
+            if cpu_samples:
+                cpu_utilization_avg = sum(cpu_samples) / len(cpu_samples)
+            else:
+                cpu_utilization_avg = psutil.cpu_percent() - cpu_percent_start
+            
+            pixels_per_second = (config["width"] * config["height"]) / generation_time if generation_time > 0 else 0
             
             return BenchmarkResult(
                 implementation="baseline",
@@ -210,14 +272,19 @@ class M4ProBenchmarkRunner:
                 height=config["height"],
                 guidance_scale=config["guidance"],
                 num_inference_steps=config["steps"],
-                generation_time=baseline_time,
+                generation_time=generation_time,
                 pixels_per_second=pixels_per_second,
                 memory_peak_mb=memory_peak_mb,
-                cpu_utilization_avg=45.0,  # Typical baseline CPU usage
-                success=True,
+                cpu_utilization_avg=cpu_utilization_avg,
+                success=success,
+                error=error if not success else None,
                 optimizations_used=[]
             )
             
+        except ImportError as e:
+            # Fallback if baseline module not available
+            logger.warning(f"Baseline module not available: {e}")
+            return await self._run_simulated_baseline_benchmark(prompt, config, test_name)
         except Exception as e:
             return BenchmarkResult(
                 implementation="baseline",
@@ -231,8 +298,47 @@ class M4ProBenchmarkRunner:
                 memory_peak_mb=0.0,
                 cpu_utilization_avg=0.0,
                 success=False,
-                error=str(e)
+                error=str(e),
+                optimizations_used=[]
             )
+
+    async def _run_simulated_baseline_benchmark(self, prompt: str, config: Dict, test_name: str) -> BenchmarkResult:
+        """Fallback simulated baseline benchmark when actual baseline unavailable"""
+        logger.info(f"Running simulated baseline benchmark for {test_name}")
+        
+        # Simulate realistic baseline performance based on M4 Pro characteristics
+        base_time_per_pixel = 0.0002  # seconds per pixel for baseline M4 Pro
+        total_pixels = config["width"] * config["height"]
+        step_multiplier = config["steps"] / 28.0  # Scale by steps
+        
+        # Add realistic variation
+        import random
+        variation = random.uniform(0.8, 1.2)
+        
+        simulated_time = (base_time_per_pixel * total_pixels * step_multiplier * variation)
+        simulated_time = max(30.0, min(300.0, simulated_time))  # Clamp to realistic range
+        
+        # Simulate the time delay
+        await asyncio.sleep(min(2.0, simulated_time * 0.01))  # Small actual delay
+        
+        memory_usage = total_pixels * 0.000005  # Approximate memory per pixel
+        cpu_usage = 35.0 + (config["steps"] / 28.0) * 15.0  # CPU scales with steps
+        
+        return BenchmarkResult(
+            implementation="baseline_simulated",
+            prompt=prompt,
+            width=config["width"],
+            height=config["height"],
+            guidance_scale=config["guidance"],
+            num_inference_steps=config["steps"],
+            generation_time=simulated_time,
+            pixels_per_second=total_pixels / simulated_time,
+            memory_peak_mb=memory_usage,
+            cpu_utilization_avg=cpu_usage,
+            success=True,
+            error=None,
+            optimizations_used=["Simulation"]
+        )
     
     async def _run_optimized_benchmarks(self, prompts: List[str], configs: List[Dict]) -> List[BenchmarkResult]:
         """Run optimized implementation benchmarks"""

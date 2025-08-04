@@ -30,18 +30,24 @@ class MetalKernelOptimizer:
             logger.warning("Metal Performance Shaders not available")
             return
             
-        # Maximum Metal optimization settings
-        os.environ['PYTORCH_MPS_HIGH_WATERMARK_RATIO'] = '0.05'
+        # Conservative Metal optimization settings to avoid ratio errors
+        os.environ['PYTORCH_MPS_HIGH_WATERMARK_RATIO'] = '0.7'  # Fixed from 0.05
         os.environ['PYTORCH_MPS_PREFER_FAST_ALLOC'] = '1'
         os.environ['PYTORCH_MPS_ALLOCATOR_POLICY'] = 'page'
-        os.environ['PYTORCH_MPS_MEMORY_FRACTION'] = '0.90'
+        os.environ['PYTORCH_MPS_MEMORY_FRACTION'] = '0.8'  # More conservative
         
-        # Enable aggressive Metal optimizations
+        # Enable Metal optimizations with error handling
         try:
-            torch.mps.set_per_process_memory_fraction(0.90)
+            if hasattr(torch.mps, 'set_per_process_memory_fraction'):
+                torch.mps.set_per_process_memory_fraction(0.8)
             logger.info("✅ Metal environment configured for maximum performance")
         except Exception as e:
             logger.warning(f"Metal configuration warning: {e}")
+            # Try clearing cache to reset state
+            try:
+                torch.mps.empty_cache()
+            except:
+                pass
     
     @contextmanager
     def metal_kernel_context(self):
@@ -51,76 +57,135 @@ class MetalKernelOptimizer:
             return
             
         try:
-            # Pre-allocate Metal buffers
-            torch.mps.empty_cache()
+            # Try to clear Metal cache before operations
+            try:
+                torch.mps.empty_cache()
+            except RuntimeError as cache_error:
+                if "low watermark ratio" in str(cache_error):
+                    logger.warning(f"Metal cache clear failed (watermark issue): {cache_error}")
+                    # Continue without cache clearing
+                else:
+                    raise
+            
             yield True
+            
         except Exception as e:
             logger.error(f"Metal kernel context error: {e}")
             yield False
         finally:
-            # Aggressive cleanup
-            torch.mps.empty_cache()
+            # Try cleanup, but don't fail if it doesn't work
+            try:
+                torch.mps.empty_cache()
+            except RuntimeError as cleanup_error:
+                if "low watermark ratio" not in str(cleanup_error):
+                    logger.warning(f"Metal cleanup warning: {cleanup_error}")
     
     def optimize_attention_computation(self, query: torch.Tensor, key: torch.Tensor, 
                                      value: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
-        """Metal-optimized attention computation"""
+        """Metal-optimized attention computation with forced Metal execution"""
         with self.metal_kernel_context() as metal_available:
             if not metal_available:
-                return self._fallback_attention(query, key, value, mask)
+                raise RuntimeError("Metal Performance Shaders not available for attention optimization")
             
-            # Move tensors to Metal device
-            query = query.to(self.device)
-            key = key.to(self.device)
-            value = value.to(self.device)
+            # Force tensors to Metal device - no fallback
+            query = query.to(self.device, non_blocking=True)
+            key = key.to(self.device, non_blocking=True) 
+            value = value.to(self.device, non_blocking=True)
             
-            # Use Metal-optimized scaled dot-product attention
+            if mask is not None:
+                mask = mask.to(self.device, non_blocking=True)
+            
+            # Use Metal-optimized scaled dot-product attention with MPS-specific optimizations
             try:
-                with torch.backends.cuda.sdp_kernel(enable_math=False, enable_flash=True, enable_mem_efficient=True):
-                    # Metal-optimized attention pattern
-                    attention_output = torch.nn.functional.scaled_dot_product_attention(
-                        query, key, value, attn_mask=mask, dropout_p=0.0, is_causal=False
-                    )
+                # Enable Metal-specific optimizations
+                with torch.autocast(device_type='mps', dtype=torch.float16):
+                    # Force Metal execution path - no CUDA fallback
+                    if hasattr(torch.nn.functional, 'scaled_dot_product_attention'):
+                        attention_output = torch.nn.functional.scaled_dot_product_attention(
+                            query, key, value, 
+                            attn_mask=mask, 
+                            dropout_p=0.0, 
+                            is_causal=False,
+                            # Force memory-efficient attention on Metal
+                            enable_gqa=True
+                        )
+                    else:
+                        # Manual Metal-optimized implementation
+                        attention_output = self._manual_metal_attention(query, key, value, mask)
+                
                 return attention_output
+                
             except Exception as e:
-                logger.warning(f"Metal attention fallback: {e}")
-                return self._fallback_attention(query, key, value, mask)
+                # If Metal fails, it's a critical error - don't fallback
+                error_msg = f"Metal attention computation failed: {e}"
+                logger.error(error_msg)
+                raise RuntimeError(error_msg) from e
+    
+    def _manual_metal_attention(self, query: torch.Tensor, key: torch.Tensor,
+                               value: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
+        """Manual Metal-optimized attention implementation"""
+        # Ensure all tensors are on Metal device with optimal dtype
+        batch_size, seq_len, head_dim = query.shape
+        
+        # Scale factor for attention
+        scale_factor = 1.0 / (head_dim ** 0.5)
+        
+        # Metal-optimized matrix multiplication with chunking for memory efficiency
+        chunk_size = min(seq_len, 1024)  # Optimize for Metal memory bandwidth
+        
+        attention_output = torch.zeros_like(query)
+        
+        for i in range(0, seq_len, chunk_size):
+            end_i = min(i + chunk_size, seq_len)
+            query_chunk = query[:, i:end_i, :]
+            
+            # Compute attention weights for chunk
+            attention_weights = torch.matmul(query_chunk, key.transpose(-2, -1)) * scale_factor
+            
+            # Apply mask if provided
+            if mask is not None:
+                mask_chunk = mask[:, i:end_i, :] if mask.dim() > 2 else mask
+                attention_weights = attention_weights + mask_chunk
+            
+            # Softmax with Metal optimization
+            attention_weights = torch.nn.functional.softmax(attention_weights, dim=-1)
+            
+            # Compute output for chunk
+            attention_output[:, i:end_i, :] = torch.matmul(attention_weights, value)
+        
+        return attention_output
     
     def _fallback_attention(self, query: torch.Tensor, key: torch.Tensor, 
                           value: torch.Tensor, mask: Optional[torch.Tensor] = None) -> torch.Tensor:
-        """Fallback attention computation"""
-        # Standard attention computation
-        scale_factor = 1 / (query.size(-1) ** 0.5)
-        attention_weights = torch.matmul(query, key.transpose(-2, -1)) * scale_factor
-        
-        if mask is not None:
-            attention_weights = attention_weights + mask
-        
-        attention_weights = torch.nn.functional.softmax(attention_weights, dim=-1)
-        attention_output = torch.matmul(attention_weights, value)
-        return attention_output
+        """Fallback attention computation - should not be used with Metal enforcement"""
+        raise RuntimeError("Fallback attention called when Metal optimization was required")
     
     def optimize_conv_operations(self, input_tensor: torch.Tensor, weight: torch.Tensor, 
                                bias: Optional[torch.Tensor] = None) -> torch.Tensor:
-        """Metal-optimized convolution operations"""
+        """Metal-optimized convolution operations with forced Metal execution"""
         with self.metal_kernel_context() as metal_available:
             if not metal_available:
-                return torch.nn.functional.conv2d(input_tensor, weight, bias)
+                raise RuntimeError("Metal Performance Shaders not available for convolution optimization")
             
-            # Move to Metal device
-            input_tensor = input_tensor.to(self.device)
-            weight = weight.to(self.device)
+            # Force tensors to Metal device
+            input_tensor = input_tensor.to(self.device, non_blocking=True)
+            weight = weight.to(self.device, non_blocking=True)
             if bias is not None:
-                bias = bias.to(self.device)
+                bias = bias.to(self.device, non_blocking=True)
             
-            # Metal-optimized convolution
+            # Metal-optimized convolution with MPS-specific settings
             try:
-                # Use Metal-specific optimizations
-                with torch.backends.cudnn.flags(enabled=False):
-                    result = torch.nn.functional.conv2d(input_tensor, weight, bias)
+                with torch.autocast(device_type='mps', dtype=torch.float16):
+                    # Force Metal execution - disable other backends
+                    result = torch.nn.functional.conv2d(
+                        input_tensor, weight, bias, 
+                        stride=1, padding=0, dilation=1, groups=1
+                    )
                 return result
             except Exception as e:
-                logger.warning(f"Metal conv fallback: {e}")
-                return torch.nn.functional.conv2d(input_tensor, weight, bias)
+                error_msg = f"Metal convolution failed: {e}"
+                logger.error(error_msg)
+                raise RuntimeError(error_msg) from e
     
     def optimize_layer_norm(self, input_tensor: torch.Tensor, normalized_shape: List[int],
                           weight: Optional[torch.Tensor] = None, 
@@ -179,21 +244,25 @@ class MetalKernelOptimizer:
             return input_tensor
     
     def optimize_matrix_multiply(self, a: torch.Tensor, b: torch.Tensor) -> torch.Tensor:
-        """Metal-optimized matrix multiplication"""
+        """Metal-optimized matrix multiplication with forced Metal execution"""
         with self.metal_kernel_context() as metal_available:
             if not metal_available:
-                return torch.matmul(a, b)
+                raise RuntimeError("Metal Performance Shaders not available for matrix multiplication")
             
-            a = a.to(self.device)
-            b = b.to(self.device)
+            # Force tensors to Metal device
+            a = a.to(self.device, non_blocking=True)
+            b = b.to(self.device, non_blocking=True)
             
             try:
-                # Use Metal-optimized BLAS operations
-                result = torch.matmul(a, b)
+                # Use Metal-optimized BLAS operations with autocast
+                with torch.autocast(device_type='mps', dtype=torch.float16):
+                    # Force Metal BLAS execution
+                    result = torch.matmul(a, b)
                 return result
             except Exception as e:
-                logger.warning(f"Metal matmul fallback: {e}")
-                return torch.matmul(a, b)
+                error_msg = f"Metal matrix multiplication failed: {e}"
+                logger.error(error_msg)
+                raise RuntimeError(error_msg) from e
     
     def get_metal_memory_stats(self) -> Dict[str, Any]:
         """Get Metal memory statistics"""

@@ -89,9 +89,28 @@ class NeuralEngineAccelerator:
     
     def _compile_attention_for_neural_engine(self, attention_module) -> Any:
         """Compile attention module for Neural Engine execution"""
-        # Simplified attention acceleration
-        # In production, this would convert specific attention patterns to CoreML
-        return attention_module
+        try:
+            # Create example input for attention module
+            example_input = torch.randn(1, 64, 768)  # [batch, seq_len, hidden_dim]
+            
+            # Trace the attention module
+            attention_module.eval()
+            traced_module = torch.jit.trace(attention_module, example_input)
+            
+            # Convert to CoreML with Neural Engine support
+            mlmodel = ct.convert(
+                traced_module,
+                inputs=[ct.TensorType(shape=(1, 64, 768))],
+                compute_units=ct.ComputeUnit.CPU_AND_NE,
+                minimum_deployment_target=ct.target.macOS12
+            )
+            
+            logger.info("✅ Attention module compiled for Neural Engine")
+            return mlmodel
+            
+        except Exception as e:
+            logger.warning(f"Failed to compile attention for Neural Engine: {e}")
+            return attention_module
     
     def accelerate_mlp_layers(self, mlp_module) -> Optional[Any]:
         """Accelerate MLP layers using Neural Engine"""
@@ -113,8 +132,28 @@ class NeuralEngineAccelerator:
     
     def _compile_mlp_for_neural_engine(self, mlp_module) -> Any:
         """Compile MLP module for Neural Engine execution"""
-        # Simplified MLP acceleration
-        return mlp_module
+        try:
+            # Create example input for MLP module
+            example_input = torch.randn(1, 768)  # [batch, hidden_dim]
+            
+            # Trace the MLP module
+            mlp_module.eval()
+            traced_module = torch.jit.trace(mlp_module, example_input)
+            
+            # Convert to CoreML with Neural Engine support
+            mlmodel = ct.convert(
+                traced_module,
+                inputs=[ct.TensorType(shape=(1, 768))],
+                compute_units=ct.ComputeUnit.CPU_AND_NE,
+                minimum_deployment_target=ct.target.macOS12
+            )
+            
+            logger.info("✅ MLP module compiled for Neural Engine")
+            return mlmodel
+            
+        except Exception as e:
+            logger.warning(f"Failed to compile MLP for Neural Engine: {e}")
+            return mlp_module
     
     def optimize_text_encoder(self, text_encoder) -> Any:
         """Optimize text encoder for Neural Engine"""

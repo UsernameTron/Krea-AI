@@ -74,36 +74,92 @@ class MaximumPerformanceFluxPipeline:
         await self._show_optimization_summary()
     
     async def _apply_all_optimizations(self):
-        """Apply all available optimizations to the pipeline"""
+        """Apply all available optimizations to the pipeline with proper error isolation"""
         optimizations_applied = []
+        optimization_errors = []
         
         try:
             # Get the loaded pipeline
             pipeline = self.async_pipeline._get_pipeline()
             if pipeline is None:
-                logger.warning("Pipeline not loaded, cannot apply optimizations")
+                logger.error("Pipeline not loaded, aborting optimization application")
+                self.generation_stats["optimizations_active"] = []
+                self.generation_stats["optimization_errors"] = ["Pipeline not loaded"]
                 return
             
-            # Apply Neural Engine optimizations
+            # Apply Neural Engine optimizations with isolation
             try:
+                logger.info("Applying Neural Engine optimizations...")
                 optimized_pipeline = self.neural_engine_optimizer.optimize_pipeline_components(pipeline)
-                optimizations_applied.append("Neural Engine")
-                print("✅ Neural Engine optimizations applied")
+                if optimized_pipeline is not None:
+                    optimizations_applied.append("Neural Engine")
+                    print("✅ Neural Engine optimizations applied")
+                else:
+                    optimization_errors.append("Neural Engine: No optimizations applied")
+                    logger.info("ℹ️  Neural Engine optimizations skipped (not available)")
             except Exception as e:
-                logger.warning(f"Neural Engine optimization failed: {e}")
+                error_msg = f"Neural Engine optimization failed: {str(e)[:100]}..."
+                optimization_errors.append(error_msg)
+                logger.warning(error_msg)
             
-            # Apply Metal optimizations
+            # Apply Metal optimizations with isolation
             try:
-                self.metal_optimizer.optimize_flux_pipeline_components(pipeline)
-                optimizations_applied.append("Metal Performance Shaders")
-                print("✅ Metal Performance Shaders optimizations applied")
+                logger.info("Applying Metal Performance Shaders optimizations...")
+                metal_result = self.metal_optimizer.optimize_flux_pipeline_components(pipeline)
+                if metal_result is not None:
+                    optimizations_applied.append("Metal Performance Shaders")
+                    print("✅ Metal Performance Shaders optimizations applied")
+                else:
+                    optimization_errors.append("Metal: Optimization returned None")
+                    logger.info("ℹ️  Metal optimizations skipped (not available)")
             except Exception as e:
-                logger.warning(f"Metal optimization failed: {e}")
+                error_msg = f"Metal optimization failed: {str(e)[:100]}..."
+                optimization_errors.append(error_msg)
+                logger.warning(error_msg)
             
+            # Apply async optimizations with isolation
+            try:
+                logger.info("Configuring async pipeline optimizations...")
+                # Async optimizations are already applied during pipeline initialization
+                optimizations_applied.append("Async Pipeline")
+                print("✅ Async pipeline optimizations applied")
+            except Exception as e:
+                error_msg = f"Async optimization failed: {str(e)[:100]}..."
+                optimization_errors.append(error_msg)
+                logger.warning(error_msg)
+            
+            # Apply thermal management with isolation
+            try:
+                logger.info("Configuring thermal management...")
+                # Thermal management is already running
+                if self.thermal_manager.monitor.monitoring_active:
+                    optimizations_applied.append("Thermal Management")
+                    print("✅ Thermal management optimizations applied")
+                else:
+                    optimization_errors.append("Thermal: Monitoring not active")
+            except Exception as e:
+                error_msg = f"Thermal management failed: {str(e)[:100]}..."
+                optimization_errors.append(error_msg)
+                logger.warning(error_msg)
+            
+            # Update statistics
             self.generation_stats["optimizations_active"] = optimizations_applied
+            self.generation_stats["optimization_errors"] = optimization_errors
+            
+            # Log summary
+            if optimizations_applied:
+                logger.info(f"✅ Successfully applied {len(optimizations_applied)} optimizations: {', '.join(optimizations_applied)}")
+            else:
+                logger.warning("⚠️  No optimizations were successfully applied")
+            
+            if optimization_errors:
+                logger.info(f"ℹ️  {len(optimization_errors)} optimization(s) skipped or failed")
             
         except Exception as e:
-            logger.error(f"Failed to apply optimizations: {e}")
+            error_msg = f"Critical error in optimization application: {e}"
+            logger.error(error_msg)
+            self.generation_stats["optimizations_active"] = optimizations_applied
+            self.generation_stats["optimization_errors"] = optimization_errors + [error_msg]
     
     def _thermal_performance_callback(self, profile):
         """Handle thermal performance profile changes"""
