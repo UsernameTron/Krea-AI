@@ -10,8 +10,8 @@ DESKTOP_DIR="$HOME/Desktop"
 APP_NAME="FLUX Krea Studio"
 APP_PATH="$DESKTOP_DIR/$APP_NAME.app"
 
-echo "🎨 Creating Desktop Shortcut for FLUX.1 Krea [dev] Official Web UI"
-echo "=============================================================="
+echo "🛡️  Creating Desktop Shortcut for FLUX.1 Krea [dev] - Timeout Protected"
+echo "====================================================================="
 
 # Create the .app bundle structure
 mkdir -p "$APP_PATH/Contents/MacOS"
@@ -47,7 +47,7 @@ cat > "$APP_PATH/Contents/Info.plist" << EOF
 </plist>
 EOF
 
-# Create the main executable script
+# Create the main executable script with timeout protection
 cat > "$APP_PATH/Contents/MacOS/FLUX Krea Studio" << 'EOF'
 #!/bin/bash
 
@@ -64,6 +64,12 @@ show_notification() {
     osascript -e "display notification \"$1\" with title \"FLUX Krea Studio\""
 }
 
+# Function to show choice dialog
+show_choice_dialog() {
+    choice=$(osascript -e "display dialog \"Choose FLUX.1 Krea mode:\" with title \"FLUX Krea Studio\" buttons {\"Cancel\", \"Web UI (Protected)\", \"Command Line (Protected)\", \"Maximum Performance\"} default button \"Web UI (Protected)\"" 2>/dev/null)
+    echo "$choice"
+}
+
 # Check if project directory exists
 if [ ! -d "$PROJECT_DIR" ]; then
     show_dialog "Error: Project directory not found at $PROJECT_DIR. Please update the path in the application."
@@ -73,21 +79,55 @@ fi
 # Change to project directory
 cd "$PROJECT_DIR"
 
-# Check if official FLUX script exists
-if [ ! -f "flux_web_ui_official.py" ]; then
-    show_dialog "Error: FLUX.1 Krea official script not found. Please make sure flux_web_ui_official.py exists."
+# Check if timeout-protected script exists (primary choice)
+if [ ! -f "flux_krea_timeout_fix.py" ]; then
+    show_dialog "Error: Timeout-protected FLUX script not found. Please make sure flux_krea_timeout_fix.py exists."
     exit 1
 fi
 
-# Show starting notification
-show_notification "Starting FLUX Krea Studio..."
+# Show version choice dialog
+choice_result=$(show_choice_dialog)
 
-# Open Terminal and run the official FLUX Krea launcher
-osascript << 'APPLESCRIPT'
+# Determine which version to run based on user choice
+if [[ "$choice_result" == *"Maximum Performance"* ]]; then
+    if [ ! -f "maximum_performance_pipeline.py" ]; then
+        show_dialog "Maximum Performance version not found. Using Web UI Protected instead."
+        script_choice="web"
+    else
+        script_choice="maximum"
+    fi
+elif [[ "$choice_result" == *"Command Line (Protected)"* ]]; then
+    script_choice="timeout"
+elif [[ "$choice_result" == *"Cancel"* ]]; then
+    exit 0
+else
+    script_choice="web"
+fi
+
+# Show starting notification and set launch parameters
+if [ "$script_choice" = "maximum" ]; then
+    show_notification "Starting FLUX Krea Studio - Maximum Performance Mode..."
+    launch_script="maximum_performance_pipeline.py"
+    mode_description="Maximum Performance (M4 Pro Optimized)"
+    launch_command="echo 'python $launch_script --prompt \"a cute cat\" --steps 20' && exec bash"
+elif [ "$script_choice" = "timeout" ]; then
+    show_notification "Starting FLUX Krea Studio - Command Line Protected..."
+    launch_script="flux_krea_timeout_fix.py"
+    mode_description="Command Line Protected (Anti-Infinite Loop)"
+    launch_command="echo 'python $launch_script --prompt \"a cute cat\" --steps 20 --timeout 300' && exec bash"
+else
+    show_notification "Starting FLUX Krea Studio - Web UI Protected..."
+    launch_script="flux_web_timeout_protected.py"
+    mode_description="Web UI Protected (Anti-Infinite Loop)"
+    launch_command="python $launch_script"
+fi
+
+# Open Terminal and run the selected FLUX Krea version
+osascript << APPLESCRIPT
 tell application "Terminal"
     activate
-    set currentTab to do script "cd '/Users/cpconnor/Krea AI/flux-krea' && export HF_TOKEN='YOUR_HF_TOKEN_HERE' && echo '🎨 FLUX.1 Krea [dev] - Official Studio' && echo '🌐 Web interface will open at: http://localhost:7860' && echo '⚠️  First generation may take 2-5 minutes (24GB model)' && echo '⚠️  Make sure HF_TOKEN is set with your token' && echo '🛑 Press Ctrl+C to stop the server' && echo '' && sleep 3 && open 'http://localhost:7860' && python flux_web_ui_official.py"
-    set custom title of currentTab to "FLUX.1 Krea Studio"
+    set currentTab to do script "cd '$PROJECT_DIR' && export HF_TOKEN='YOUR_HF_TOKEN_HERE' && echo '🛡️  FLUX.1 Krea Studio - $mode_description' && echo '========================================' && echo '⚠️  First generation: 2-5 minutes (24GB model)' && echo '⚠️  HF_TOKEN required for model access' && echo '🛑 Press Ctrl+C to cancel any stuck generation' && echo '⏰ Timeout protection: 5 minutes per generation' && echo '' && $launch_command"
+    set custom title of currentTab to "FLUX Krea Studio - $mode_description"
 end tell
 APPLESCRIPT
 
@@ -106,11 +146,23 @@ EOF
 echo "✅ Desktop shortcut created successfully!"
 echo "📍 Location: $APP_PATH"
 echo ""
+echo "🛡️  NEW FEATURES - Timeout Protection:"
+echo "   ✅ Prevents infinite loops (like the 971% CPU issue)"
+echo "   ✅ 5-minute timeout per generation"
+echo "   ✅ Choice between Timeout Protected & Maximum Performance modes"
+echo "   ✅ Better error handling and memory management"
+echo ""
 echo "🎯 To use the shortcut:"
 echo "   1. Double-click 'FLUX Krea Studio' on your desktop"
-echo "   2. Terminal will open and start the web interface"
-echo "   3. Your browser will automatically open to the interface"
-echo "   4. Close Terminal window to stop the server"
+echo "   2. Choose version: 'Timeout Protected' (recommended) or 'Maximum Performance'"
+echo "   3. Terminal opens with the selected mode ready"
+echo "   4. Run: python [script] --prompt 'your prompt' --steps 20"
+echo "   5. Generation will timeout after 5 minutes if stuck"
+echo ""
+echo "🚨 INFINITE LOOP PREVENTION:"
+echo "   • Timeout Protected mode prevents 900%+ CPU usage"
+echo "   • Automatic memory cleanup after generation"
+echo "   • Press Ctrl+C to cancel stuck generations"
 echo ""
 echo "💡 If you need to update the project path:"
 echo "   Right-click the app → Show Package Contents → Contents/MacOS/FLUX Krea Studio"
