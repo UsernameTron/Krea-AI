@@ -9,6 +9,8 @@ import torch
 import argparse
 import time
 import psutil
+import gc
+import ctypes
 from pathlib import Path
 from typing import Optional
 
@@ -127,6 +129,98 @@ class M4ProFluxInference:
         except Exception as e:
             print(f"    ⚠️  Attention optimization warning: {e}")
     
+    def _defragment_memory(self):
+        """Aggressive memory defragmentation"""
+        print("🧹 Starting aggressive memory defragmentation...")
+        
+        # Python garbage collection
+        collected = gc.collect()
+        print(f"    ✅ Garbage collected {collected} objects")
+        
+        # Clear PyTorch caches based on device
+        if self.device == "mps":
+            torch.mps.empty_cache()
+            torch.mps.synchronize()
+            print("    ✅ MPS cache cleared and synchronized")
+        elif self.device == "cuda":
+            torch.cuda.empty_cache()
+            torch.cuda.synchronize()
+            print("    ✅ CUDA cache cleared and synchronized")
+        
+        # Force Python memory compaction on macOS
+        try:
+            if hasattr(ctypes, 'CDLL'):
+                libc = ctypes.CDLL("libc.dylib")
+                if hasattr(libc, 'malloc_trim'):
+                    result = libc.malloc_trim(0)
+                    print(f"    ✅ Memory compaction attempted (result: {result})")
+                else:
+                    print("    ⚠️  malloc_trim not available")
+            else:
+                print("    ⚠️  ctypes.CDLL not available")
+        except Exception as e:
+            print(f"    ⚠️  Memory compaction failed: {e}")
+        
+        # Additional garbage collection after cache clearing
+        collected_after = gc.collect()
+        print(f"    ✅ Final cleanup collected {collected_after} objects")
+        
+        print("✅ Memory defragmentation completed")
+    
+    def _get_optimal_resolution(self, requested_width: int, requested_height: int) -> tuple:
+        """Scale resolution based on available memory"""
+        available_mem = psutil.virtual_memory().available / (1024**3)  # GB
+        total_mem = psutil.virtual_memory().total / (1024**3)  # GB
+        used_mem_percent = psutil.virtual_memory().percent
+        
+        print(f"📊 Memory status: {available_mem:.1f}GB available ({100-used_mem_percent:.1f}% free) of {total_mem:.1f}GB total")
+        
+        # Calculate pixel count for memory estimation
+        requested_pixels = requested_width * requested_height
+        base_pixels = 1024 * 1024  # 1MP baseline
+        
+        # Memory thresholds and scaling factors
+        if available_mem < 8:  # Less than 8GB available - aggressive scaling
+            scale_factor = 0.6
+            reason = "Very low memory (< 8GB available)"
+        elif available_mem < 12:  # Less than 12GB available - moderate scaling
+            scale_factor = 0.75
+            reason = "Low memory (< 12GB available)"
+        elif used_mem_percent > 85:  # High memory usage - conservative scaling
+            scale_factor = 0.8
+            reason = "High memory usage (> 85%)"
+        elif requested_pixels > (1536 * 1536) and available_mem < 16:  # Large image with limited memory
+            scale_factor = 0.85
+            reason = "Large resolution with limited memory"
+        else:
+            # Sufficient memory available
+            return (requested_width, requested_height)
+        
+        # Apply scaling and ensure dimensions are multiples of 64 (optimal for diffusion models)
+        scaled_width = max(512, int((requested_width * scale_factor) // 64) * 64)
+        scaled_height = max(512, int((requested_height * scale_factor) // 64) * 64)
+        
+        # Additional validation to prevent extremely small resolutions
+        min_dimension = 512
+        if scaled_width < min_dimension or scaled_height < min_dimension:
+            aspect_ratio = requested_width / requested_height
+            if aspect_ratio > 1:  # Landscape
+                scaled_width = max(min_dimension, scaled_width)
+                scaled_height = max(min_dimension, int(scaled_width / aspect_ratio // 64) * 64)
+            else:  # Portrait or square
+                scaled_height = max(min_dimension, scaled_height)
+                scaled_width = max(min_dimension, int(scaled_height * aspect_ratio // 64) * 64)
+        
+        if (scaled_width, scaled_height) != (requested_width, requested_height):
+            reduction_percent = (1 - scale_factor) * 100
+            pixel_reduction = ((requested_pixels - (scaled_width * scaled_height)) / requested_pixels) * 100
+            print(f"⚠️  Resolution scaled down due to: {reason}")
+            print(f"    Original: {requested_width}x{requested_height} ({requested_pixels:,} pixels)")
+            print(f"    Optimized: {scaled_width}x{scaled_height} ({scaled_width*scaled_height:,} pixels)")
+            print(f"    Reduction: {pixel_reduction:.1f}% fewer pixels ({reduction_percent:.1f}% scale factor)")
+        
+        return (scaled_width, scaled_height)
+    
     def load_models(self, model_name: str = "flux-krea-dev"):
         """Load models with M4 Pro optimizations"""
         print(f"📥 Loading {model_name} with M4 Pro optimizations...")
@@ -139,6 +233,9 @@ class M4ProFluxInference:
         
         self.load_time = time.time() - start_time
         print(f"✅ Models loaded in {self.load_time:.1f} seconds")
+        
+        # Defragment memory after model loading
+        self._defragment_memory()
     
     def _load_flux_modules(self, model_name: str):
         """Load FLUX modules (original implementation)"""
@@ -236,22 +333,31 @@ class M4ProFluxInference:
     
     def generate_image(self, prompt: str, width: int = 1024, height: int = 1024,
                       guidance: float = 4.5, num_steps: int = 28, 
-                      seed: Optional[int] = None):
+                      seed: Optional[int] = None, disable_auto_scaling: bool = False):
         """Generate image with M4 Pro optimizations"""
         
         if not (self.sampler or self.pipeline):
             raise RuntimeError("Models not loaded. Call load_models() first.")
         
+        # Apply dynamic resolution scaling based on available memory (unless disabled)
+        if disable_auto_scaling:
+            optimized_width, optimized_height = width, height
+            print("ℹ️  Auto-scaling disabled - using requested resolution")
+        else:
+            optimized_width, optimized_height = self._get_optimal_resolution(width, height)
+        
         print(f"🖼️  Generating image...")
         print(f"  Prompt: {prompt}")
-        print(f"  Size: {width}x{height}")
+        if (optimized_width, optimized_height) != (width, height):
+            print(f"  Requested size: {width}x{height}")
+            print(f"  Optimized size: {optimized_width}x{optimized_height}")
+        else:
+            print(f"  Size: {optimized_width}x{optimized_height}")
         print(f"  Steps: {num_steps}, Guidance: {guidance}")
         print(f"  Device: {self.device}")
         
-        # Clear MPS cache before generation
-        if self.device == "mps":
-            torch.mps.empty_cache()
-            torch.mps.synchronize()
+        # Clear MPS cache and defragment memory before generation
+        self._defragment_memory()
         
         start_time = time.time()
         
@@ -262,23 +368,23 @@ class M4ProFluxInference:
         
         try:
             if self.use_official_modules:
-                # Use FLUX sampler
+                # Use FLUX sampler with optimized resolution
                 image = self.sampler(
                     prompt=prompt,
-                    width=width,
-                    height=height,
+                    width=optimized_width,
+                    height=optimized_height,
                     guidance=guidance,
                     num_steps=num_steps,
                     seed=seed,
                 )
             else:
-                # Use diffusers pipeline
+                # Use diffusers pipeline with optimized resolution
                 generator = torch.Generator(device=self.device).manual_seed(seed) if seed else None
                 
                 image = self.pipeline(
                     prompt,
-                    height=height,
-                    width=width,
+                    height=optimized_height,
+                    width=optimized_width,
                     guidance_scale=guidance,
                     num_inference_steps=num_steps,
                     generator=generator
@@ -287,7 +393,10 @@ class M4ProFluxInference:
             self.generation_time = time.time() - start_time
             
             print(f"✅ Generation complete in {self.generation_time:.1f} seconds")
-            print(f"🚀 Speed: {(width * height) / self.generation_time:.0f} pixels/second")
+            print(f"🚀 Speed: {(optimized_width * optimized_height) / self.generation_time:.0f} pixels/second")
+            
+            # Defragment memory after generation
+            self._defragment_memory()
             
             return image
             
@@ -340,10 +449,8 @@ class M4ProFluxInference:
     
     def cleanup(self):
         """Cleanup resources"""
-        if self.device == "mps":
-            torch.mps.empty_cache()
-        elif self.device == "cuda":
-            torch.cuda.empty_cache()
+        print("🧹 Final cleanup and memory defragmentation...")
+        self._defragment_memory()
         
         print("✅ Resources cleaned up")
 
@@ -359,6 +466,8 @@ def main():
     parser.add_argument('--seed', type=int, help='Random seed for reproducible results')
     parser.add_argument('--use-diffusers', action='store_true', 
                        help='Force use of diffusers pipeline instead of FLUX modules')
+    parser.add_argument('--disable-auto-scaling', action='store_true',
+                       help='Disable automatic resolution scaling based on available memory')
     
     args = parser.parse_args()
     
@@ -385,7 +494,8 @@ def main():
             height=args.height,
             guidance=args.guidance,
             num_steps=args.steps,
-            seed=args.seed
+            seed=args.seed,
+            disable_auto_scaling=args.disable_auto_scaling
         )
         
         # Save image
