@@ -235,7 +235,7 @@ def main():
                     guidance_scale=3.5,  # Lower guidance for memory
                     num_inference_steps=params['steps'],
                     generator=generator,
-                    max_sequence_length=128,  # Reduced for memory
+                    max_sequence_length=256,  # Extended token limit
                     return_dict=True
                 )
             
