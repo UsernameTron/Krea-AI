@@ -11,7 +11,7 @@ import signal
 import sys
 import os
 from pathlib import Path
-from diffusers.pipelines.flux.pipeline_flux import FluxPipeline
+from diffusers import FluxPipeline
 
 # Set conservative MPS environment variables for stability
 os.environ.setdefault('PYTORCH_MPS_MEMORY_FRACTION', '0.8')
@@ -245,7 +245,7 @@ def main():
                     guidance_scale=4.0,  # Conservative guidance to prevent black images
                     num_inference_steps=params['steps'],
                     generator=generator,
-                    max_sequence_length=256,  # Extended token limit
+                    max_sequence_length=128,  # Reduced to prevent black images
                     return_dict=True
                 )
             
@@ -256,29 +256,7 @@ def main():
             
             # Save image with descriptive filename
             output_path = Path(generate_filename(params['prompt']))
-            # Extract and save the image with proper type handling
-            if isinstance(result, tuple):
-                image = result[0]
-            else:
-                image = result.images[0] if hasattr(result, 'images') else result
-
-            # Ensure we have a valid image
-            if image is None:
-                raise ValueError("No image was generated")
-
-            # Convert to PIL Image if needed
-            from PIL import Image
-            import numpy as np
-            
-            if isinstance(image, torch.Tensor):
-                image = image.cpu().numpy()
-            if isinstance(image, np.ndarray):
-                image = Image.fromarray((image * 255).astype(np.uint8))
-            if not isinstance(image, Image.Image):
-                raise ValueError(f"Failed to convert output to PIL Image. Got type: {type(image)}")
-
-            # Save the image
-            image.save(output_path)
+            result.images[0].save(output_path)
             
             print(f"\n🎉 Generation Complete!")
             print(f"⏱️  Total time: {generation_time:.1f} seconds")
