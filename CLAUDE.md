@@ -1,79 +1,68 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working with this repository.
 
 ## Project Overview
 
-FLUX-Krea is a PyTorch-based implementation of FLUX.1 Krea [dev], a 12B parameter text-to-image model that's a CFG-distilled version of Krea 1. The repository provides inference code for generating images from text prompts using the model.
+FLUX-Krea is a PyTorch-based text-to-image generation application using the FLUX.1 Krea [dev] 12B parameter model, optimized for Apple Silicon (MPS). The codebase was consolidated from ~40 files into a clean modular architecture.
 
 ## Common Commands
 
-### Environment Setup
 ```bash
-# Using pip
-pip install -r requirements.txt
+# System info (no model load)
+python main.py info
 
-# Using uv (recommended)
-uv sync
+# Generate an image
+python main.py generate -p "a cute cat" --seed 42
+
+# Launch web UI
+python main.py web
+
+# Run benchmarks
+python main.py benchmark --quick
+
+# Run tests
+python -m pytest tests/ -v
+
+# Single launcher (loads .env)
+./launch.sh info
 ```
 
-### Running Inference
-```bash
-# Basic image generation
-python inference.py --prompt "a cute cat" --seed 42
+## File Structure
 
-# With custom parameters
-python inference.py --prompt "your prompt" --width 1280 --height 1024 --guidance 4.5 --num-steps 28 --seed 42 --output my_image.png
-```
+| File | Purpose |
+|------|---------|
+| `main.py` | CLI entry point — argparse subcommands: generate, web, benchmark, info |
+| `app.py` | Gradio web UI — FluxWebApp with background loading, timeout, debug log |
+| `pipeline.py` | FluxKreaPipeline — unified pipeline with optimization levels and fallback chain |
+| `config.py` | FluxConfig dataclass — loads from config.yaml + env vars + CLI overrides |
+| `config.yaml` | Default settings — generation params, device config, thresholds |
+| `optimizers/metal.py` | MetalOptimizer — MPS environment, VAE autocast, memory stats |
+| `optimizers/neural_engine.py` | NeuralEngineOptimizer — CoreML stub (not yet functional) |
+| `optimizers/thermal.py` | ThermalManager — background temp monitoring, performance profiles |
+| `utils/benchmark.py` | run_benchmark() — tests generation at different step counts |
+| `utils/monitor.py` | get_system_info() — PyTorch, MPS, memory, CPU info |
+| `launch.sh` | Shell launcher — loads .env and delegates to main.py |
 
-### Jupyter Notebook
-```bash
-jupyter notebook inference.ipynb
-```
+## Key Architecture Decisions
 
-## Architecture Overview
-
-The codebase follows a modular structure centered around the FLUX diffusion model:
-
-### Core Components
-
-1. **Model Architecture** (`src/flux/model.py`)
-   - `Flux`: Main transformer-based model with double and single stream blocks
-   - `FluxParams`: Configuration dataclass for model parameters
-   - Uses mixed attention mechanisms with both image and text streams
-
-2. **Pipeline** (`src/flux/pipeline.py`)
-   - `Pipeline`: Base class for inference workflow
-   - `Sampler`: Simplified sampler that takes pre-loaded models
-   - Handles the complete generation process from noise to final image
-
-3. **Model Loading** (`src/flux/util.py`)
-   - `load_flow_model()`: Loads the main FLUX model from HuggingFace
-   - `load_ae()`: Loads the autoencoder for image encoding/decoding
-   - `load_clip()` and `load_t5()`: Load text encoders
-   - All models are loaded with bfloat16 precision by default
-
-4. **Modules** (`src/flux/modules/`)
-   - `layers.py`: Core attention and MLP layers
-   - `autoencoder.py`: VAE for image encoding/decoding
-   - `conditioner.py`: Text conditioning modules
-
-### Key Configuration
-- Model: "flux-krea-dev" (12B parameters)
-- Default resolution: 1024x1024 (supports 1024-1280px range)
-- Recommended steps: 28-32
-- Recommended guidance: 3.5-5.0
-- Uses HuggingFace Hub for model downloads
-
-### Data Flow
-1. Text prompt → CLIP/T5 embeddings
-2. Random noise generation
-3. Denoising process through FLUX model
-4. VAE decoding to final image
-5. Post-processing and saving
-
-## Model Weights
-The model automatically downloads weights from `black-forest-labs/FLUX.1-Krea-dev` on HuggingFace Hub. Local paths can be set via environment variables `FLUX` and `AE`.
+- **Single pipeline** with 3 optimization levels: none, standard, maximum
+- **Fallback chain**: maximum -> standard -> none (with warnings)
+- **Config priority**: CLI args > env vars (FLUX_ prefix) > config.yaml > defaults
+- **MPS watermark ratio**: 0.8 (never 0.0 — causes cache errors)
+- **bfloat16**: Required dtype for Apple Silicon (float16 causes black images)
+- **Safety mode**: max_sequence_length=128 + guidance_scale=4.0 prevents black images
+- **No fake data**: Thermal/Neural Engine report None when real data unavailable
 
 ## Device Support
-Supports both CUDA and CPU inference, with CUDA being the default and recommended option for performance.
+
+Primary: Apple Silicon via MPS (Metal Performance Shaders)
+Fallback: CPU (automatic if MPS unavailable)
+Model: `black-forest-labs/FLUX.1-Krea-dev` from Hugging Face Hub
+
+## Environment
+
+- Python 3.10.13 (.python-version)
+- PyTorch 2.x with MPS
+- HF_TOKEN required (env var only, never hardcoded)
+- `.env` sets MPS tuning parameters

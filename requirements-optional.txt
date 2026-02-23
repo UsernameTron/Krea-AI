@@ -1,0 +1,11 @@
+# FLUX.1 Krea — Optional Dependencies
+
+# Core ML / Neural Engine support (macOS only)
+coremltools>=8.0
+
+# Apple MLX framework (experimental)
+mlx>=0.19.0
+mlx-lm>=0.19.0
+
+# Jupyter notebook support
+jupyter

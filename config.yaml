@@ -1,0 +1,46 @@
+model:
+  id: "black-forest-labs/FLUX.1-Krea-dev"
+  dtype: "bfloat16"
+
+device:
+  preferred: "mps"  # mps, cpu, auto
+  mps_watermark_ratio: 0.8
+  mps_low_watermark_ratio: 0.6
+  mps_memory_fraction: 0.85
+  mps_allocator_policy: "expandable_segments"
+  mps_prefer_fast_alloc: true
+  mps_enable_fallback: true
+  cpu_threads: 8  # M4 Pro: 8 performance cores
+
+generation:
+  width: 1024
+  height: 1024
+  steps: 28
+  guidance_scale: 4.5
+  max_sequence_length: 256
+
+# Conservative settings to prevent black images on MPS.
+# Enable with FLUX_SAFETY_MODE=1 or --safety-mode flag.
+safety_mode:
+  enabled: false
+  guidance_scale: 4.0
+  max_sequence_length: 128
+  disable_vae_tiling: true
+  attention_slice_size: 1
+
+thermal:
+  mode: "adaptive"  # maximum, balanced, efficient, adaptive
+  optimal_threshold: 70
+  warm_threshold: 80
+  hot_threshold: 90
+
+web:
+  host: "127.0.0.1"
+  port: 7860
+  share: false
+
+output:
+  directory: "./outputs"
+  filename_pattern: "flux_{timestamp}_{prompt_slug}.png"
+
+optimization_level: "standard"  # none, standard, maximum

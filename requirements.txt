@@ -1,0 +1,31 @@
+# FLUX.1 Krea — Core Dependencies
+
+# PyTorch (MPS support for Apple Silicon)
+torch>=2.7.0
+torchvision>=0.22.0
+
+# Diffusers pipeline
+diffusers>=0.34.0
+
+# Hugging Face ecosystem
+transformers>=4.50.0
+huggingface-hub>=0.30.0
+accelerate>=1.5.0
+safetensors>=0.5.0
+
+# Image processing
+Pillow>=10.0.0
+
+# Utilities
+numpy>=1.26.0
+tqdm
+pyyaml>=6.0
+
+# Web UI
+gradio>=5.0.0
+
+# System monitoring
+psutil
+
+# Testing
+pytest>=7.0.0

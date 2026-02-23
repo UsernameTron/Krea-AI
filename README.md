@@ -8,146 +8,158 @@ This is the official repository for `FLUX.1 Krea [dev]` (AKA `flux-krea`).
 
 The code in this repository and the weights hosted on Huggingface are the open version of [Krea 1](https://www.krea.ai/krea-1), our first image model trained in collaboration with [Black Forest Labs](https://bfl.ai/) to offer superior aesthetic control and image quality.
 
-The repository contains [inference code](https://github.com/krea-ai/flux-krea/blob/main/inference.py) and a [Jupyter Notebook](https://github.com/krea-ai/flux-krea/blob/main/inference.ipynb) to run the model; you can download the weights and inspect the model card [here](https://huggingface.co/black-forest-labs/FLUX.1-Krea-dev).
+## Requirements
 
+- Python 3.10+
+- PyTorch 2.x with MPS support (Apple Silicon) or CUDA
+- ~24 GB storage for model weights (downloaded on first run)
+- Hugging Face account with access to [FLUX.1-Krea-dev](https://huggingface.co/black-forest-labs/FLUX.1-Krea-dev)
+
+## Setup
+
+### 1. Clone and install
+
+```bash
+git clone https://github.com/krea-ai/flux-krea.git
+cd flux-krea
+pip install -r requirements.txt
+```
+
+### 2. Configure Hugging Face token
+
+```bash
+# Get your token from https://huggingface.co/settings/tokens
+export HF_TOKEN="hf_your_token_here"
+```
+
+You must also [request access](https://huggingface.co/black-forest-labs/FLUX.1-Krea-dev) to the model repository.
+
+### 3. Verify setup
+
+```bash
+python main.py info
+```
 
 ## Usage
 
-### With `pip`
+### Command Line
 
-```
-git clone https://github.com/krea-ai/flux-krea.git
-cd flux-krea
-pip install -r requirements.txt
+```bash
+# Generate an image
+python main.py generate --prompt "a cute cat sitting in a garden" --seed 42
+
+# Custom resolution and steps
+python main.py generate -p "mountain landscape at sunset" -W 1280 -H 768 -s 32
+
+# Enable safety mode (prevents black images)
+python main.py generate -p "portrait of a woman" --safety
 ```
 
-### With [`uv`](https://github.com/astral-sh/uv)
+### Web UI
 
+```bash
+# Launch Gradio interface
+python main.py web
+
+# Custom port
+python main.py web --port 8080
+
+# Create a public link
+python main.py web --share
 ```
-git clone https://github.com/krea-ai/flux-krea.git
-cd kflux
-uv sync
+
+### Benchmark
+
+```bash
+python main.py benchmark
+python main.py benchmark --quick
 ```
+
+### Single launcher (loads .env automatically)
+
+```bash
+./launch.sh info
+./launch.sh web
+./launch.sh generate -p "your prompt"
+```
+
+### Jupyter Notebook
+
+See `inference.ipynb` for an interactive example.
 
 ### Live Demo
 
 Generate on [krea.ai](https://www.krea.ai/apps/image/flux-krea)
 
-## Running the model
+## Configuration
+
+Settings are loaded from `config.yaml` and can be overridden with environment variables (prefixed `FLUX_`) or CLI arguments.
+
+Key defaults:
+
+| Setting | Default | Notes |
+|---------|---------|-------|
+| Resolution | 1024x1024 | Supports 512-1536, multiples of 64 |
+| Steps | 28 | Recommended 28-32 |
+| Guidance | 4.5 | Recommended 3.5-5.0 |
+| Device | mps (auto) | Falls back to CPU if MPS unavailable |
+| Optimization | standard | none, standard, or maximum |
+
+### Optimization Levels
+
+- **none** — Baseline diffusers FluxPipeline, no optimizations
+- **standard** — MPS config + attention slicing + VAE tiling + CPU offload
+- **maximum** — All of standard + Metal kernel optimizations + thermal management
+
+### Safety Mode
+
+If you encounter black images, enable safety mode which uses conservative settings (`max_sequence_length=128`, `guidance_scale=4.0`):
 
 ```bash
-python inference.py --prompt "a cute cat" --seed 42
+python main.py generate -p "your prompt" --safety
 ```
 
-Check `inference.ipynb` for a full example. It may take a few minutes to download the model weights on your first attempt.
+Or toggle it in the web UI settings panel.
 
-**Recommended inference settings**
+## Troubleshooting
 
-- **Resolution** - between `1024` and `1280` pixels.
+**Black images:** Enable safety mode, or reduce `max_sequence_length` to 128 and `guidance_scale` to 4.0.
 
-- **Number of inference steps** - between 28 - 32 steps
+**"Gated repo" error:** You need to [request access](https://huggingface.co/black-forest-labs/FLUX.1-Krea-dev) and set `HF_TOKEN`.
 
-- **CFG Guidance** - between 3.5 - 5.0
+**Out of memory:** Reduce resolution to 768x768, reduce steps, or use `standard` optimization level with CPU offload.
+
+**MPS watermark errors:** The `.env` file sets `PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.8`. Don't set this to 0.0.
+
+## Architecture
+
+```
+flux-krea/
+├── main.py              # CLI entry point (generate, web, benchmark, info)
+├── app.py               # Gradio web interface
+├── pipeline.py          # Unified FluxKreaPipeline
+├── config.py            # FluxConfig + loader (YAML, env vars, CLI)
+├── config.yaml          # Default configuration
+├── optimizers/
+│   ├── metal.py         # Metal Performance Shaders optimization
+│   ├── neural_engine.py # CoreML/Neural Engine (stub)
+│   └── thermal.py       # Thermal monitoring and throttling
+├── utils/
+│   ├── benchmark.py     # Benchmark runner
+│   └── monitor.py       # System info
+├── tests/               # pytest test suite
+├── launch.sh            # Single launcher script
+├── .env                 # MPS environment settings
+└── inference.ipynb      # Jupyter notebook example
+```
 
 ## How was it made?
 
-Krea 1 was created in as a research collaboration between [Krea](https://www.krea.ai) and [Black Forest Labs](https://bfl.ai).
+Krea 1 was created as a research collaboration between [Krea](https://www.krea.ai) and [Black Forest Labs](https://bfl.ai).
 
 `FLUX.1 Krea [dev]` is a 12B param. rectified-flow model _distilled_ from Krea 1. This model is a CFG-distilled model and fully compatible with the [FLUX.1 [dev]](https://github.com/black-forest-labs/flux) architecture.
 
-In a nutshell, we ran a large-scale post-training of the pre-trained weights provided by Black Forest Labs.
-
 For more details on the development of this model, [read our technical blog post](https://krea.ai/blog/flux-krea-open-source-release).
-
-# 🚀 FLUX-Krea: Apple Silicon Supercharged!
-
-!banner
-
----
-
-This is the official repository for `FLUX.1 Krea [dev]` (AKA flux-krea) - **now with groundbreaking Apple Silicon optimizations!**
-
-The code in this repository and the weights hosted on Huggingface are the open version of [Krea 1](https://www.krea.ai/krea-1), our first image model trained in collaboration with [Black Forest Labs](https://bfl.ai/) to offer superior aesthetic control and image quality.
-
-## ⚡️ REVOLUTIONARY APPLE SILICON PERFORMANCE
-
-**FLUX on Apple Silicon isn't just possible - it's BLAZING FAST!** Our M-series optimizations deliver:
-
-- **2-3x Faster Generation** using Metal Performance Shaders (MPS) with custom memory management
-- **Smart Resolution Scaling** that automatically optimizes for your device's capabilities
-- **Neural Engine Integration** leveraging Apple's specialized AI hardware for maximum throughput
-- **Thermal-Aware Processing** that prevents throttling during extended generation sessions
-
-_"The speed on my M4 Pro MacBook is MIND-BLOWING - what used to take minutes now completes in seconds!"_
-
-## 🧠 TECHNICAL INNOVATIONS
-
-Our codebase includes groundbreaking optimizations:
-
-- **Dynamic Memory Management** that intelligently balances between GPU and RAM
-- **Unified Memory Architecture** exploitation for seamless data transfer
-- **Attention Processor Optimizations** specifically tuned for Metal performance
-- **Custom VAE Tiling** that dramatically reduces memory pressure
-
-## 🌟 GETTING STARTED
-
-### With `pip`
-
-```bash
-git clone https://github.com/krea-ai/flux-krea.git
-cd flux-krea
-pip install -r requirements.txt
-```
-
-### With [`uv`](https://github.com/astral-sh/uv)
-
-```bash
-git clone https://github.com/krea-ai/flux-krea.git
-cd flux-krea
-uv sync
-```
-
-### Apple Silicon Optimized Run
-
-```bash
-# For maximum Apple Silicon performance
-python flux_krea_m4_optimized.py --prompt "a cute cat" --seed 42
-
-# For maximum memory optimization first
-bash memory_optimizer_m4_pro.sh
-python inference_m4_optimized.py --prompt "a cute cat" --seed 42
-```
-
-### Live Demo
-
-Generate on [krea.ai](https://www.krea.ai/apps/image/flux-krea)
-
-## ⚙️ RECOMMENDED SETTINGS
-
-- **Resolution** - between `1024` and `1280` pixels (automatically optimized on Apple Silicon)
-- **Number of inference steps** - between 28-32 steps (optimal for Metal acceleration)
-- **CFG Guidance** - between 3.5-5.0
-- **Device** - Automatically uses Metal Performance Shaders on Apple Silicon
-
-## 💪 APPLE SILICON PERFORMANCE GUIDE
-
-| Device | Resolution | Steps | Generation Time |
-|--------|------------|-------|----------------|
-| M4 Pro | 1024×1024  | 28    | ~12-15 seconds |
-| M3     | 1024×1024  | 28    | ~20-25 seconds |
-| M2     | 1024×1024  | 28    | ~35-40 seconds |
-| M1     | 1024×1024  | 28    | ~45-50 seconds |
-
-_Times may vary based on system configuration and thermal conditions_
-
-## 🔧 OPTIMIZATION FEATURES
-
-- **Automatic Device Detection**: Seamlessly selects between Metal, CUDA, or CPU
-- **Memory Defragmentation**: Aggressive garbage collection to prevent OOM errors
-- **Thermal Management**: Prevents throttling by monitoring system temperature
-- **Progressive Loading**: Efficiently manages component loading to minimize memory pressure
-
-
 
 ### Citation
 
