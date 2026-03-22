@@ -1,0 +1,11 @@
+[tool.pytest.ini_options]
+markers = [
+    "requires_mps: marks tests requiring Apple MPS (Metal Performance Shaders)",
+]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+warn_return_any = false
+warn_unused_configs = true
+exclude = ["tests/"]
