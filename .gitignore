@@ -175,3 +175,6 @@ models/*.safetensors
 models/**/*.safetensors
 models/FLUX.1-Krea-dev/
 web_outputs/
+
+# Claude Code
+.claude/
