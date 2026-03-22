@@ -78,7 +78,7 @@ class TestFluxProfilerInit:
 
         with patch("utils.profiler.get_config") as mock_gc:
             mock_gc.return_value = FluxConfig()
-            p = FluxProfiler()
+            FluxProfiler()
             mock_gc.assert_called_once()
 
 

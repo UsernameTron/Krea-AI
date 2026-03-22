@@ -42,7 +42,7 @@ class TestConfigureEnvironment:
         opt = MetalOptimizer(config)
         opt.metal_available = True
 
-        with patch("torch.mps.set_per_process_memory_fraction") as mock_frac:
+        with patch("torch.mps.set_per_process_memory_fraction"):
             # Clear env vars so setdefault actually sets them
             with patch.dict("os.environ", {}, clear=False):
                 opt._configure_environment()
@@ -101,8 +101,6 @@ class TestMetalKernelContext:
 
         # Only raise on the first call (pre-yield); let the finally call succeed
         call_count = [0]
-        original = opt._safe_empty_cache
-
         def raise_once():
             call_count[0] += 1
             if call_count[0] == 1:
@@ -252,7 +250,7 @@ class TestOptimizeVae:
         with patch.object(opt, "metal_kernel_context") as mock_ctx:
             mock_ctx.return_value.__enter__ = MagicMock(return_value=False)
             mock_ctx.return_value.__exit__ = MagicMock(return_value=False)
-            result = mock_vae.forward(mock_sample)
+            mock_vae.forward(mock_sample)
 
         original_forward.assert_called_once_with(mock_sample)
 

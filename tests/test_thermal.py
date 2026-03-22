@@ -132,7 +132,6 @@ class TestStartStopMonitoring:
         config = FluxConfig()
         tm = ThermalManager(config)
         tm._monitoring = True  # Pre-set as if already started
-        first_thread = tm._thread
         with patch("optimizers.thermal.threading.Thread") as mock_thread_cls:
             tm.start_monitoring()
         mock_thread_cls.assert_not_called()
