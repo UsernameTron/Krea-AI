@@ -75,6 +75,21 @@ python main.py benchmark
 python main.py benchmark --quick
 ```
 
+### Profile
+
+Measure stage-by-stage timing for generation (model load, encoding, denoising, decoding):
+
+```bash
+# Basic profiling
+python main.py profile --prompt "a cute cat" --steps 20
+
+# Custom resolution
+python main.py profile --prompt "test" --width 768 --height 768 --steps 12
+
+# Kernel-level detail with torch.profiler
+python main.py profile --prompt "test" --torch-profile
+```
+
 ### Single launcher (loads .env automatically)
 
 ```bash
@@ -135,19 +150,20 @@ Or toggle it in the web UI settings panel.
 
 ```
 flux-krea/
-├── main.py              # CLI entry point (generate, web, benchmark, info)
+├── main.py              # CLI entry point (generate, web, benchmark, profile, info)
 ├── app.py               # Gradio web interface
 ├── pipeline.py          # Unified FluxKreaPipeline
 ├── config.py            # FluxConfig + loader (YAML, env vars, CLI)
 ├── config.yaml          # Default configuration
 ├── optimizers/
 │   ├── metal.py         # Metal Performance Shaders optimization
-│   ├── neural_engine.py # CoreML/Neural Engine (stub)
+│   ├── neural_engine.py # CoreML/ANE acceleration (VAE decoder conversion)
 │   └── thermal.py       # Thermal monitoring and throttling
 ├── utils/
 │   ├── benchmark.py     # Benchmark runner
-│   └── monitor.py       # System info
-├── tests/               # pytest test suite
+│   ├── monitor.py       # System info
+│   └── profiler.py      # Stage-by-stage performance profiler
+├── tests/               # 299 tests, 96% coverage
 ├── launch.sh            # Single launcher script
 ├── .env                 # MPS environment settings
 └── inference.ipynb      # Jupyter notebook example
