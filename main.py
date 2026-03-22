@@ -91,6 +91,39 @@ def cmd_benchmark(config: FluxConfig, args):
             )
 
 
+def cmd_profile(config: FluxConfig, args):
+    """Run generation with detailed per-stage profiling."""
+    from pipeline import FluxKreaPipeline
+    from utils.profiler import FluxProfiler
+
+    profiler = FluxProfiler(config)
+    pipeline = FluxKreaPipeline(config)
+
+    prompt = args.prompt or "a serene mountain landscape at sunset"
+    width = args.width or config.generation.width
+    height = args.height or config.generation.height
+    steps = args.steps or config.generation.steps
+
+    print(f"Profiling generation: {width}x{height}, {steps} steps...")
+    print(f"Prompt: {prompt!r}")
+    print()
+
+    profiler.profile_generation(pipeline, prompt, width, height, steps)
+    print(profiler.get_summary())
+
+    if args.torch_profile:
+        print("\nRunning torch.profiler (kernel-level timing)...")
+        detailed = profiler.profile_with_torch_profiler(pipeline, prompt, width, height, steps)
+        if detailed.get("profile_available"):
+            print("\nTop operators by CPU time:")
+            for op in detailed.get("top_ops", [])[:10]:
+                print(f"  {op['name']:<50} {op['cpu_time_ms']:>10.3f} ms  (x{op['count']})")
+        else:
+            print(f"torch.profiler unavailable: {detailed.get('error', 'unknown error')}")
+
+    pipeline.unload()
+
+
 def cmd_info(config: FluxConfig, _args):
     """Show system information."""
     import torch
@@ -164,6 +197,14 @@ def main():
     # info
     subparsers.add_parser("info", help="Show system info")
 
+    # profile
+    profile_parser = subparsers.add_parser("profile", help="Profile generation performance")
+    profile_parser.add_argument("--prompt", "-p", default=None, help="Text prompt (default: landscape)")
+    profile_parser.add_argument("--width", "-W", type=int, default=None, help="Image width (default: config)")
+    profile_parser.add_argument("--height", "-H", type=int, default=None, help="Image height (default: config)")
+    profile_parser.add_argument("--steps", "-s", type=int, default=None, help="Inference steps (default: config)")
+    profile_parser.add_argument("--torch-profile", action="store_true", help="Enable torch.profiler kernel timing")
+
     args = parser.parse_args()
 
     if not args.command:
@@ -203,6 +244,7 @@ def main():
         "web": cmd_web,
         "benchmark": cmd_benchmark,
         "info": cmd_info,
+        "profile": cmd_profile,
     }
 
     try:
