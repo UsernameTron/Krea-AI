@@ -173,7 +173,7 @@ class NeuralEngineOptimizer:
             True if conversion succeeded and the .mlpackage was cached.
             False if conversion failed (pipeline continues with MPS).
         """
-        result = {
+        result: Dict[str, Any] = {
             "attempted": True,
             "success": False,
             "error": None,
@@ -275,7 +275,7 @@ class NeuralEngineOptimizer:
         Returns:
             Always False for FLUX.1 (T5-XXL too large for ANE).
         """
-        result = {
+        result: Dict[str, Any] = {
             "attempted": True,
             "success": False,
             "error": None,

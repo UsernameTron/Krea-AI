@@ -10,7 +10,7 @@ import os
 import time
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Any, Callable, Optional
 
 import torch
 import torch.backends.mps
@@ -39,9 +39,9 @@ class FluxKreaPipeline:
 
     def __init__(self, config: Optional[FluxConfig] = None):
         self.config = config or get_config()
-        self.pipeline = None
+        self.pipeline: Any = None
         self.is_loaded = False
-        self.device = None
+        self.device: Optional[torch.device] = None
         self.dtype = self._get_dtype()
         self._metal_optimizer = None
         self._thermal_manager = None

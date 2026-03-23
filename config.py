@@ -9,7 +9,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
-import yaml
+import yaml  # type: ignore[import-untyped]
 
 
 class OptimizationLevel(Enum):
@@ -225,13 +225,15 @@ def _apply_env_vars(config: FluxConfig):
                 config.optimization_level = value
             continue
 
-        section_name = mapping[0]
-        attr_name = mapping[1]
+        section_name: str = mapping[0]  # type: ignore[assignment]
+        attr_name: str = mapping[1]  # type: ignore[assignment]
         converter = mapping[2] if len(mapping) > 2 else str
 
-        section_obj = section_map[section_name]
+        section_obj = section_map.get(section_name)
+        if section_obj is None:
+            continue
         try:
-            setattr(section_obj, attr_name, converter(value))
+            setattr(section_obj, attr_name, converter(value))  # type: ignore[operator]
         except (ValueError, TypeError):
             pass  # Skip invalid env var values silently
 

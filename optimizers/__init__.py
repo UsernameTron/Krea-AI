@@ -5,15 +5,17 @@ Provides Metal kernel optimization, Neural Engine acceleration,
 and thermal performance management for Apple Silicon.
 """
 
+from typing import Any, Dict
+
 from config import FluxConfig, OptimizationLevel
 
 
-def get_optimizer(config: FluxConfig):
+def get_optimizer(config: FluxConfig) -> Dict[str, Any]:
     """Factory function to get the appropriate optimizer set for the config.
 
     Returns a dict of available optimizers keyed by name.
     """
-    optimizers = {}
+    optimizers: Dict[str, Any] = {}
     level = config.get_optimization_level()
 
     if level == OptimizationLevel.MAXIMUM:
