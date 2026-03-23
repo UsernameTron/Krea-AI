@@ -179,3 +179,8 @@ web_outputs/
 # Claude Code
 .claude/
 .claire/
+
+# Session state (private, not committed)
+state/
+context/
+outputs/
