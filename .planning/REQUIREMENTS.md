@@ -200,4 +200,66 @@ These are hard constraints that apply across the entire workspace. Violations ar
 
 ---
 
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| REQ-F-001 | N/A | VALIDATED |
+| REQ-F-002 | N/A | VALIDATED |
+| REQ-F-003 | N/A | VALIDATED |
+| REQ-F-004 | N/A | VALIDATED |
+| REQ-F-005 | N/A | VALIDATED |
+| REQ-F-006 | N/A | VALIDATED |
+| REQ-F-007 | N/A | VALIDATED |
+| REQ-F-008 | N/A | VALIDATED |
+| REQ-F-010 | Parallel | Pending |
+| REQ-F-011 | Parallel | Pending |
+| REQ-F-012 | Parallel | Pending |
+| REQ-F-013 | Parallel | Pending |
+| REQ-F-014 | Parallel | Pending |
+| REQ-F-015 | Parallel | Pending |
+| REQ-F-016 | Parallel | Pending |
+| REQ-F-017 | Parallel | Pending |
+| REQ-M-001 | Phase 1 | Pending |
+| REQ-M-002 | Phase 1 | Pending |
+| REQ-M-003 | Phase 1 | Pending |
+| REQ-M-004 | Phase 1 | Pending |
+| REQ-M-005 | Phase 1 | Pending |
+| REQ-M-006 | Phase 1 | Pending |
+| REQ-M-010 | Phase 2 | Pending |
+| REQ-M-011 | Phase 2 | Pending |
+| REQ-M-012 | Phase 2 | Pending |
+| REQ-M-013 | Phase 2 | Pending |
+| REQ-M-014 | Phase 2 | Pending |
+| REQ-M-015 | Phase 2 | Pending |
+| REQ-M-016 | Phase 2 | Pending |
+| REQ-M-017 | Phase 2 | Pending |
+| REQ-M-018 | Phase 2 | Pending |
+| REQ-M-020 | Phase 3 | Pending |
+| REQ-M-021 | Phase 3 | Pending |
+| REQ-M-022 | Phase 3 | Pending |
+| REQ-M-023 | Phase 3 | Pending |
+| REQ-M-030 | Phase 4 | Pending |
+| REQ-M-031 | Phase 4 | Pending |
+| REQ-M-032 | Phase 4 | Pending |
+| REQ-M-033 | Phase 4 | Pending |
+| REQ-M-034 | Phase 4 | Pending |
+| REQ-M-035 | Phase 4 | Pending |
+| REQ-M-040 | Phase 5 | Pending |
+| REQ-M-041 | Phase 5 | Pending |
+| REQ-M-042 | Phase 5 | Pending |
+| REQ-M-043 | Phase 5 | Pending |
+| REQ-M-044 | Phase 5 | Pending |
+| REQ-M-050 | Phase 6 | Pending |
+| REQ-M-051 | Phase 6 | Pending |
+| REQ-M-052 | Phase 6 | Pending |
+| REQ-M-053 | DEFERRED | Deferred |
+| REQ-M-054 | Phase 6 | Pending |
+| REQ-M-055 | Phase 6 | Pending |
+| REQ-M-060 | Phase 7 | Pending |
+| REQ-M-061 | Phase 7 | Pending |
+| REQ-M-062 | Phase 7 | Pending |
+
+---
+
 *71 requirements. Every pattern has a home. Every constraint has enforcement.*
