@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 2 executing — Waves 1-2 complete, Wave 3 next"
-stopped_at: Wave 2 complete (02-02/03/04), Wave 3 next
-last_updated: "2026-04-14T21:00:00.000Z"
-last_activity: "2026-04-14 — Wave 2 complete (distillate + classifier + comedy selector, 37 tests green)"
+status: "Phase 2 code complete — 8/8 plans done, awaiting integration test with real API"
+stopped_at: All waves committed, integration test pending (requires ANTHROPIC_API_KEY)
+last_updated: "2026-04-14T23:00:00.000Z"
+last_activity: "2026-04-14 — Waves 3-5 complete (prompt builder + LLM client + validator + barrel + integration test), 111 unit/mock tests green"
 progress:
   total_phases: 7
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 8
-  completed_plans: 4
-  percent: 28
+  completed_plans: 8
+  percent: 42
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** The Post Brief is the product -- a single structured JSON document containing every element of a satirical LinkedIn post, all satirically coherent from one voice-aware pass.
-**Current focus:** Phase 2 - Post Brief Generator (EXECUTING — Waves 1-2 complete, 4/8 plans done)
+**Current focus:** Phase 2 - Post Brief Generator (CODE COMPLETE — 8/8 plans done, integration test pending)
 
 ## Current Position
 
 Phase 0 (Bootstrap): COMPLETE
 Phase 1 (Mirror Post Scaffolding): COMPLETE
 Phase: 2 of 7 (Post Brief Generator) + Parallel flux-krea Optimization
-Plan: 4 of 8 in current phase
-Status: Phase 2 executing — Waves 1-2 complete, Wave 3 next
-Last activity: 2026-04-14 — Wave 2 complete (distillate + classifier + comedy, 37 tests)
+Plan: 8 of 8 in current phase
+Status: Phase 2 code complete — awaiting integration test with real API
+Last activity: 2026-04-14 — Waves 3-5 complete, 111 unit/mock tests green
 Branch: main
 
 Progress: [###░░░░░░░] 28%
@@ -98,8 +98,16 @@ None.
 8. 3 clean commits in mirror-post
 9. Tree clean
 
+## Phase 2 Deliverables (Waves 3-5)
+
+| Wave | SHA | Description | Tests |
+|------|-----|-------------|-------|
+| 3 (02-05) | 93e4666 | System prompt builder, Pattern 5, cache markers | 31 |
+| 4 (02-06) | 4d2bb67 | LLM generation client, Structured Outputs, mock tests | 12 |
+| 5 (02-07/08) | 07e3dce | Semantic validator, barrel export, integration test | 30 |
+
 ## Session Continuity
 
-Last session: 2026-04-14T21:00:00.000Z
-Stopped at: Wave 2 complete (02-02/03/04), Wave 3 next
-Next: Execute Wave 3 (02-05 system prompt builder), then Wave 4 (02-06 LLM client), then Wave 5 (02-07/08 validator + integration)
+Last session: 2026-04-14T23:00:00.000Z
+Stopped at: All 8 plans committed. 111 unit/mock tests green. Integration test created but not yet run (requires ANTHROPIC_API_KEY).
+Next: Run `node test/integration.js` with API key to validate 5 real scenarios. If pass, verify Phase 2 success criteria from ROADMAP.md, then close Phase 2 and start Phase 3 discussion.

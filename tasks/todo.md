@@ -22,15 +22,16 @@
 - [x] Verification: 9/9 items passed
 - [x] State close: commit 507a5bc
 
-## Phase 2 Post Brief Generator — IN PROGRESS
+## Phase 2 Post Brief Generator — CODE COMPLETE
 
 - [x] /gsd:discuss-phase 2 — 23 decisions captured in 02-CONTEXT.md (commit 21d056f)
 - [x] /gsd:plan-phase 2 — 8 PLAN.md files in 5 waves (commits a5ea09f, 0ec6c1d)
 - [x] Wave 1 (02-01): Structured Outputs schema audit gate — PASS (19/24 optional params)
 - [x] Wave 2 (02-02/03/04): Persona distillate, input classifier, comedy selector — 37 tests green
-- [ ] Wave 3 (02-05): System prompt builder with Pattern 5 + cache markers
-- [ ] Wave 4 (02-06): LLM generation client with Structured Outputs + fallback
-- [ ] Wave 5 (02-07/08): Brief Validator extension + end-to-end integration test
+- [x] Wave 3 (02-05): System prompt builder, Pattern 5, cache markers — 31 tests (SHA 93e4666)
+- [x] Wave 4 (02-06): LLM generation client, Structured Outputs + fallback — 12 mock tests (SHA 4d2bb67)
+- [x] Wave 5 (02-07/08): Semantic validator + barrel export + integration test — 30 tests (SHA 07e3dce)
+- [ ] Run integration test with real API key (5 scenarios, `node test/integration.js`)
 - [ ] /gsd:verify-work — validate against Phase 2 success criteria
 
 ## Backlog
@@ -41,6 +42,6 @@
 ## Session Handoff
 
 **Last session:** 2026-04-14
-**Branch:** main (clean after commit 2996d9a)
-**State:** Phase 2 executing — 4/8 plans complete (Waves 1-2 done). 37 tests across 5 suites. mirror-post at commit 005859b. Context paused at 79% between waves.
-**Pick up with:** Resume from `.continue-here.md` — execute Waves 3-5, then verify and close Phase 2.
+**Branch:** main (clean after commit below)
+**State:** Phase 2 code complete — 8/8 plans done. 111 unit/mock tests green across 8 suites. Integration test created but needs ANTHROPIC_API_KEY to run.
+**Pick up with:** Run `node test/integration.js` with API key, then `/gsd:verify-work` against Phase 2 success criteria, then close Phase 2.
