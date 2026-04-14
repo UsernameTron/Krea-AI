@@ -1,13 +1,13 @@
 {
   "version": "1.0",
   "timestamp": "2026-04-14",
-  "phase": "1",
-  "phase_name": "Mirror Post Scaffolding",
-  "phase_dir": ".planning/phases/01-mirror-post-scaffolding",
-  "plan": 3,
-  "task": 17,
-  "total_tasks": 17,
-  "status": "complete",
+  "phase": "2",
+  "phase_name": "Post Brief Generator",
+  "phase_dir": ".planning/phases/02-post-brief-generator",
+  "plan": 0,
+  "task": 0,
+  "total_tasks": 8,
+  "status": "planned",
   "completed_tasks": [
     {"id": 1, "name": "PLAN-01-01: Directory structure, config, foundational files (7 tasks)", "status": "complete", "commit": "77af7b5"},
     {"id": 2, "name": "PLAN-01-02: Asset import and conversion (5 tasks)", "status": "complete", "commit": "a32a8a7"},
@@ -23,7 +23,7 @@
     {"decision": "Added docs/DEVOPS-HANDOFF.md to satisfy commit hook gate", "rationale": "Documentation standards hook requires all 3 docs present", "phase": "1"}
   ],
   "uncommitted_files": [],
-  "next_action": "/gsd:discuss-phase 2 (Post Brief Generator)",
+  "next_action": "/gsd:execute-phase 2",
   "context_notes": "Phase 1 complete. mirror-post/ is a separate git repo with 3 clean commits. All 9 verification items pass. Phase 2 builds the Post Brief Generator (input classifier, LLM generation, brief validator).",
   "verification": {
     "harness": "4 passed, 0 failed, 4 total",
