@@ -5,6 +5,7 @@
 
 # Sub-projects have their own repos
 flux-krea/
+mirror-post/
 
 # Private context
 context/
