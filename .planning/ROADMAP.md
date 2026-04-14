@@ -13,13 +13,12 @@ Build the complete Mirror Post satirical LinkedIn compositor pipeline: from user
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Mirror Post Scaffolding** - Directory structure, persona assets, Post Brief schema, test fixtures
+- [x] **Phase 1: Mirror Post Scaffolding** - Directory structure, persona assets, Post Brief schema, test fixtures
 - [x] **Phase 2: Post Brief Generator** - Input classifier, system prompt builder, LLM generation, Brief Validator
-- [ ] **Phase 3: LinkedIn Visual Grammar** - Prop taxonomy, composition zones, engagement generator
-- [ ] **Phase 4: Image Prompt Engine** - Scene templates, prompt builder, modifier selection
-- [ ] **Phase 5: Compositor** - LinkedIn chrome, text overlay, tweet embed rendering
-- [ ] **Phase 6: Artifact UI** - Input form, brief display/edit, image prompt output
-- [ ] **Phase 7: Integration** - End-to-end pipeline testing and validation
+- [ ] **Phase 3: Visual Grammar + Image Prompt Builder** - Foundation prompt asset, deterministic prompt builder, zone spec, engagement generator
+- [ ] **Phase 4: Compositor** - LinkedIn chrome, text overlay, tweet embed, engagement bar over hero image
+- [ ] **Phase 5: Artifact UI** - Input form, brief display/edit, image prompt output
+- [ ] **Phase 6: Integration** - End-to-end pipeline testing and 4-post roundtrip validation
 - [ ] **Parallel: flux-krea Optimization** - Scheduler, MPS tuning, torch.compile, --prompt-file
 
 ## Phase Details
@@ -70,97 +69,79 @@ Plans:
 - [ ] 02-07-PLAN.md — Brief Validator extension with safety/voice/completeness checks (Wave 4)
 - [ ] 02-08-PLAN.md — End-to-end integration test + human verification (Wave 4)
 
-### Phase 3: LinkedIn Visual Grammar
-**Goal**: The visual rules for satirical LinkedIn post construction are codified as importable data -- prop taxonomy, composition zones, and engagement generation -- ready for consumption by Image Prompt Engine and Compositor
-**Depends on**: Phase 1
-**Requirements**: REQ-M-020, REQ-M-021, REQ-M-022, REQ-M-023
-**Patterns**: None (pure data/logic module)
-**Enforces**: REQ-X-002 (grammar data consumed via Post Brief contract)
+### Phase 3: Visual Grammar + Image Prompt Builder
+**Goal**: A Post Brief can be deterministically transformed into a Flux-compatible image prompt by prepending the static foundation prompt and appending character/scene/props delta — with zero LLM calls — and the compositor zone spec accurately describes the reference layout
+**Depends on**: Phase 2
+**Requirements**: REQ-M-020, REQ-M-021, REQ-M-022, REQ-M-023, REQ-M-030, REQ-M-031, REQ-M-032, REQ-M-033, REQ-M-034, REQ-M-035, REQ-X-060, REQ-X-061, REQ-X-062, REQ-X-063, REQ-X-064, REQ-X-065, REQ-X-066, REQ-X-070, REQ-X-071
+**Patterns**: None (pure data/logic module, deterministic construction)
+**Enforces**: REQ-X-002 (Post Brief contract), REQ-X-010 (no MidJourney flags), REQ-X-011 (diffusion prompts describe surfaces — but props with text are rendered IN the hero image by Flux), REQ-X-025 (no flux-krea source modifications), REQ-X-060 (3:2 horizontal), REQ-X-061 to REQ-X-066 (visual identity), REQ-X-070 (foundation prompt is a static asset, loaded once), REQ-X-071 (deterministic prompt construction, no LLM)
 **Success Criteria** (what must be TRUE):
-  1. Props JSON covers all prop types observed in the 4 reference outputs (mugs, whiteboards, desk items, business cards, nameplates) with placement options and text constraints
-  2. Zones JSON accurately describes the 1920x1080 spatial layout: LinkedIn header, profile bar, hero image with sub-zones (headline overlay, body overlay, subject, tweet embed), and engagement bar
-  3. Engagement generator produces satirically calibrated metrics (reaction counts, dominant reaction type, comment count) that vary by character type and post tone
-  4. Module has zero external dependencies and makes zero LLM calls
+  1. Foundation prompt YAML at `mirror-post/src/config/foundation-prompt.yaml` is committed as a static asset and loaded exactly once per session (not per call)
+  2. `image-prompt-builder.js` takes any valid Post Brief and outputs a Flux-compatible prompt that begins with `foundation.reusable_master_prompt` followed by character delta, props (with text rendered IN diffusion output), environment, and fidelity modifiers — fully deterministic, zero LLM calls
+  3. Compositor zone spec describes the full-bleed 3:2 hero layout with: left ~40% gradient text zone (headline + body), LinkedIn chrome positions (top nav, profile bar, engagement bar), tweet embed card slot (lower-right), engagement bar at bottom — matching the 5 reference images
+  4. Engagement generator produces satirically calibrated metrics (reaction counts, dominant reaction type, comment count) that vary by character type and post tone
+  5. Brent Vellum Post Brief produces a coherent middle-management office prompt where every prompt starts with the foundation prefix and prop text (mug label, whiteboard content) is described as part of the diffusion output
 **Plans**: TBD
 
 Plans:
-- [ ] 03-01: Prop taxonomy, composition zones, and engagement generator
+- [ ] 03-01: Foundation prompt loader + image-prompt-builder.js
+- [ ] 03-02: Compositor zone spec + engagement generator
 
-### Phase 4: Image Prompt Engine
-**Goal**: A Post Brief can be transformed into a complete local diffusion prompt with intelligent modifier selection, composition-aware framing, and explicit text-free surface descriptions
-**Depends on**: Phase 2, Phase 3
-**Requirements**: REQ-M-030, REQ-M-031, REQ-M-032, REQ-M-033, REQ-M-034, REQ-M-035, REQ-X-060, REQ-X-061, REQ-X-062, REQ-X-063, REQ-X-064, REQ-X-065, REQ-X-066
-**Patterns**: None specific (consumes pattern-driven data from Phase 2)
-**Enforces**: REQ-X-010 (no MidJourney flags -- prompt validator rejects --ar, --v syntax), REQ-X-011 (diffusion prompts describe surfaces only, no text content), REQ-X-027 (compositor owns all text rendering), REQ-X-025 (standard prompts, no flux-krea source modifications), REQ-X-060 (3:2 horizontal output), REQ-X-061 (hyperreal polished corporate-social aesthetic), REQ-X-062 (clean modular layout), REQ-X-063 (crisp sans-serif typography), REQ-X-064 (hero palette follows Post Brief), REQ-X-065 (deadpan satirical tone), REQ-X-066 (dynamic hero, fixed template)
-**Success Criteria** (what must be TRUE):
-  1. Scene templates exist for all 4 archetype environments (office-executive, office-middle-mgmt, airport-hustle, call-center-floor) with environment, subject, prop positions, and composition specs
-  2. Prompt builder produces positive prompt, negative prompt, parameters, and composition_notes from any valid Post Brief
-  3. Generated prompts leave the left 35-40% of frame clear for text overlays (text_clear_zone) and describe prop surfaces without text content
-  4. Modifier selection pulls 15-20 modifiers per scene from the ultra-fidelity library, matched to scene type and mood
-  5. Brent Vellum Post Brief produces a coherent office-middle-mgmt prompt with correct prop surface descriptions
-**Plans**: TBD
-
-Plans:
-- [ ] 04-01: Scene templates for 4 archetype environments
-- [ ] 04-02: Prompt builder and modifier selection logic
-
-### Phase 5: Compositor
-**Goal**: A diffusion-generated hero image plus a Post Brief can be assembled into a final 1920x1080 PNG with LinkedIn UI chrome, text overlays, tweet embed card, and engagement metrics
-**Depends on**: Phase 3, Phase 4
+### Phase 4: Compositor
+**Goal**: A flux-krea hero image plus a Post Brief can be assembled into a final 1920x1080 PNG with LinkedIn UI chrome, left-side gradient text overlay, tweet embed card, and engagement metrics — chrome layout consistent across any hero image
+**Depends on**: Phase 3
 **Requirements**: REQ-M-040, REQ-M-041, REQ-M-042, REQ-M-043, REQ-M-044, REQ-X-050, REQ-X-051, REQ-X-052, REQ-X-060, REQ-X-061, REQ-X-062, REQ-X-063, REQ-X-064, REQ-X-065, REQ-X-066
 **Patterns**: None specific
-**Enforces**: REQ-X-027 (ALL text rendering happens here -- headline, body, prop text, tweet, engagement), REQ-X-026 (two-stage pipeline: diffusion hero + compositor overlay), REQ-X-050 (fixed input dimensions from flux-krea), REQ-X-051 (compositor template is fixed asset), REQ-X-052 (deterministic output -- byte-identical given same inputs), REQ-X-060 (3:2 horizontal output), REQ-X-061 (hyperreal polished corporate-social aesthetic), REQ-X-062 (clean modular layout), REQ-X-063 (crisp sans-serif typography), REQ-X-064 (corporate blue/white/gray chrome), REQ-X-065 (deadpan satirical tone), REQ-X-066 (fixed template, dynamic hero + text)
+**Enforces**: REQ-X-027 (compositor renders headline, body, tweet card, engagement text — props text remains IN the hero image), REQ-X-026 (two-stage pipeline), REQ-X-050 (fixed input dimensions), REQ-X-051 (compositor template is fixed asset), REQ-X-052 (deterministic output)
 **Success Criteria** (what must be TRUE):
-  1. LinkedIn UI chrome renders recognizably (dark header bar, profile section with avatar/name/title, engagement footer) -- stylistically similar, not pixel-perfect, no LinkedIn logo
-  2. Headline text renders with highlight words in accent color, body text renders with bold/italic formatting, hashtags render below body
-  3. Tweet embed card renders as a white rounded card with author, handle, text, and hashtags in correct layout
-  4. Output is a single PNG at 1920x1080 with all zones populated per the composition spec
-  5. Engagement bar displays correct reaction icons, count, and comment count from the Post Brief
+  1. HTML-to-PNG compositor (Canvas API or Puppeteer) takes a hero image + Post Brief and outputs a single 1920x1080 PNG
+  2. LinkedIn chrome (top nav, profile bar with avatar/name/title, engagement bar with reactions and comment count) renders consistently regardless of the underlying hero image
+  3. Headline + body text overlay on the left ~40% with semi-transparent dark gradient renders readably against any hero background
+  4. Tweet embed card renders correctly as a white rounded card (lower-right) when present in the Post Brief, and is omitted cleanly when absent
+  5. Output is byte-identical given identical Post Brief + identical hero image (REQ-X-052 pixel-comparison test)
 **Plans**: TBD
 **UI hint**: yes
 
 Plans:
-- [ ] 05-01: LinkedIn UI chrome template and canvas setup
-- [ ] 05-02: Text overlay renderer and tweet embed renderer
+- [ ] 04-01: LinkedIn chrome template + Canvas/Puppeteer setup
+- [ ] 04-02: Text overlay (gradient zone) + tweet embed card renderer
 
-### Phase 6: Artifact UI
-**Goal**: Users can input a scenario or browse archetypes, generate and edit a Post Brief, and produce a copy-ready image prompt -- all within a Claude Desktop artifact with Obsidian dark-mode aesthetic
-**Depends on**: Phase 2, Phase 4
+### Phase 5: Artifact UI
+**Goal**: Users can input a scenario or browse archetypes, generate and edit a Post Brief, and produce a copy-ready image prompt — all within a Claude Desktop React artifact with Obsidian dark-mode aesthetic
+**Depends on**: Phase 3
 **Requirements**: REQ-M-050, REQ-M-051, REQ-M-052, REQ-M-054, REQ-M-055
 **Patterns**: None specific
-**Enforces**: REQ-X-033 (Obsidian dark-mode aesthetic: deep navy, gold accents, cream backgrounds), REQ-X-043 (React artifact)
-**Deferred**: REQ-M-053 (Compositor preview in artifact -- marked DEFERRED, out of M1 scope)
+**Enforces**: REQ-X-033 (Obsidian dark-mode aesthetic), REQ-X-043 (React artifact)
+**Deferred**: REQ-M-053 (compositor preview in artifact — out of M1 scope)
 **Success Criteria** (what must be TRUE):
-  1. Input form accepts freeform text and provides an archetype browser displaying all archetypes grouped by domain with name, signature move, and tell
-  2. Generated Post Brief displays with all fields editable in-place (character, post content, props, tweet embed, engagement)
-  3. "Generate Image Prompt" produces a diffusion-ready prompt with composition guide showing zone layout, and "Copy" buttons work for prompt, negative prompt, and Brief JSON
-  4. Full input-to-prompt flow completes in under 20 seconds
-  5. UI follows Obsidian dark-mode aesthetic (deep navy background, gold accents, cream text)
+  1. Input form accepts freeform text and provides an archetype browser grouped by domain
+  2. Sliders adjust satirical intensity (1-5), character expression, environment type, and prop density
+  3. Generated Post Brief displays with all fields editable in-place
+  4. One-click "Generate Image Prompt" runs brief → image prompt and provides Copy buttons for the Flux-ready prompt
+  5. Full input-to-prompt flow completes in under 20 seconds and the UI follows Obsidian dark-mode aesthetic (deep navy, gold accents, cream text)
 **Plans**: TBD
 **UI hint**: yes
 
 Plans:
-- [ ] 06-01: Input form with archetype browser
-- [ ] 06-02: Post Brief display with inline editing
-- [ ] 06-03: Image prompt output with composition guide
+- [ ] 05-01: Input form + archetype browser + sliders
+- [ ] 05-02: Brief display with inline editing + image prompt output
 
-### Phase 7: Integration
-**Goal**: The complete pipeline -- input to brief to prompt to hero image to composite -- works end-to-end and produces structurally matching outputs for all 4 reference posts
-**Depends on**: Phase 5, Phase 6
+### Phase 6: Integration + End-to-End
+**Goal**: The complete pipeline — input → Post Brief → image prompt → flux-krea → compositor → final PNG — works end-to-end and produces structurally matching outputs for all 4 reference posts plus a freeform original scenario
+**Depends on**: Phase 4, Phase 5
 **Requirements**: REQ-M-060, REQ-M-061, REQ-M-062
 **Patterns**: All patterns validated end-to-end
-**Enforces**: REQ-X-002 (Post Brief contract never bypassed across full pipeline), REQ-X-003 (prompt-file.json contract between Mirror Post and flux-krea)
+**Enforces**: REQ-X-002 (Post Brief contract never bypassed), REQ-X-003 (prompt-file contract between Mirror Post and flux-krea)
 **Success Criteria** (what must be TRUE):
-  1. Input "HR manager who strips job descriptions" produces a complete composite image with Brent Vellum character, correct props, and LinkedIn chrome
+  1. Pipeline test runs input → Post Brief → image prompt → flux-krea → compositor → final PNG without manual intervention
   2. All 4 reference post roundtrips (Brent Vellum, Trevor B. hustle, Trevor B. closer, Pete C. titles) produce structurally matching outputs
-  3. A freeform original scenario produces a coherent end-to-end output with original character
-  4. Edit flow works: generate brief, edit mug text, regenerate prompt -- updated prompt reflects the edit
-  5. Total pipeline completes in under 2 minutes end-to-end
-  6. Compositor produces byte-identical output given identical Post Brief + identical hero image (REQ-X-052 pixel-comparison test)
+  3. A freeform original scenario produces a coherent end-to-end output with original character and props
+  4. Edit flow works: generate brief → edit a field → regenerate prompt → updated prompt reflects the edit
+  5. Compositor produces byte-identical output given identical Post Brief + identical hero image
 **Plans**: TBD
 
 Plans:
-- [ ] 07-01: End-to-end pipeline wiring and 4-post roundtrip validation
+- [ ] 06-01: End-to-end pipeline wiring and 4-post roundtrip validation
 
 ### Parallel: flux-krea Optimization
 **Goal**: Generation latency drops from 60-90 seconds to 30-45 seconds on M4 Pro, with --prompt-file flag enabling structured input from Mirror Post
@@ -223,30 +204,32 @@ These constraints apply across ALL phases. Any phase output that violates these 
 | REQ-M-016 | Phase 2 | Post Brief Generator |
 | REQ-M-017 | Phase 2 | Post Brief Generator |
 | REQ-M-018 | Phase 2 | Post Brief Generator |
-| REQ-M-020 | Phase 3 | Visual Grammar |
-| REQ-M-021 | Phase 3 | Visual Grammar |
-| REQ-M-022 | Phase 3 | Visual Grammar |
-| REQ-M-023 | Phase 3 | Visual Grammar |
-| REQ-M-030 | Phase 4 | Image Prompt Engine |
-| REQ-M-031 | Phase 4 | Image Prompt Engine |
-| REQ-M-032 | Phase 4 | Image Prompt Engine |
-| REQ-M-033 | Phase 4 | Image Prompt Engine |
-| REQ-M-034 | Phase 4 | Image Prompt Engine |
-| REQ-M-035 | Phase 4 | Image Prompt Engine |
-| REQ-M-040 | Phase 5 | Compositor |
-| REQ-M-041 | Phase 5 | Compositor |
-| REQ-M-042 | Phase 5 | Compositor |
-| REQ-M-043 | Phase 5 | Compositor |
-| REQ-M-044 | Phase 5 | Compositor |
-| REQ-M-050 | Phase 6 | Artifact UI |
-| REQ-M-051 | Phase 6 | Artifact UI |
-| REQ-M-052 | Phase 6 | Artifact UI |
+| REQ-M-020 | Phase 3 | Visual Grammar + Image Prompt Builder |
+| REQ-M-021 | Phase 3 | Visual Grammar + Image Prompt Builder |
+| REQ-M-022 | Phase 3 | Visual Grammar + Image Prompt Builder |
+| REQ-M-023 | Phase 3 | Visual Grammar + Image Prompt Builder |
+| REQ-M-030 | Phase 3 | Visual Grammar + Image Prompt Builder |
+| REQ-M-031 | Phase 3 | Visual Grammar + Image Prompt Builder |
+| REQ-M-032 | Phase 3 | Visual Grammar + Image Prompt Builder |
+| REQ-M-033 | Phase 3 | Visual Grammar + Image Prompt Builder |
+| REQ-M-034 | Phase 3 | Visual Grammar + Image Prompt Builder |
+| REQ-M-035 | Phase 3 | Visual Grammar + Image Prompt Builder |
+| REQ-M-040 | Phase 4 | Compositor |
+| REQ-M-041 | Phase 4 | Compositor |
+| REQ-M-042 | Phase 4 | Compositor |
+| REQ-M-043 | Phase 4 | Compositor |
+| REQ-M-044 | Phase 4 | Compositor |
+| REQ-M-050 | Phase 5 | Artifact UI |
+| REQ-M-051 | Phase 5 | Artifact UI |
+| REQ-M-052 | Phase 5 | Artifact UI |
 | REQ-M-053 | DEFERRED | Artifact UI (stretch) |
-| REQ-M-054 | Phase 6 | Artifact UI |
-| REQ-M-055 | Phase 6 | Artifact UI |
-| REQ-M-060 | Phase 7 | Integration |
-| REQ-M-061 | Phase 7 | Integration |
-| REQ-M-062 | Phase 7 | Integration |
+| REQ-M-054 | Phase 5 | Artifact UI |
+| REQ-M-055 | Phase 5 | Artifact UI |
+| REQ-M-060 | Phase 6 | Integration |
+| REQ-M-061 | Phase 6 | Integration |
+| REQ-M-062 | Phase 6 | Integration |
+| REQ-X-070 | Phase 3 | Foundation prompt is static asset, loaded once |
+| REQ-X-071 | Phase 3 | Image prompt construction is deterministic, no LLM |
 | REQ-F-010 | Parallel | flux-krea Optimization |
 | REQ-F-011 | Parallel | flux-krea Optimization |
 | REQ-F-012 | Parallel | flux-krea Optimization |
@@ -264,16 +247,15 @@ These constraints apply across ALL phases. Any phase output that violates these 
 ## Progress
 
 **Execution Order:**
-Phases 1-7 execute sequentially (with Phase 3 potentially parallel to Phase 2).
+Phases 1-6 execute sequentially. Phase 5 (Artifact UI) may run in parallel with Phase 4 (Compositor) since both depend on Phase 3.
 Parallel work stream executes independently in flux-krea/ repo.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Scaffolding | 3/3 | COMPLETE | 2026-04-14 |
-| 2. Post Brief Generator | 0/3 | Not started | - |
-| 3. Visual Grammar | 0/1 | Not started | - |
-| 4. Image Prompt Engine | 0/2 | Not started | - |
-| 5. Compositor | 0/2 | Not started | - |
-| 6. Artifact UI | 0/3 | Not started | - |
-| 7. Integration | 0/1 | Not started | - |
+| 2. Post Brief Generator | 8/8 | COMPLETE | 2026-04-14 |
+| 3. Visual Grammar + Image Prompt Builder | 0/2 | Not started | - |
+| 4. Compositor | 0/2 | Not started | - |
+| 5. Artifact UI | 0/2 | Not started | - |
+| 6. Integration | 0/1 | Not started | - |
 | P. flux-krea Optimization | 0/6 | Not started | - |
