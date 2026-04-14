@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 2 COMPLETE — UAT 4/5 pass, latency criterion revised per D-22 (Opus quality > speed)"
-stopped_at: Phase 2 closed; ready to start Phase 3 (LinkedIn Visual Grammar)
-last_updated: "2026-04-14T23:30:00.000Z"
-last_activity: "2026-04-14 — Phase 2 closed: criterion 5 latency revised <15s → <60s per D-22 Opus selection, all 5 criteria now pass"
+status: "Architecture revised — Phases 3-7 collapsed into Phases 3-6 (three-layer visual system)"
+stopped_at: Architecture revision committed; Phase 3 discussion deferred to next session (context hit 79%)
+last_updated: "2026-04-14T17:10:00.000Z"
+last_activity: "2026-04-14 — Revised ROADMAP: new Phases 3-6 reflect three-layer visual architecture; added REQ-X-070/071; foundation prompt committed as static asset"
 progress:
-  total_phases: 7
+  total_phases: 6
   completed_phases: 2
-  total_plans: 8
-  completed_plans: 8
-  percent: 42
+  total_plans: 11
+  completed_plans: 11
+  percent: 33
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** The Post Brief is the product -- a single structured JSON document containing every element of a satirical LinkedIn post, all satirically coherent from one voice-aware pass.
-**Current focus:** Phase 2 COMPLETE — ready for Phase 3 (LinkedIn Visual Grammar)
+**Current focus:** Architecture revised; ready to discuss new Phase 3 (Visual Grammar + Image Prompt Builder)
 
 ## Current Position
 
 Phase 0 (Bootstrap): COMPLETE
 Phase 1 (Mirror Post Scaffolding): COMPLETE
-Phase: 2 of 7 (Post Brief Generator) + Parallel flux-krea Optimization
-Plan: 8 of 8 in current phase
-Status: Phase 2 code complete — awaiting integration test with real API
-Last activity: 2026-04-14 — Waves 3-5 complete, 111 unit/mock tests green
+Phase 2 (Post Brief Generator): COMPLETE
+Phase: 3 of 6 (Visual Grammar + Image Prompt Builder — NEW SCOPE) + Parallel flux-krea Optimization
+Status: Awaiting `/gsd:discuss-phase 3` in fresh session (context hit 79% during architecture revision)
+Last activity: 2026-04-14 — Architecture revision: Phases 3-7 → Phases 3-6, REQ-X-070/071 added, foundation prompt committed
 Branch: main
 
 Progress: [###░░░░░░░] 28%
