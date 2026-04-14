@@ -81,11 +81,11 @@ Plans:
   3. Compositor zone spec describes the full-bleed 3:2 hero layout with: left ~40% gradient text zone (headline + body), LinkedIn chrome positions (top nav, profile bar, engagement bar), tweet embed card slot (lower-right), engagement bar at bottom — matching the 5 reference images
   4. Engagement generator produces satirically calibrated metrics (reaction counts, dominant reaction type, comment count) that vary by character type and post tone
   5. Brent Vellum Post Brief produces a coherent middle-management office prompt where every prompt starts with the foundation prefix and prop text (mug label, whiteboard content) is described as part of the diffusion output
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 03-01: Foundation prompt loader + image-prompt-builder.js
-- [ ] 03-02: Compositor zone spec + engagement generator
+- [ ] 03-01-PLAN.md — Foundation prompt loader, scene templates, and image prompt builder (Wave 1)
+- [ ] 03-02-PLAN.md — Compositor zone spec, prop taxonomy, and engagement generator (Wave 1)
 
 ### Phase 4: Compositor
 **Goal**: A flux-krea hero image plus a Post Brief can be assembled into a final 1920x1080 PNG with LinkedIn UI chrome, left-side gradient text overlay, tweet embed card, and engagement metrics — chrome layout consistent across any hero image
