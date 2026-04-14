@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 2 executing — Wave 1 complete, Wave 2 in progress"
-stopped_at: Wave 1 complete (02-01), Wave 2 starting
-last_updated: "2026-04-14T20:00:00.000Z"
-last_activity: "2026-04-14 — Wave 1 complete (02-01 schema audit gate PASS, 19/24 optional params)"
+status: "Phase 2 executing — Waves 1-2 complete, Wave 3 next"
+stopped_at: Wave 2 complete (02-02/03/04), Wave 3 next
+last_updated: "2026-04-14T21:00:00.000Z"
+last_activity: "2026-04-14 — Wave 2 complete (distillate + classifier + comedy selector, 37 tests green)"
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 8
-  completed_plans: 1
-  percent: 16
+  completed_plans: 4
+  percent: 28
 ---
 
 # Project State
@@ -21,19 +21,19 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** The Post Brief is the product -- a single structured JSON document containing every element of a satirical LinkedIn post, all satirically coherent from one voice-aware pass.
-**Current focus:** Phase 2 - Post Brief Generator (EXECUTING — Wave 1 complete, 1/8 plans done)
+**Current focus:** Phase 2 - Post Brief Generator (EXECUTING — Waves 1-2 complete, 4/8 plans done)
 
 ## Current Position
 
 Phase 0 (Bootstrap): COMPLETE
 Phase 1 (Mirror Post Scaffolding): COMPLETE
 Phase: 2 of 7 (Post Brief Generator) + Parallel flux-krea Optimization
-Plan: 1 of 8 in current phase
-Status: Phase 2 executing — Wave 1 complete, Wave 2 in progress
-Last activity: 2026-04-14 — Wave 1 complete (02-01 schema audit gate PASS)
+Plan: 4 of 8 in current phase
+Status: Phase 2 executing — Waves 1-2 complete, Wave 3 next
+Last activity: 2026-04-14 — Wave 2 complete (distillate + classifier + comedy, 37 tests)
 Branch: main
 
-Progress: [##░░░░░░░░] 16%
+Progress: [###░░░░░░░] 28%
 
 ## Performance Metrics
 
@@ -100,6 +100,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-14T20:00:00.000Z
-Stopped at: Wave 1 complete (02-01), Wave 2 starting
-Next: Execute Wave 2 (02-02, 02-03, 02-04 in parallel)
+Last session: 2026-04-14T21:00:00.000Z
+Stopped at: Wave 2 complete (02-02/03/04), Wave 3 next
+Next: Execute Wave 3 (02-05 system prompt builder), then Wave 4 (02-06 LLM client), then Wave 5 (02-07/08 validator + integration)
