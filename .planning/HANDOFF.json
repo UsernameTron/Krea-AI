@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-04-14T04:05:10.889Z",
+  "phase": "0",
+  "phase_name": "bootstrap",
+  "phase_dir": ".planning",
+  "plan": 0,
+  "task": 5,
+  "total_tasks": 9,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "Codebase mapping (7 docs)", "status": "done", "commit": "5b45df9"},
+    {"id": 2, "name": "Initialize git repo for Krea-AI", "status": "done", "commit": "5b45df9"},
+    {"id": 3, "name": "Create CLAUDE.md, README.md, docs/DEVOPS-HANDOFF.md", "status": "done", "commit": "5b45df9"},
+    {"id": 4, "name": "Write PROJECT.md from plan documents", "status": "done", "commit": "5b45df9"},
+    {"id": 5, "name": "Commit Mirror Post source assets", "status": "done", "commit": "6f28543"},
+    {"id": 6, "name": "Collect workflow preferences and create config.json", "status": "done", "commit": null}
+  ],
+  "remaining_tasks": [
+    {"id": 7, "name": "Define REQUIREMENTS.md from plans", "status": "not_started"},
+    {"id": 8, "name": "Create ROADMAP.md via gsd-roadmapper agent", "status": "not_started"},
+    {"id": 9, "name": "Create STATE.md and generate CLAUDE.md via gsd-tools", "status": "not_started"}
+  ],
+  "blockers": [],
+  "human_actions_pending": [],
+  "decisions": [
+    {"decision": "YOLO mode, Standard granularity, Parallel execution, Commit docs", "rationale": "User selected recommended defaults", "phase": "0"},
+    {"decision": "Quality model profile (Opus for research/roadmap agents)", "rationale": "User selected for deeper analysis given effort max directive", "phase": "0"},
+    {"decision": "Research enabled, Plan check enabled, Verifier enabled", "rationale": "Full quality pipeline for maximum effort", "phase": "0"},
+    {"decision": "Krea-AI gets its own git repo (separate from parent projects/ workspace)", "rationale": "Parent projects/.gitignore excludes Krea-AI/ via * rule. Krea-AI needs own repo for version control.", "phase": "0"}
+  ],
+  "uncommitted_files": [".planning/config.json"],
+  "next_action": "Commit config.json, then define REQUIREMENTS.md from KNOWLEDGE_BASE.md + PLAN_01 + PLAN_02 plans, then spawn gsd-roadmapper to create ROADMAP.md and STATE.md",
+  "context_notes": "Phase 0 bootstrap is ~65% complete. PROJECT.md written, all docs created, source assets committed, workflow config collected. Remaining: requirements extraction, roadmap creation, STATE.md initialization. The plans in 'Plans for Krea AI/' contain everything needed to derive requirements and roadmap — no additional questioning needed. Sub-repo detection was skipped since flux-krea is gitignored."
+}
