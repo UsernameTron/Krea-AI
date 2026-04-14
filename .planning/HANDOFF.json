@@ -1,40 +1,39 @@
 {
   "version": "1.0",
-  "timestamp": "2026-04-14T21:29:49.357Z",
+  "timestamp": "2026-04-14T21:45:00.000Z",
   "phase": "02",
   "phase_name": "post-brief-generator",
   "phase_dir": ".planning/phases/02-post-brief-generator",
   "plan": 8,
-  "task": "integration-verification",
+  "task": "close-phase-decision",
   "total_tasks": 8,
-  "status": "paused",
+  "status": "paused-awaiting-decision",
   "completed_tasks": [
-    {"id": "02-01", "name": "Structured Outputs schema audit", "status": "done"},
-    {"id": "02-02/03/04", "name": "Persona distillate, input classifier, comedy selector", "status": "done"},
-    {"id": "02-05", "name": "System prompt builder (Pattern 5)", "status": "done"},
-    {"id": "02-06", "name": "LLM client + Structured Outputs + fallback", "status": "done"},
-    {"id": "02-07/08", "name": "Semantic validator + barrel + integration test", "status": "done"},
+    {"id": "02-01..08", "name": "All Phase 2 plans (audit, distillate, classifier, comedy, prompt builder, LLM client, validator, integration test)", "status": "done"},
     {"id": "fix-1", "name": "Timeout 15s->90s, safety rule 6 (contacts), rule 7 (jargon quoting)", "status": "done", "commit": "8aef5d8"},
     {"id": "fix-2", "name": "HIGH-RISK 'transform' callout in safety-rails.md", "status": "done", "commit": "618e457"},
-    {"id": "fix-3", "name": "Deterministic transform substitutions + rename archetype trait 'AI Transformation Leader'->'AI Reinvention Leader'", "status": "done", "commit": "f0afcb1"}
+    {"id": "fix-3", "name": "Deterministic transform substitutions + rename archetype trait", "status": "done", "commit": "f0afcb1"},
+    {"id": "verify-1", "name": "Live integration test 5/5 PASS", "status": "done", "evidence": "All 5 scenarios passed validator, 39-48s each, ~3,900 input tokens"},
+    {"id": "verify-2", "name": "/gsd:verify-work — UAT.md created against Phase 2 success criteria", "status": "done", "commit": "b26e718"}
   ],
   "remaining_tasks": [
-    {"id": "verify-1", "name": "Re-run integration test with API key (5 scenarios)", "status": "not_started"},
-    {"id": "verify-2", "name": "/gsd:verify-work against Phase 2 success criteria (only if 5/5 pass)", "status": "not_started"},
-    {"id": "close-phase", "name": "Close Phase 2, then /gsd:discuss-phase 3 (Visual Grammar)", "status": "not_started"}
+    {"id": "decision-1", "name": "User decision on Phase 2 success criterion 5 (latency <15s vs Opus reality 39-48s)", "status": "awaiting_user", "recommendation": "Update ROADMAP criterion to <60s — D-22 chose Opus 4.6 for voice fidelity, criterion was Sonnet-era"},
+    {"id": "close-1", "name": "Update ROADMAP.md Phase 2 latency criterion (if option 1 approved)", "status": "blocked_on_decision"},
+    {"id": "close-2", "name": "Mark Phase 2 complete in ROADMAP/STATE", "status": "blocked_on_decision"},
+    {"id": "next-phase", "name": "/gsd:discuss-phase 3 (LinkedIn Visual Grammar)", "status": "blocked_on_close"}
   ],
   "blockers": [
-    {"description": "Integration test needs ANTHROPIC_API_KEY env var to run", "type": "human_action", "workaround": "User exports key in shell before running"}
+    {"description": "User decision needed on latency criterion: update to <60s, downgrade model, or defer", "type": "human_action"}
   ],
   "human_actions_pending": [
-    {"action": "Run: cd mirror-post && ANTHROPIC_API_KEY=sk-ant-... node test/integration.js", "context": "Verify 3 'transform' fixes resolved last failing scenario (resume-padder). Last live run was 4/5.", "blocking": true}
+    {"action": "Confirm option 1 (update ROADMAP latency criterion to <60s) or pick alternative", "context": "Criterion 5 of Phase 2 says <15s. Live tests took 39-48s. Root cause is D-22 (Opus 4.6 over Sonnet for voice fidelity), not a defect. 4/5 criteria already PASS.", "blocking": true}
   ],
   "decisions": [
     {"decision": "Raise integration test timeout 15s->90s", "rationale": "Real Opus 4.6 calls take 30-60s; 15s was mock-calibrated", "phase": "02"},
-    {"decision": "Fix 'transform' leak via prompt engineering (3 layers) instead of LLM client retry tier", "rationale": "Lower blast radius; preserves Pattern 7 tier semantics. Fallback escalation path documented if leak recurs.", "phase": "02"},
-    {"decision": "Rename archetype trait 'AI Transformation Leader'->'AI Reinvention Leader'", "rationale": "LLM was echoing verbatim source text from archetype context into output; remove the source.", "phase": "02"}
+    {"decision": "Fix 'transform' leak via prompt engineering (3 layers) over LLM client retry tier", "rationale": "Lower blast radius; preserves Pattern 7 tier semantics", "phase": "02"},
+    {"decision": "Rename archetype trait 'AI Transformation Leader'->'AI Reinvention Leader'", "rationale": "LLM was echoing verbatim source text from archetype context", "phase": "02"}
   ],
   "uncommitted_files": [],
-  "next_action": "cd /Users/cpconnor/projects/Krea-AI/mirror-post && ANTHROPIC_API_KEY=sk-ant-... node test/integration.js",
-  "context_notes": "Phase 2 code complete (111 unit/mock tests green across 8 suites). Last live integration run: 4/5 pass. Only resume-padder failed on unquoted 'transform'. Three complementary fixes applied across safety-rails.md, persona-voice-distillate.md, and library.json (commits 618e457, f0afcb1). UNTESTED with new fixes. If 'transform' still leaks after this re-run, escalate to architectural fix: add BANNED_CORPORATE_JARGON to LLM client Pattern 7 retry tier in src/brief/llm-client.js (1 retry with corrective re-prompt naming the specific banned word). Latent bug in validator.js containsUnquoted(): apostrophes in contractions count as single quotes and could cause false negatives — not the cause of current failures but worth tracking. Context was at 90% when paused."
+  "next_action": "User confirms criterion 5 resolution. If option 1: update ROADMAP.md Phase 2 success criterion 5 from '<15 seconds' to '<60 seconds', mark Phase 2 complete, then /gsd:discuss-phase 3.",
+  "context_notes": "Integration test 5/5 PASS this session (commits 60d4129 handoff, b26e718 UAT). Phase 2 code is solid. The only open item is reconciling ROADMAP success criterion 5 with the D-22 model decision. UAT.md at .planning/phases/02-post-brief-generator/02-UAT.md documents the full verification including the criterion-mismatch finding. Recommended path: option 1 (update criterion to <60s, close phase). Latent bug still tracked: validator.js containsUnquoted() apostrophe handling. Pattern 7 retry tier escalation path remains documented as fallback if 'transform' regresses in future runs."
 }
