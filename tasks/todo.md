@@ -26,17 +26,21 @@
 
 - [x] /gsd:discuss-phase 2 — 23 decisions captured in 02-CONTEXT.md (commit 21d056f)
 - [x] /gsd:plan-phase 2 — 8 PLAN.md files in 5 waves (commits a5ea09f, 0ec6c1d)
-- [ ] /gsd:execute-phase 2 — execute 8 plans across 5 waves
-- [ ] /gsd:verify-work — validate against success criteria
+- [x] Wave 1 (02-01): Structured Outputs schema audit gate — PASS (19/24 optional params)
+- [x] Wave 2 (02-02/03/04): Persona distillate, input classifier, comedy selector — 37 tests green
+- [ ] Wave 3 (02-05): System prompt builder with Pattern 5 + cache markers
+- [ ] Wave 4 (02-06): LLM generation client with Structured Outputs + fallback
+- [ ] Wave 5 (02-07/08): Brief Validator extension + end-to-end integration test
+- [ ] /gsd:verify-work — validate against Phase 2 success criteria
 
 ## Backlog
 
 - [ ] Review CONCERNS.md and prioritize tech debt items
-- [ ] Update REQUIREMENTS.md REQ-M-013 model from claude-sonnet-4 to claude-opus-4-6 (aligns with D-22)
+- [x] Update REQUIREMENTS.md REQ-M-013 model from claude-sonnet-4 to claude-opus-4-6 (aligns with D-22) — done in preliminary commit 1bf7776
 
 ## Session Handoff
 
 **Last session:** 2026-04-14
-**Branch:** main (clean after commit)
-**State:** Phase 2 planned. 8 plans across 5 waves: schema audit gate (W1), distillate + classifier + comedy selector (W2 parallel), system prompt builder (W3), LLM client (W4), validator + integration test (W5). Verification passed — 0 blockers, 9/9 REQs covered, all 23 decisions honored, all 5 user ordering constraints satisfied.
-**Pick up with:** `/gsd:execute-phase 2`
+**Branch:** main (clean after commit 2996d9a)
+**State:** Phase 2 executing — 4/8 plans complete (Waves 1-2 done). 37 tests across 5 suites. mirror-post at commit 005859b. Context paused at 79% between waves.
+**Pick up with:** Resume from `.continue-here.md` — execute Waves 3-5, then verify and close Phase 2.
