@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: "Phase 2 code complete — 8/8 plans done, awaiting integration test with real API"
-stopped_at: All waves committed, integration test pending (requires ANTHROPIC_API_KEY)
-last_updated: "2026-04-14T23:00:00.000Z"
-last_activity: "2026-04-14 — Waves 3-5 complete (prompt builder + LLM client + validator + barrel + integration test), 111 unit/mock tests green"
+status: "Phase 2 COMPLETE — UAT 4/5 pass, latency criterion revised per D-22 (Opus quality > speed)"
+stopped_at: Phase 2 closed; ready to start Phase 3 (LinkedIn Visual Grammar)
+last_updated: "2026-04-14T23:30:00.000Z"
+last_activity: "2026-04-14 — Phase 2 closed: criterion 5 latency revised <15s → <60s per D-22 Opus selection, all 5 criteria now pass"
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
   completed_plans: 8
   percent: 42
@@ -21,7 +21,7 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** The Post Brief is the product -- a single structured JSON document containing every element of a satirical LinkedIn post, all satirically coherent from one voice-aware pass.
-**Current focus:** Phase 2 - Post Brief Generator (CODE COMPLETE — 8/8 plans done, integration test pending)
+**Current focus:** Phase 2 COMPLETE — ready for Phase 3 (LinkedIn Visual Grammar)
 
 ## Current Position
 

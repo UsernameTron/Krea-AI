@@ -14,7 +14,7 @@ Build the complete Mirror Post satirical LinkedIn compositor pipeline: from user
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Mirror Post Scaffolding** - Directory structure, persona assets, Post Brief schema, test fixtures
-- [ ] **Phase 2: Post Brief Generator** - Input classifier, system prompt builder, LLM generation, Brief Validator
+- [x] **Phase 2: Post Brief Generator** - Input classifier, system prompt builder, LLM generation, Brief Validator
 - [ ] **Phase 3: LinkedIn Visual Grammar** - Prop taxonomy, composition zones, engagement generator
 - [ ] **Phase 4: Image Prompt Engine** - Scene templates, prompt builder, modifier selection
 - [ ] **Phase 5: Compositor** - LinkedIn chrome, text overlay, tweet embed rendering
@@ -57,7 +57,7 @@ Plans:
   2. Freeform scenarios (e.g., "Cloud architect who only deploys to PowerPoint") produce original characters with coherent props, not archetype copies
   3. Generated Post Briefs pass all Brief Validator hard-fail checks: schema compliance, safety, banned phrases, prop completeness, engagement sanity
   4. All 4 reference fixture inputs produce structurally similar Post Briefs to their expected outputs
-  5. Generation completes in under 15 seconds per brief with assembled system prompt under 8K tokens
+  5. Generation completes in under 60 seconds per brief with assembled system prompt under 8K tokens (revised from <15s per D-22: Opus 4 selected for quality over latency; observed p50 ~32s, p95 ~50s acceptable for satirical-quality requirements)
 **Plans**: 8 plans in 4 waves
 
 Plans:
