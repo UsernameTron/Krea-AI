@@ -85,7 +85,7 @@ Plans:
 
 Plans:
 - [ ] 03-01-PLAN.md — Foundation prompt loader, scene templates, and image prompt builder (Wave 1)
-- [ ] 03-02-PLAN.md — Compositor zone spec, prop taxonomy, and engagement generator (Wave 1)
+- [x] 03-02-PLAN.md — Compositor zone spec, prop taxonomy, and engagement generator (Wave 1)
 
 ### Phase 4: Compositor
 **Goal**: A flux-krea hero image plus a Post Brief can be assembled into a final 1920x1080 PNG with LinkedIn UI chrome, left-side gradient text overlay, tweet embed card, and engagement metrics — chrome layout consistent across any hero image
@@ -254,7 +254,7 @@ Parallel work stream executes independently in flux-krea/ repo.
 |-------|----------------|--------|-----------|
 | 1. Scaffolding | 3/3 | COMPLETE | 2026-04-14 |
 | 2. Post Brief Generator | 8/8 | COMPLETE | 2026-04-14 |
-| 3. Visual Grammar + Image Prompt Builder | 0/2 | Not started | - |
+| 3. Visual Grammar + Image Prompt Builder | 1/2 | In Progress|  |
 | 4. Compositor | 0/2 | Not started | - |
 | 5. Artifact UI | 0/2 | Not started | - |
 | 6. Integration | 0/1 | Not started | - |
