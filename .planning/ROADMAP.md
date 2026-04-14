@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Mirror Post Scaffolding** - Directory structure, persona assets, Post Brief schema, test fixtures
 - [x] **Phase 2: Post Brief Generator** - Input classifier, system prompt builder, LLM generation, Brief Validator
-- [ ] **Phase 3: Visual Grammar + Image Prompt Builder** - Foundation prompt asset, deterministic prompt builder, zone spec, engagement generator
+- [x] **Phase 3: Visual Grammar + Image Prompt Builder** - Foundation prompt asset, deterministic prompt builder, zone spec, engagement generator (completed 2026-04-14)
 - [ ] **Phase 4: Compositor** - LinkedIn chrome, text overlay, tweet embed, engagement bar over hero image
 - [ ] **Phase 5: Artifact UI** - Input form, brief display/edit, image prompt output
 - [ ] **Phase 6: Integration** - End-to-end pipeline testing and 4-post roundtrip validation
@@ -84,7 +84,7 @@ Plans:
 **Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 03-01-PLAN.md — Foundation prompt loader, scene templates, and image prompt builder (Wave 1)
+- [x] 03-01-PLAN.md — Foundation prompt loader, scene templates, and image prompt builder (Wave 1)
 - [x] 03-02-PLAN.md — Compositor zone spec, prop taxonomy, and engagement generator (Wave 1)
 
 ### Phase 4: Compositor
@@ -254,7 +254,7 @@ Parallel work stream executes independently in flux-krea/ repo.
 |-------|----------------|--------|-----------|
 | 1. Scaffolding | 3/3 | COMPLETE | 2026-04-14 |
 | 2. Post Brief Generator | 8/8 | COMPLETE | 2026-04-14 |
-| 3. Visual Grammar + Image Prompt Builder | 1/2 | In Progress|  |
+| 3. Visual Grammar + Image Prompt Builder | 2/2 | Complete   | 2026-04-14 |
 | 4. Compositor | 0/2 | Not started | - |
 | 5. Artifact UI | 0/2 | Not started | - |
 | 6. Integration | 0/1 | Not started | - |
