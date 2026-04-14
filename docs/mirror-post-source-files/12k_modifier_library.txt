@@ -1,0 +1,30 @@
+**12K Image Prompt Modifier Library**
+
+---
+
+**Resolution & Render Fidelity**  
+`12 k`, `12000 px`, `60 MP`, `super-resolution`, `hyper-detailed`, `extreme micro-detail`, `film-scan clarity`, `8-way supersample`, `retina-grade render`, `oversampled geometry`
+
+**Camera & Lens**  
+`full-frame sensor`, `Phase One IQ4`, `Hasselblad H6D`, `50 mm f/1.2`, `100 mm macro`, `tilt-shift`, `orthographic`, `8K cine camera`, `cinemaScope aspect`, `ISO 50`, `low-distortion prime`, `anamorphic glass`, `Zeiss Otus optics`
+
+**Lighting**  
+`HDRI dome light`, `global illumination`, `subsurface scattering`, `softbox key`, `golden-hour backlight`, `god-rays`, `volumetric fog`, `practical tungsten practicals`, `specular highlights`, `bounce fill`, `multi-directional strobes`, `gel-filtered lights`
+
+**Surface & Texture**  
+`physically-based materials`, `PBR shaders`, `high-frequency displacement`, `ray-traced reflections`, `sub-micron bump`, `anodized metal`, `weathered patina`, `scanned surface maps`, `micro-scratch detail`, `fractal mesh topology`
+
+**Post-Processing / Film Look**  
+`ACEScg color space`, `Kodak Porta 800 emulation`, `DaVinci Resolve grade`, `unsharp mask`, `32-bit float workflow`, `Gaussian bloom`, `chromatic adaptation`, `motion film LUT`, `push-processed film`, `analog halation`, `nonlinear tone curve`
+
+**Depth & Focus**  
+`creamy bokeh`, `f/1.4 shallow DOF`, `zinestar-style depth pass`, `focus-stacked`, `hyperfocal sharpness`, `rack focus`, `soft focus edge`, `multi-plane composition`
+
+**Color & Mood**  
+`duotone teal-orange`, `cinematic contrast curve`, `muted earth palette`, `high-saturation pop-art`, `neon noir`, `moody chiaroscuro`, `washed pastel tones`, `retro film hues`, `dusk palette`, `vibrant gradient overlays`
+
+**Environment Detail**  
+`photons mapped`, `ray-marched fog`, `caustic patterns`, `particle motes`, `lens dust`, `UV scatter`, `chromatic bloom edges`, `scene occlusion pass`, `physical sky model`, `volumetric light diffusion`
+
+**Negatives (anti-patterns)**  
+`no watermark`, `no text`, `no logo`, `no banding`, `no compression artifacts`, `no motion blur`, `no NSFW`, `no extra limbs`, `no bad anatomy`, `no cut-off edges`, `no cloned patches`
