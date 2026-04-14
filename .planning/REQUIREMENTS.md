@@ -63,7 +63,7 @@ These requirements are satisfied by the existing flux-krea codebase (299 tests, 
 | REQ-M-010 | Input classifier — archetype lookup (exact, fuzzy, domain), scenario detection, freeform | ACTIVE | PLAN_02 Module 1 |
 | REQ-M-011 | System prompt builder assembling persona spec + archetype + comedy structures + schema | ACTIVE | PLAN_02 Module 1, Phase 1 |
 | REQ-M-012 | Prompt assembly per Pattern 5: persona + safety at system prompt END, archetype + scenario as first user message (see REQ-X-031) | ACTIVE | PLAN_02 Module 1 + pattern-context.md |
-| REQ-M-013 | LLM generation via Anthropic API (claude-sonnet-4) | ACTIVE | PLAN_02 Module 1, Phase 2 |
+| REQ-M-013 | LLM generation via Anthropic API (claude-opus-4-6) | ACTIVE | PLAN_02 Module 1, Phase 2 |
 | REQ-M-014 | Brief Validator — schema, safety, voice, completeness checks independent of LLM reasoning (see REQ-X-029) | ACTIVE | PLAN_02 Module 1, Phase 3 |
 | REQ-M-015 | Archetype metadata loaded upfront; full definitions loaded only on selection (see REQ-X-032) | ACTIVE | pattern-context.md Pattern 12 |
 | REQ-M-016 | Assembled system prompt fits within 8K tokens | ACTIVE | PLAN_02 Module 1, Phase 1 |
