@@ -12,9 +12,13 @@
 - [x] Task 8: Create ROADMAP.md via gsd-roadmapper (7+1 phases)
 - [x] Task 9: Create STATE.md and finalize CLAUDE.md
 
+## Phase 1 Discuss — COMPLETE
+
+- [x] /gsd:discuss-phase 1 — 5 decisions captured in 01-CONTEXT.md
+
 ## Next
 
-- [ ] /gsd:discuss-phase 1 (Mirror Post scaffolding)
+- [ ] /gsd:plan-phase 1 (Mirror Post scaffolding — 3 plans: structure, assets, schema+fixtures)
 
 ## Backlog
 
@@ -22,7 +26,7 @@
 
 ## Session Handoff
 
-**Last session:** 2026-04-13
-**Branch:** main (clean, Phase 0 complete + post-bootstrap cleanup done)
-**State:** Phase 0 COMPLETE. Branch promoted to main. Hook log gitignored. REQ count corrected to 78. Krea-AI bypasses main-branch commit hook.
-**Pick up with:** /gsd:discuss-phase 1
+**Last session:** 2026-04-14
+**Branch:** main (clean)
+**State:** Phase 1 context gathered. 5 implementation decisions locked in 01-CONTEXT.md: props normalized to array, tweet_embed required, nav_easter_eggs optional, voice sliders mirror persona spec encoding, separate git repo, hybrid fixtures (1 gold + 3 skeletons).
+**Pick up with:** /gsd:plan-phase 1

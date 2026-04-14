@@ -1,36 +1,27 @@
 {
   "version": "1.0",
-  "timestamp": "2026-04-13T22:00:00.000Z",
-  "phase": "0",
-  "phase_name": "bootstrap",
-  "phase_dir": ".planning",
+  "timestamp": "2026-04-14T13:43:39.388Z",
+  "phase": "1",
+  "phase_name": "Mirror Post Scaffolding",
+  "phase_dir": ".planning/phases/01-mirror-post-scaffolding",
   "plan": 0,
-  "task": 9,
-  "total_tasks": 9,
-  "status": "complete",
-  "completed_tasks": [
-    {"id": 1, "name": "Codebase mapping (7 docs)", "status": "done", "commit": "5b45df9"},
-    {"id": 2, "name": "Initialize git repo for Krea-AI", "status": "done", "commit": "5b45df9"},
-    {"id": 3, "name": "Create CLAUDE.md, README.md, docs/DEVOPS-HANDOFF.md", "status": "done", "commit": "5b45df9"},
-    {"id": 4, "name": "Write PROJECT.md from plan documents", "status": "done", "commit": "5b45df9"},
-    {"id": 5, "name": "Commit Mirror Post source assets", "status": "done", "commit": "6f28543"},
-    {"id": 6, "name": "Collect workflow preferences and create config.json", "status": "done", "commit": "1617091"},
-    {"id": 7, "name": "Define REQUIREMENTS.md from plans", "status": "done", "commit": "6cde55b"},
-    {"id": 8, "name": "Create ROADMAP.md via gsd-roadmapper agent", "status": "done", "commit": "a3d0b15"},
-    {"id": 9, "name": "Create STATE.md and finalize CLAUDE.md", "status": "done", "commit": "6900238"}
+  "task": 0,
+  "total_tasks": 17,
+  "status": "paused",
+  "completed_tasks": [],
+  "remaining_tasks": [
+    {"id": 1, "name": "PLAN-01-01: Directory structure, config, foundational files (7 tasks)", "status": "not_started"},
+    {"id": 2, "name": "PLAN-01-02: Asset import and conversion (5 tasks)", "status": "not_started"},
+    {"id": 3, "name": "PLAN-01-03: Post Brief schema + test fixtures (5 tasks)", "status": "not_started"}
   ],
-  "remaining_tasks": [],
   "blockers": [],
   "human_actions_pending": [],
   "decisions": [
-    {"decision": "YOLO mode, Standard granularity, Parallel execution, Commit docs", "rationale": "User selected recommended defaults", "phase": "0"},
-    {"decision": "Quality model profile (Opus for research/roadmap agents)", "rationale": "User selected for deeper analysis given effort max directive", "phase": "0"},
-    {"decision": "Research enabled, Plan check enabled, Verifier enabled", "rationale": "Full quality pipeline for maximum effort", "phase": "0"},
-    {"decision": "Krea-AI gets its own git repo (separate from parent projects/ workspace)", "rationale": "Parent projects/.gitignore excludes Krea-AI/ via * rule. Krea-AI needs own repo for version control.", "phase": "0"},
-    {"decision": "78 requirements extracted across 4 categories with REQ-ID traceability", "rationale": "All 4 KB v2.1 patterns encoded as cross-cutting constraints (REQ-X-029 to X-032)", "phase": "0"},
-    {"decision": "7 sequential phases + 1 parallel flux-krea stream", "rationale": "Standard granularity (7 phases), dependency order matches PLAN_02 module chain", "phase": "0"}
+    {"decision": "Hand-written validator over ajv for schema.js", "rationale": "Zero deps in scaffolding, ~100 lines of field/type checks", "phase": "1"},
+    {"decision": "Wave parallelism: 01-02 and 01-03 run after 01-01", "rationale": "Non-overlapping paths, both depend on directory structure", "phase": "1"},
+    {"decision": "All 6 discuss-phase decisions (D-01 to D-06) applied to plan", "rationale": "Props array, required tweet_embed, optional nav_easter_eggs, voice sliders, separate repo, hybrid fixtures", "phase": "1"}
   ],
-  "uncommitted_files": [],
-  "next_action": "/gsd:discuss-phase 1",
-  "context_notes": "Phase 0 bootstrap is 100% complete. All 9 tasks done. REQUIREMENTS.md (78 REQs), ROADMAP.md (7+1 phases), STATE.md, and CLAUDE.md all committed. Ready for Phase 1 scaffolding after branch merge."
+  "uncommitted_files": ["tasks/todo.md"],
+  "next_action": "Write 3 GSD PLAN.md files to .planning/phases/01-mirror-post-scaffolding/ from approved plan at ~/.claude/plans/bubbly-cuddling-creek.md, then run /gsd:execute-phase 1",
+  "context_notes": "Plan approved in plan mode. The approved plan lives at ~/.claude/plans/bubbly-cuddling-creek.md with full task detail, acceptance criteria, and wave assignments. Plans need to be converted to GSD PLAN.md format with frontmatter (wave, depends_on, files_modified, autonomous) and XML task blocks before execution. Source assets confirmed at docs/mirror-post-source-files/."
 }
