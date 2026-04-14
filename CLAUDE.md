@@ -34,9 +34,10 @@ Krea-AI/                    # This workspace (GSD-managed)
 
 | File | Purpose |
 |------|---------|
-| `.planning/PROJECT.md` | Project context and requirements |
-| `.planning/ROADMAP.md` | Phase structure (when created) |
-| `.planning/STATE.md` | Current execution state (when created) |
+| `.planning/PROJECT.md` | Project context, constraints, key decisions |
+| `.planning/REQUIREMENTS.md` | 71 requirements with REQ-ID traceability (REQ-F/M/X) |
+| `.planning/ROADMAP.md` | 7 phases + parallel flux-krea stream with REQ-ID coverage |
+| `.planning/STATE.md` | Current execution state and session continuity |
 | `Plans for Krea AI/KNOWLEDGE_BASE.md` | Comprehensive analysis and integration strategy |
 | `Plans for Krea AI/PLAN_01_SCAFFOLDING.md` | Mirror Post framework scaffolding spec |
 | `Plans for Krea AI/PLAN_02_MODULES.md` | Mirror Post module specs (5 modules) |
