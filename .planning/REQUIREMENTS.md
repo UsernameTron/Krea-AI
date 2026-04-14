@@ -178,6 +178,28 @@ These are hard constraints that apply across the entire workspace. Violations ar
 | REQ-X-042 | Node.js 20+ for mirror-post | PROJECT.md |
 | REQ-X-043 | React for Artifact UI (Claude Desktop artifact) | PLAN_01 Decision 1 |
 
+### 3.7 Compositor Consistency
+
+| REQ-ID | Constraint | Enforcement | Source |
+|--------|-----------|-------------|--------|
+| REQ-X-050 | flux-krea output dimensions MUST be exactly 1920x1080 or a defined hero zone dimension. Compositor depends on fixed input dimensions. | Pipeline config validation, compositor input check | PROJECT.md, PLAN_02 Module 4 |
+| REQ-X-051 | Compositor template (LinkedIn chrome) is a FIXED asset — PNG/SVG overlay with text injection points. It is never generated, only applied. | Template stored as static asset, not generated per-run | PLAN_02 Module 4 |
+| REQ-X-052 | Compositor must produce byte-identical output given identical Post Brief + identical hero image. Pixel-comparison tests required. | Deterministic rendering tests in integration suite | Integration testing |
+
+### 3.8 Visual Identity Spec
+
+Hard constraints, not suggestions.
+
+| REQ-ID | Constraint | Enforcement | Source |
+|--------|-----------|-------------|--------|
+| REQ-X-060 | Output aspect ratio is 3:2 horizontal. No square crop, no portrait framing of the final composite. | Compositor output dimension check | Visual identity spec |
+| REQ-X-061 | Visual language is hyperreal polished corporate-social design — premium professional-networking-platform aesthetic with editorial-commercial finish and serious executive polish. | Visual review at verification | Visual identity spec |
+| REQ-X-062 | Desktop-first composition with clean modular layout. No clutter, no meme chaos, no cartoon parody. | Visual review at verification | Visual identity spec |
+| REQ-X-063 | Typography is crisp sans-serif with sparse high-impact text behavior. Text is restrained — never dense, never decorative. | Compositor font/layout config | Visual identity spec |
+| REQ-X-064 | Color palette for the compositor chrome is corporate blue, white, and cool gray. Hero image palette is unconstrained — it follows the Post Brief context. | Compositor style constants | Visual identity spec |
+| REQ-X-065 | Tone is deadpan satirical business aesthetic with restrained corporate absurdity. The humor lives in the content and props, not the visual chrome. | Brief Validator tone check, visual review | Visual identity spec |
+| REQ-X-066 | Hero image content (characters, props, environment, scene) is fully dynamic — driven by the Post Brief context each generation. What is FIXED across every output is the compositor template: LinkedIn chrome, zone layout (text left / hero right), typography style, engagement bar, and overall composition. The template never changes. Only the hero image and injected text content change. | Compositor architecture (static template + dynamic injection) | Visual identity spec |
+
 ---
 
 ## Summary
@@ -187,8 +209,8 @@ These are hard constraints that apply across the entire workspace. Violations ar
 | flux-krea validated (REQ-F-001 to F-008) | 8 | 8 VALIDATED |
 | flux-krea active optimization (REQ-F-010 to F-017) | 8 | 8 ACTIVE |
 | mirror-post (REQ-M-001 to M-062) | 33 | 32 ACTIVE, 1 DEFERRED |
-| cross-cutting (REQ-X-001 to X-043) | 22 | 22 constraints (always enforced) |
-| **Total** | **71** | |
+| cross-cutting (REQ-X-001 to X-066) | 32 | 32 constraints (always enforced) |
+| **Total** | **81** | |
 
 ### Ambiguity Flags
 
@@ -262,4 +284,4 @@ These are hard constraints that apply across the entire workspace. Violations ar
 
 ---
 
-*71 requirements. Every pattern has a home. Every constraint has enforcement.*
+*81 requirements. Every pattern has a home. Every constraint has enforcement.*
