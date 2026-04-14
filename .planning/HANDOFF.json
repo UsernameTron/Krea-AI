@@ -5,7 +5,7 @@
   "phase_name": "bootstrap",
   "phase_dir": ".planning",
   "plan": 0,
-  "task": 5,
+  "task": 6,
   "total_tasks": 9,
   "status": "paused",
   "completed_tasks": [
