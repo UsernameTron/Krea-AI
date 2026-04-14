@@ -89,9 +89,9 @@ Plans:
 ### Phase 4: Image Prompt Engine
 **Goal**: A Post Brief can be transformed into a complete local diffusion prompt with intelligent modifier selection, composition-aware framing, and explicit text-free surface descriptions
 **Depends on**: Phase 2, Phase 3
-**Requirements**: REQ-M-030, REQ-M-031, REQ-M-032, REQ-M-033, REQ-M-034, REQ-M-035
+**Requirements**: REQ-M-030, REQ-M-031, REQ-M-032, REQ-M-033, REQ-M-034, REQ-M-035, REQ-X-060, REQ-X-061, REQ-X-062, REQ-X-063, REQ-X-064, REQ-X-065, REQ-X-066
 **Patterns**: None specific (consumes pattern-driven data from Phase 2)
-**Enforces**: REQ-X-010 (no MidJourney flags -- prompt validator rejects --ar, --v syntax), REQ-X-011 (diffusion prompts describe surfaces only, no text content), REQ-X-027 (compositor owns all text rendering), REQ-X-025 (standard prompts, no flux-krea source modifications)
+**Enforces**: REQ-X-010 (no MidJourney flags -- prompt validator rejects --ar, --v syntax), REQ-X-011 (diffusion prompts describe surfaces only, no text content), REQ-X-027 (compositor owns all text rendering), REQ-X-025 (standard prompts, no flux-krea source modifications), REQ-X-060 (3:2 horizontal output), REQ-X-061 (hyperreal polished corporate-social aesthetic), REQ-X-062 (clean modular layout), REQ-X-063 (crisp sans-serif typography), REQ-X-064 (hero palette follows Post Brief), REQ-X-065 (deadpan satirical tone), REQ-X-066 (dynamic hero, fixed template)
 **Success Criteria** (what must be TRUE):
   1. Scene templates exist for all 4 archetype environments (office-executive, office-middle-mgmt, airport-hustle, call-center-floor) with environment, subject, prop positions, and composition specs
   2. Prompt builder produces positive prompt, negative prompt, parameters, and composition_notes from any valid Post Brief
@@ -107,9 +107,9 @@ Plans:
 ### Phase 5: Compositor
 **Goal**: A diffusion-generated hero image plus a Post Brief can be assembled into a final 1920x1080 PNG with LinkedIn UI chrome, text overlays, tweet embed card, and engagement metrics
 **Depends on**: Phase 3, Phase 4
-**Requirements**: REQ-M-040, REQ-M-041, REQ-M-042, REQ-M-043, REQ-M-044
+**Requirements**: REQ-M-040, REQ-M-041, REQ-M-042, REQ-M-043, REQ-M-044, REQ-X-050, REQ-X-051, REQ-X-052, REQ-X-060, REQ-X-061, REQ-X-062, REQ-X-063, REQ-X-064, REQ-X-065, REQ-X-066
 **Patterns**: None specific
-**Enforces**: REQ-X-027 (ALL text rendering happens here -- headline, body, prop text, tweet, engagement), REQ-X-026 (two-stage pipeline: diffusion hero + compositor overlay)
+**Enforces**: REQ-X-027 (ALL text rendering happens here -- headline, body, prop text, tweet, engagement), REQ-X-026 (two-stage pipeline: diffusion hero + compositor overlay), REQ-X-050 (fixed input dimensions from flux-krea), REQ-X-051 (compositor template is fixed asset), REQ-X-052 (deterministic output -- byte-identical given same inputs), REQ-X-060 (3:2 horizontal output), REQ-X-061 (hyperreal polished corporate-social aesthetic), REQ-X-062 (clean modular layout), REQ-X-063 (crisp sans-serif typography), REQ-X-064 (corporate blue/white/gray chrome), REQ-X-065 (deadpan satirical tone), REQ-X-066 (fixed template, dynamic hero + text)
 **Success Criteria** (what must be TRUE):
   1. LinkedIn UI chrome renders recognizably (dark header bar, profile section with avatar/name/title, engagement footer) -- stylistically similar, not pixel-perfect, no LinkedIn logo
   2. Headline text renders with highlight words in accent color, body text renders with bold/italic formatting, hashtags render below body
@@ -156,6 +156,7 @@ Plans:
   3. A freeform original scenario produces a coherent end-to-end output with original character
   4. Edit flow works: generate brief, edit mug text, regenerate prompt -- updated prompt reflects the edit
   5. Total pipeline completes in under 2 minutes end-to-end
+  6. Compositor produces byte-identical output given identical Post Brief + identical hero image (REQ-X-052 pixel-comparison test)
 **Plans**: TBD
 
 Plans:
