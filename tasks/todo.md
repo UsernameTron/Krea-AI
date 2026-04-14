@@ -14,7 +14,6 @@
 
 ## Next
 
-- [ ] Merge feat/phase-0-bootstrap to main
 - [ ] /gsd:discuss-phase 1 (Mirror Post scaffolding)
 
 ## Backlog
@@ -24,6 +23,6 @@
 ## Session Handoff
 
 **Last session:** 2026-04-13
-**Branch:** feat/phase-0-bootstrap (clean, all 9 tasks committed)
-**State:** Phase 0 COMPLETE. All planning docs in place.
-**Pick up with:** /gsd:discuss-phase 1 after merging bootstrap branch to main.
+**Branch:** main (clean, Phase 0 complete + post-bootstrap cleanup done)
+**State:** Phase 0 COMPLETE. Branch promoted to main. Hook log gitignored. REQ count corrected to 78. Krea-AI bypasses main-branch commit hook.
+**Pick up with:** /gsd:discuss-phase 1
