@@ -1,0 +1,17 @@
+# OS
+.DS_Store
+*.~lock.*
+~$*
+
+# Sub-projects have their own repos
+flux-krea/
+
+# Private context
+context/
+state/
+
+# Claude Code
+.claude/worktrees/
+
+# Node
+node_modules/
