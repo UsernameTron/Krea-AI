@@ -31,6 +31,7 @@
 - [x] Wave 3 (02-05): System prompt builder, Pattern 5, cache markers — 31 tests (SHA 93e4666)
 - [x] Wave 4 (02-06): LLM generation client, Structured Outputs + fallback — 12 mock tests (SHA 4d2bb67)
 - [x] Wave 5 (02-07/08): Semantic validator + barrel export + integration test — 30 tests (SHA 07e3dce)
+- [x] Fix integration test failures: timeout (15s→90s), safety prompt (no fictional contacts), jargon prompt (require quotes) — commit 8aef5d8
 - [ ] Run integration test with real API key (5 scenarios, `node test/integration.js`)
 - [ ] /gsd:verify-work — validate against Phase 2 success criteria
 
@@ -42,6 +43,9 @@
 ## Session Handoff
 
 **Last session:** 2026-04-14
-**Branch:** main (clean after commit below)
+**Branch:** main (clean)
 **State:** Phase 2 code complete — 8/8 plans done. 111 unit/mock tests green across 8 suites. Integration test created but needs ANTHROPIC_API_KEY to run.
-**Pick up with:** Run `node test/integration.js` with API key, then `/gsd:verify-work` against Phase 2 success criteria, then close Phase 2.
+**Pick up with:**
+1. `cd /Users/cpconnor/projects/Krea-AI/mirror-post && export ANTHROPIC_API_KEY=sk-ant-... && node test/integration.js`
+2. If all 5 pass: `/gsd:verify-work` against Phase 2 success criteria
+3. Close Phase 2, then `/gsd:discuss-phase 3` (Visual Grammar)
