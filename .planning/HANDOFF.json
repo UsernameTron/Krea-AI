@@ -27,10 +27,10 @@
     {"decision": "Quality model profile (Opus for research/roadmap agents)", "rationale": "User selected for deeper analysis given effort max directive", "phase": "0"},
     {"decision": "Research enabled, Plan check enabled, Verifier enabled", "rationale": "Full quality pipeline for maximum effort", "phase": "0"},
     {"decision": "Krea-AI gets its own git repo (separate from parent projects/ workspace)", "rationale": "Parent projects/.gitignore excludes Krea-AI/ via * rule. Krea-AI needs own repo for version control.", "phase": "0"},
-    {"decision": "71 requirements extracted across 4 categories with REQ-ID traceability", "rationale": "All 4 KB v2.1 patterns encoded as cross-cutting constraints (REQ-X-029 to X-032)", "phase": "0"},
+    {"decision": "78 requirements extracted across 4 categories with REQ-ID traceability", "rationale": "All 4 KB v2.1 patterns encoded as cross-cutting constraints (REQ-X-029 to X-032)", "phase": "0"},
     {"decision": "7 sequential phases + 1 parallel flux-krea stream", "rationale": "Standard granularity (7 phases), dependency order matches PLAN_02 module chain", "phase": "0"}
   ],
   "uncommitted_files": [],
-  "next_action": "Merge feat/phase-0-bootstrap to main, then /gsd:discuss-phase 1",
-  "context_notes": "Phase 0 bootstrap is 100% complete. All 9 tasks done. REQUIREMENTS.md (71 REQs), ROADMAP.md (7+1 phases), STATE.md, and CLAUDE.md all committed. Ready for Phase 1 scaffolding after branch merge."
+  "next_action": "/gsd:discuss-phase 1",
+  "context_notes": "Phase 0 bootstrap is 100% complete. All 9 tasks done. REQUIREMENTS.md (78 REQs), ROADMAP.md (7+1 phases), STATE.md, and CLAUDE.md all committed. Ready for Phase 1 scaffolding after branch merge."
 }

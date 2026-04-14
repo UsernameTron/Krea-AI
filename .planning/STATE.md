@@ -12,9 +12,9 @@ See: .planning/PROJECT.md (updated 2026-04-13)
 Phase 0 (Bootstrap): COMPLETE
 Phase: 1 of 7 (Mirror Post Scaffolding) + Parallel flux-krea Optimization
 Plan: 0 of 3 in current phase
-Status: Ready to plan — run /gsd:discuss-phase 1 after merging bootstrap branch
-Last activity: 2026-04-13 — Phase 0 bootstrap closed. REQUIREMENTS.md (71 REQs), ROADMAP.md (7+1 phases), STATE.md created.
-Branch: feat/phase-0-bootstrap (to be merged to main before Phase 1)
+Status: Ready to plan — run /gsd:discuss-phase 1
+Last activity: 2026-04-13 — Phase 0 bootstrap closed. REQUIREMENTS.md (78 REQs), ROADMAP.md (7+1 phases), STATE.md created.
+Branch: main
 
 Progress: [░░░░░░░░░░] 0%
 
