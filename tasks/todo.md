@@ -40,12 +40,19 @@
 - [ ] Review CONCERNS.md and prioritize tech debt items
 - [x] Update REQUIREMENTS.md REQ-M-013 model from claude-sonnet-4 to claude-opus-4-6 (aligns with D-22) — done in preliminary commit 1bf7776
 
+## Phase 3 Visual Grammar + Image Prompt Builder — PLANNED
+
+- [x] /gsd:discuss-phase 3 — 14 decisions captured in 03-CONTEXT.md
+- [x] /gsd:plan-phase 3 --skip-research — 2 plans in 1 wave, verified 10/10
+- [ ] /gsd:execute-phase 3 — run both plans in parallel (Wave 1)
+- [ ] /gsd:verify-work — validate against Phase 3 success criteria
+
 ## Session Handoff
 
-**Last session:** 2026-04-14
+**Last session:** 2026-04-15
 **Branch:** main (clean)
-**State:** Phase 2 code complete — 8/8 plans done. 111 unit/mock tests green across 8 suites. Integration test created but needs ANTHROPIC_API_KEY to run.
+**State:** Phase 3 planned — 2 plans (03-01: foundation loader + prompt builder, 03-02: zone spec + engagement generator) in 1 wave. Verification passed all 10 dimensions. 19/19 requirements covered.
 **Pick up with:**
-1. `cd /Users/cpconnor/projects/Krea-AI/mirror-post && export ANTHROPIC_API_KEY=sk-ant-... && node test/integration.js`
-2. If all 5 pass: `/gsd:verify-work` against Phase 2 success criteria
-3. Close Phase 2, then `/gsd:discuss-phase 3` (Visual Grammar)
+1. `/gsd:execute-phase 3` — both plans run in parallel (Wave 1)
+2. After execution: `/gsd:verify-work` against Phase 3 success criteria
+3. After verification: `/gsd:ship` or start `/gsd:discuss-phase 4` (Compositor)
