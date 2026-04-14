@@ -13,5 +13,8 @@ state/
 # Claude Code
 .claude/worktrees/
 
+# Transient hook logs (do not commit)
+.claude/hooks/*.log
+
 # Node
 node_modules/
