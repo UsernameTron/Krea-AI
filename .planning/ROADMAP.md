@@ -58,12 +58,17 @@ Plans:
   3. Generated Post Briefs pass all Brief Validator hard-fail checks: schema compliance, safety, banned phrases, prop completeness, engagement sanity
   4. All 4 reference fixture inputs produce structurally similar Post Briefs to their expected outputs
   5. Generation completes in under 15 seconds per brief with assembled system prompt under 8K tokens
-**Plans**: TBD
+**Plans**: 8 plans in 4 waves
 
 Plans:
-- [ ] 02-01: Input classifier and system prompt builder with Pattern 5 positioning
-- [ ] 02-02: LLM generation via Anthropic API with Pattern 12 lazy loading
-- [ ] 02-03: Brief Validator (deterministic, zero-trust) and test harness against 4 fixtures
+- [ ] 02-01-PLAN.md — Schema optional-parameter audit + Structured Outputs decision gate (Wave 1)
+- [ ] 02-02-PLAN.md — Persona voice distillate generation + version-assertion test (Wave 2)
+- [ ] 02-03-PLAN.md — Input classifier with archetype/domain/freeform routing (Wave 2)
+- [ ] 02-04-PLAN.md — Comedy structure selector with Pattern 12 lazy loading (Wave 2)
+- [ ] 02-05-PLAN.md — System prompt builder with Pattern 5 positioning + cache markers (Wave 3)
+- [ ] 02-06-PLAN.md — LLM generation client with Structured Outputs + fallback (Wave 3)
+- [ ] 02-07-PLAN.md — Brief Validator extension with safety/voice/completeness checks (Wave 4)
+- [ ] 02-08-PLAN.md — End-to-end integration test + human verification (Wave 4)
 
 ### Phase 3: LinkedIn Visual Grammar
 **Goal**: The visual rules for satirical LinkedIn post construction are codified as importable data -- prop taxonomy, composition zones, and engagement generation -- ready for consumption by Image Prompt Engine and Compositor
