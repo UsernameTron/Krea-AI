@@ -67,6 +67,9 @@
 5. Before `/gsd:plan-phase 04.2`: get operator confirmation on D-NEW-01 walk-back and chrome PNG authoring contract (4 human-authored PNGs required)
 6. Still-open carry-over gaps: ROADMAP renumbering, Phase 5 split (5a/5b), deprecated module deletion timing, Phase 2 v2 migration scope
 
+## Phase 5a Handoff (captured 2026-04-15)
+- [ ] When Phase 5a delivers real variant-a.png, regenerate brent-vellum-v2-golden.png. Use REGENERATE_GOLDEN=1 flag documented in 04.2-05-PLAN.md. Commit new golden to mirror-post/test/fixtures/golden-outputs/.
+
 ## Phase 5 Preconditions (captured 2026-04-15)
 - [ ] Update flux-krea/CLAUDE.md Python requirement to "3.10-3.12" (currently says "3.10+" which is misleading — torch 2.7 wheels don't exist for Python 3.14)
 - [ ] First task of Phase 5 execution: onboarding runbook (homebrew python@3.11, venv creation, pip install -r requirements.txt, HF token setup, one-shot verification render). Saves 30+ min of rediscovery.

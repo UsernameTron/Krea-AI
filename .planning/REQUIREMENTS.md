@@ -184,7 +184,8 @@ These are hard constraints that apply across the entire workspace. Violations ar
 |--------|-----------|-------------|--------|
 | REQ-X-050 | flux-krea output dimensions MUST be exactly 1920x1080 or a defined hero zone dimension. Compositor depends on fixed input dimensions. | Pipeline config validation, compositor input check | PROJECT.md, PLAN_02 Module 4 |
 | REQ-X-051 | Compositor template (LinkedIn chrome) is a FIXED asset — PNG/SVG overlay with text injection points. It is never generated, only applied. | Template stored as static asset, not generated per-run | PLAN_02 Module 4 |
-| REQ-X-052 | Compositor must produce byte-identical output given identical Post Brief + identical hero image. Pixel-comparison tests required. | Deterministic rendering tests in integration suite | Integration testing |
+| REQ-X-052a | Scene rendering (Phase 5) must be seed-deterministic: same seed + same variant prompt = same scene pixels. | Phase 5 fixture hash comparison | Visual identity spec |
+| REQ-X-052b | Overlay composition (Phase 4) must be byte-identical against committed golden PNG fixture given identical Post Brief + identical scene PNG. | Phase 4 golden test via Buffer.compare | Visual identity spec |
 
 ### 3.8 Visual Identity Spec
 
@@ -192,12 +193,12 @@ Hard constraints, not suggestions.
 
 | REQ-ID | Constraint | Enforcement | Source |
 |--------|-----------|-------------|--------|
-| REQ-X-060 | Output aspect ratio is 3:2 horizontal. No square crop, no portrait framing of the final composite. | Compositor output dimension check | Visual identity spec |
+| REQ-X-060 | Output aspect ratio is 16:9 horizontal at 1920×1080 resolution. No square crop, no portrait framing of the final composite. | Compositor output dimension check | Visual identity spec |
 | REQ-X-061 | Visual language is hyperreal polished corporate-social design — premium professional-networking-platform aesthetic with editorial-commercial finish and serious executive polish. | Visual review at verification | Visual identity spec |
 | REQ-X-062 | Desktop-first composition with clean modular layout. No clutter, no meme chaos, no cartoon parody. | Visual review at verification | Visual identity spec |
 | REQ-X-063 | Typography is crisp sans-serif with sparse high-impact text behavior. Text is restrained — never dense, never decorative. | Compositor font/layout config | Visual identity spec |
 | REQ-X-064 | Color palette for the compositor chrome is corporate blue, white, and cool gray. Hero image palette is unconstrained — it follows the Post Brief context. | Compositor style constants | Visual identity spec |
-| REQ-X-065 | Tone is deadpan satirical business aesthetic with restrained corporate absurdity. The humor lives in the content and props, not the visual chrome. | Brief Validator tone check, visual review | Visual identity spec |
+| REQ-X-065 | Tone is deadpan satirical business aesthetic with restrained corporate absurdity. The humor lives in the content and props, not the visual chrome. | Phase 5 scene aesthetic review + Phase 2 Brief Generator content validation. NOT a Phase 4 compositor concern. | Visual identity spec |
 | REQ-X-066 | Hero image content (characters, props, environment, scene) is fully dynamic — driven by the Post Brief context each generation. What is FIXED across every output is the compositor template: LinkedIn chrome, zone layout (text left / hero right), typography style, engagement bar, and overall composition. The template never changes. Only the hero image and injected text content change. | Compositor architecture (static template + dynamic injection) | Visual identity spec |
 | REQ-X-070 | The foundation prompt (`mirror-post/src/config/foundation-prompt.yaml`) is a static asset, loaded exactly once per session and never modified per-call. Its `reusable_master_prompt` is prepended verbatim to every Flux image prompt to lock the satirical corporate visual style. | Image prompt builder asserts foundation loaded once; every output prompt begins with `reusable_master_prompt` | 2026-04-14 design review |
 | REQ-X-071 | Image prompt construction is fully deterministic: foundation prefix + character/scene/props delta from the Post Brief + fidelity modifiers. No LLM call is made during image prompt generation. | Image prompt builder is a pure function of (Post Brief, foundation, modifiers); unit test asserts identical output for identical input | 2026-04-14 design review |
