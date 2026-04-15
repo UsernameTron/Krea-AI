@@ -62,3 +62,7 @@
 **Pick up with:**
 1. `/clear` then `/gsd:discuss-phase 4` (Compositor — LinkedIn chrome + text overlay + tweet embed + engagement bar over hero image)
 2. 3 human verification items from Phase 3 deferred (visual quality, compositor chrome, engagement feel) — naturally addressed in Phase 4+6
+
+## Phase 5 Preconditions (captured 2026-04-15)
+- [ ] Update flux-krea/CLAUDE.md Python requirement to "3.10-3.12" (currently says "3.10+" which is misleading — torch 2.7 wheels don't exist for Python 3.14)
+- [ ] First task of Phase 5 execution: onboarding runbook (homebrew python@3.11, venv creation, pip install -r requirements.txt, HF token setup, one-shot verification render). Saves 30+ min of rediscovery.
