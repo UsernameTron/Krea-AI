@@ -1,41 +1,55 @@
 {
   "version": "1.0",
-  "timestamp": "2026-04-15T14:06:59.924Z",
-  "phase": "04.1",
-  "phase_name": "Compositor Gap Closure (post-UAT)",
+  "timestamp": "2026-04-15T15:45:13.675Z",
+  "phase": "04",
+  "phase_name": "compositor (architecture reset)",
   "phase_dir": ".planning/phases/04-compositor",
-  "plan": "04-03-PLAN.md",
-  "task": 1,
-  "total_tasks": 12,
-  "status": "paused_before_execution",
+  "plan": "04.2",
+  "task": 0,
+  "total_tasks": 0,
+  "status": "paused",
+  "sub_status": "architecture_reset_awaiting_approval",
   "completed_tasks": [
-    {"id": 0, "name": "Plan written (04-03-PLAN.md)", "status": "done", "commit": "44201f8"},
-    {"id": 0, "name": "Plan amended — golden-regen commit msg explicit", "status": "done", "commit": "bd3cd12"}
+    {"id": 1, "name": "Create archive branch in mirror-post (archive/phase-4-programmatic-chrome)", "status": "done", "commit": "c25d88a"},
+    {"id": 2, "name": "Stage and commit Phase 5 LinkedIn template variants A/B/C/D + master wrapper", "status": "done", "commit": "45dfdfa"},
+    {"id": 3, "name": "Draft 04-CONTEXT-RESET.md with D-NEW-01..08, archetype->variant mapping, risks", "status": "done", "commit": "34946c6"},
+    {"id": 4, "name": "Mark Phase 4 RESET IN PROGRESS in ROADMAP.md and flag Phase 5 naming collision", "status": "done", "commit": "34946c6"},
+    {"id": 5, "name": "Update STATE.md status to reset_in_progress with pivot summary", "status": "done", "commit": "34946c6"},
+    {"id": 6, "name": "Capture two learned lessons in tasks/lessons.md (architecture, determinism)", "status": "done", "commit": "uncommitted"}
   ],
   "remaining_tasks": [
-    {"id": 1, "name": "Wave 1 T1: LinkedIn blue palette + avatar (Bugs 1, 4)", "status": "not_started"},
-    {"id": 2, "name": "Wave 1 T2: LinkedIn in logo asset + render (Bug 2)", "status": "not_started"},
-    {"id": 3, "name": "Wave 1 T3: Bundle Noto Color Emoji + fix emoji render (Bug 3)", "status": "not_started"},
-    {"id": 4, "name": "Wave 2 T4: Remove nav_easter_eggs from fixtures", "status": "not_started"},
-    {"id": 5, "name": "Wave 2 T5: Remove nav_easter_eggs from brief schemas", "status": "not_started"},
-    {"id": 6, "name": "Wave 2 T6: Strip nav misspelling guidance from persona distillate", "status": "not_started"},
-    {"id": 7, "name": "Wave 2 T7: Clean brief generator prompts + system-prompt-builder", "status": "not_started"},
-    {"id": 8, "name": "Wave 2 T8: Verify REQUIREMENTS.md clean (planner confirmed 0 matches)", "status": "not_started"},
-    {"id": 9, "name": "Wave 3 T9: Hardcode standard LinkedIn nav labels in render-chrome.js", "status": "not_started"},
-    {"id": 10, "name": "Wave 3 T10: Update chrome test assertions", "status": "not_started"},
-    {"id": 11, "name": "Wave 4 T11: Regenerate golden PNG + npm run test:all (x2)", "status": "not_started"},
-    {"id": 12, "name": "Wave 5 T12: Human UAT gate — operator reviews golden", "status": "not_started"}
+    {"id": 7, "name": "Operator approves 04-CONTEXT-RESET.md", "status": "blocked_on_human"},
+    {"id": 8, "name": "Resolve ROADMAP renumbering: Phase 5 Artifact UI vs new 05-image-prompt-engine/", "status": "blocked_on_human"},
+    {"id": 9, "name": "Decide Post Brief schema bump strategy (D-NEW-06): v2 bump vs in-place patch", "status": "blocked_on_human"},
+    {"id": 10, "name": "Decide Phase 5 split: 5a (variant A end-to-end) vs single Phase 5", "status": "blocked_on_human"},
+    {"id": 11, "name": "Run /gsd:plan-phase 04.2 — text overlay only against Phase-5 scene fixtures", "status": "not_started"},
+    {"id": 12, "name": "Phase 5 must produce at least one variant scene PNG before 04.2 execution can build golden test", "status": "blocked_on_phase_5"}
   ],
-  "blockers": [],
+  "blockers": [
+    {"description": "Operator approval of 04-CONTEXT-RESET.md required before any 04.2 planning", "type": "human_action", "workaround": null},
+    {"description": "ROADMAP Phase 5 naming collision (Artifact UI vs 05-image-prompt-engine)", "type": "human_action", "workaround": "Hold renumbering until operator decides"},
+    {"description": "Phase 5 (Image Prompt Engine) is now strictly blocking Phase 4 — at least one variant scene PNG fixture needed before Phase 04.2 golden test can be built", "type": "external", "workaround": "Recommend splitting Phase 5 into 5a (variant A) + 5b (B/C/D + rest)"}
+  ],
   "human_actions_pending": [
-    {"action": "Operator visual UAT on regenerated brent-vellum-golden.png", "context": "Wave 5 gate — Phase 4 stays OPEN until approval", "blocking": true}
+    {"action": "Read and approve .planning/phases/04-compositor/04-CONTEXT-RESET.md", "context": "Defines D-NEW-01..08 and the new compositor contract; gates all Phase 04.2 work", "blocking": true},
+    {"action": "Decide ROADMAP renumbering: Image Prompt Engine -> 5, Artifact UI -> 6, Integration -> 7", "context": "Current ROADMAP still has Phase 5 = Artifact UI, but new directory is 05-image-prompt-engine/", "blocking": true},
+    {"action": "Decide Post Brief schema bump strategy (D-NEW-06)", "context": "image_seed.scene_template becomes enum A|B|C|D — breaking change to v1 schema; recommend v2 bump", "blocking": false},
+    {"action": "Decide whether to delete deprecated compositor modules from main now or after 04.2 plan approval", "context": "render-chrome.js, render-engagement-bar.js, render-tweet-card.js, nav-icon module, emoji pipeline, BGRA fix all preserved on archive branch only", "blocking": false},
+    {"action": "Sanity-check archetype->variant mapping (D-NEW-05) — D is heavy with 6/17", "context": "May want to rebalance once at least one D scene exists", "blocking": false}
   ],
   "decisions": [
-    {"decision": "Bundle NotoColorEmoji.ttf in src/compositor/fonts/", "rationale": "REQ-X-052 determinism — node-canvas/Cairo has no system font fallback for color emoji; Inter has no emoji glyphs so fillText silently drops them", "phase": "04.1"},
-    {"decision": "Golden regen commit message made explicit about destructive overwrite", "rationale": "Audit trail clarity — replaces prior approved baseline", "phase": "04.1"},
-    {"decision": "Task F (REQUIREMENTS.md) is verify-only no-op", "rationale": "Planner grepped and found zero nav_easter_eggs references in REQUIREMENTS.md", "phase": "04.1"}
+    {"decision": "D-NEW-01: Scene generation belongs to Phase 5 (chrome baked into diffusion output)", "rationale": "Programmatic chrome rendering accumulated repeated symptom fixes (Twemoji COLR swap, nav_easter_eggs removal, golden PNG regen, BGRA channel-swap) — architecture was wrong", "phase": "04"},
+    {"decision": "D-NEW-02: Compositor overlays text only; render-text-overlay.js survives, all chrome modules die", "rationale": "FLUX cannot reliably render multi-sentence satirical body copy with punctuation; text overlay is the one job the compositor must own", "phase": "04"},
+    {"decision": "D-NEW-03: Per-variant VARIANT_SLOTS constants in code (rejected scene-aware CV positioning and flux-krea sidecar JSON)", "rationale": "Each variant has fixed UI shell by template design; slots are pinned by prompt, not floating; simplest deterministic option", "phase": "04"},
+    {"decision": "D-NEW-04: Determinism contract split into REQ-X-052a (scene, Phase 5) + REQ-X-052b (overlay, Phase 4) with checked-in scene PNG fixture as handoff", "rationale": "Diffusion and canvas pipelines have entirely different determinism guarantees; cannot enforce byte-identical contract end-to-end", "phase": "04"},
+    {"decision": "D-NEW-05: Static archetype->variant table in Phase 2; image_seed.scene_template becomes enum; fallback B (executive strategy office)", "rationale": "B reads as the most generic professional LinkedIn baseline without coding to a specific psychological stereotype", "phase": "04"},
+    {"decision": "D-NEW-06: Post Brief schema bump to v2 (preferred over in-place v1 patch)", "rationale": "Breaking change to image_seed.scene_template field; honors lessons.md rule about explicit version bumps for contract changes", "phase": "04"},
+    {"decision": "D-NEW-07: Legacy compositor modules deleted from main (preserved on archive branch only), not retained as dead code", "rationale": "Honors global No Orphaned Code rule", "phase": "04"},
+    {"decision": "D-NEW-08: Cross-phase nav_easter_eggs removal retroactively justified — entire chrome path is gone", "rationale": "Removal stands; no further action needed", "phase": "04"}
   ],
-  "uncommitted_files": [],
-  "next_action": "Re-run /gsd:execute-phase 04.1 — executor was stopped mid-read before any file modifications. Plan file 04-03-PLAN.md is source of truth. Clean restart.",
-  "context_notes": "Executor agent was launched (agentId a92073d9b7f315082) and stopped by user via /gsd:pause-work before any code changes. Plan has 12 tasks across 5 waves. Tasks 2, 3, 9 all touch render-chrome.js — must be serialized. Golden-regen commit message (Task 11) MUST be: 'test(golden): regenerate compositor golden PNG — replaces prior broken baseline (wrong chrome color, bare nav icons); new PNG is the approved baseline as of 04.1 UAT'. Run npm run test:all TWICE in Wave 4 for cross-run determinism on bundled Noto Color Emoji."
+  "uncommitted_files": [
+    "tasks/lessons.md (two new learned rules: architecture symptom-patch limit, determinism boundary split)"
+  ],
+  "next_action": "Operator reads .planning/phases/04-compositor/04-CONTEXT-RESET.md and either approves it (then run /gsd:plan-phase 04.2) or returns revisions. Do NOT auto-progress to /gsd:plan-phase 04.2.",
+  "context_notes": "Phase 4 architecture pivot session. Operator stopped a BGRA channel-swap bug fix mid-flight and called the architecture wrong. Compositor abandons programmatic LinkedIn chrome rendering — Phase 5 (Image Prompt Engine) will produce full LinkedIn screenshots via flux-krea, and Phase 4 shrinks to text overlay only. All prior compositor work preserved on mirror-post branch archive/phase-4-programmatic-chrome at SHA c25d88a430f080c58854c16a248584c7ae245587 — no commits reverted. Five Phase 5 template prompts (variants A/B/C/D + master wrapper) committed at 45dfdfa. New CONTEXT doc written as 04-CONTEXT-RESET.md (supersedes 04-CONTEXT.md, which is preserved untouched). ROADMAP.md marks Phase 4 as RESET IN PROGRESS and flags Phase 5 naming collision for operator decision. STATE.md status = reset_in_progress. Two learned lessons added to tasks/lessons.md (uncommitted). Hard rules: do not touch mirror-post code, do not revert/delete Phase 4 commits, do not merge BGRA fix, do not auto-proceed to /gsd:plan-phase 04.2."
 }
