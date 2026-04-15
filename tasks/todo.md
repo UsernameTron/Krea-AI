@@ -40,19 +40,25 @@
 - [ ] Review CONCERNS.md and prioritize tech debt items
 - [x] Update REQUIREMENTS.md REQ-M-013 model from claude-sonnet-4 to claude-opus-4-6 (aligns with D-22) — done in preliminary commit 1bf7776
 
-## Phase 3 Visual Grammar + Image Prompt Builder — PLANNED
+## Phase 3 Visual Grammar + Image Prompt Builder — COMPLETE
 
 - [x] /gsd:discuss-phase 3 — 14 decisions captured in 03-CONTEXT.md
 - [x] /gsd:plan-phase 3 --skip-research — 2 plans in 1 wave, verified 10/10
-- [ ] /gsd:execute-phase 3 — run both plans in parallel (Wave 1)
-- [ ] /gsd:verify-work — validate against Phase 3 success criteria
+- [x] /gsd:execute-phase 3 — 2 plans parallel (Wave 1), 43 new tests, 153 total green
+- [x] /gsd:verify-work — 14/14 must-haves verified, 19/19 REQs accounted for
+
+## Phase 4 Compositor — NOT STARTED
+
+- [ ] /gsd:discuss-phase 4 — gather context for compositor (LinkedIn chrome, text overlay, tweet embed, engagement bar)
+- [ ] /gsd:plan-phase 4 — create plans
+- [ ] /gsd:execute-phase 4 — build compositor
+- [ ] /gsd:verify-work — validate
 
 ## Session Handoff
 
 **Last session:** 2026-04-15
 **Branch:** main (clean)
-**State:** Phase 3 planned — 2 plans (03-01: foundation loader + prompt builder, 03-02: zone spec + engagement generator) in 1 wave. Verification passed all 10 dimensions. 19/19 requirements covered.
+**State:** Phase 3 complete, verified. 50% through milestone. 153 tests across 10 suites.
 **Pick up with:**
-1. `/gsd:execute-phase 3` — both plans run in parallel (Wave 1)
-2. After execution: `/gsd:verify-work` against Phase 3 success criteria
-3. After verification: `/gsd:ship` or start `/gsd:discuss-phase 4` (Compositor)
+1. `/clear` then `/gsd:discuss-phase 4` (Compositor — LinkedIn chrome + text overlay + tweet embed + engagement bar over hero image)
+2. 3 human verification items from Phase 3 deferred (visual quality, compositor chrome, engagement feel) — naturally addressed in Phase 4+6
