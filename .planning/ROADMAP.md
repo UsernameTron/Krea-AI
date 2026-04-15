@@ -16,9 +16,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Mirror Post Scaffolding** - Directory structure, persona assets, Post Brief schema, test fixtures
 - [x] **Phase 2: Post Brief Generator** - Input classifier, system prompt builder, LLM generation, Brief Validator
 - [x] **Phase 3: Visual Grammar + Image Prompt Builder** - Foundation prompt asset, deterministic prompt builder, zone spec, engagement generator (completed 2026-04-14)
-- [~] **Phase 4: Compositor** - RESET IN PROGRESS (2026-04-15). Programmatic LinkedIn chrome rendering abandoned. Scope shrinks to text overlay only onto Phase 5 scene screenshots. See `.planning/phases/04-compositor/04-CONTEXT-RESET.md`. Prior work preserved on `archive/phase-4-programmatic-chrome` (mirror-post repo). Phase 5 (Image Prompt Engine) is now blocking. **ROADMAP RENUMBERING NEEDED** — current "Phase 5: Artifact UI" collides with the new `05-image-prompt-engine/` directory; flagged for operator decision.
-- [ ] **Phase 5: Artifact UI** - Input form, brief display/edit, image prompt output
-- [ ] **Phase 6: Integration** - End-to-end pipeline testing and 4-post roundtrip validation
+- [~] **Phase 4: Compositor (RESCOPED)** - Plan 04.2 pending. Static chrome PNG overlay + text overlay onto Phase 5 scene PNG. Programmatic LinkedIn chrome rendering abandoned 2026-04-15; prior work preserved on `archive/phase-4-programmatic-chrome` (mirror-post repo). See `.planning/phases/04-compositor/04-CONTEXT.md`. Blocks on Phase 5a (first scene PNG fixture).
+- [ ] **Phase 5: Image Prompt Engine (NEW, split 5a/5b)** - Archetype→variant mapping, scene prompt expansion with Phase-5-render-time placeholder substitution, flux-krea invocation, scene PNG output. Split: **5a** variant A end-to-end (unblocks Phase 04.2 golden test), **5b** variants B/C/D + remaining engine scope. See `.planning/phases/05-image-prompt-engine/`.
+- [ ] **Phase 6: Artifact UI** (was Phase 5) - Input form, brief display/edit, image prompt output
+- [ ] **Phase 7: Integration** (was Phase 6) - End-to-end pipeline testing and 4-post roundtrip validation
 - [ ] **Parallel: flux-krea Optimization** - Scheduler, MPS tuning, torch.compile, --prompt-file
 
 ## Phase Details
@@ -87,27 +88,53 @@ Plans:
 - [x] 03-01-PLAN.md — Foundation prompt loader, scene templates, and image prompt builder (Wave 1)
 - [x] 03-02-PLAN.md — Compositor zone spec, prop taxonomy, and engagement generator (Wave 1)
 
-### Phase 4: Compositor (RESET IN PROGRESS 2026-04-15)
-**Status**: Architecture pivot. Goal/criteria below are the OLD contract — preserved for audit. New contract in `04-CONTEXT-RESET.md`. Sub-phase 04.2 will replan against the new contract pending operator approval. Phase 5 now blocks Phase 4.
-**Goal (deprecated)**: A flux-krea hero image plus a Post Brief can be assembled into a final 1920x1080 PNG with LinkedIn UI chrome, left-side gradient text overlay, tweet embed card, and engagement metrics — chrome layout consistent across any hero image
-**Depends on**: Phase 3
-**Requirements**: REQ-M-040, REQ-M-041, REQ-M-042, REQ-M-043, REQ-M-044, REQ-X-050, REQ-X-051, REQ-X-052, REQ-X-060, REQ-X-061, REQ-X-062, REQ-X-063, REQ-X-064, REQ-X-065, REQ-X-066
+### Phase 4: Compositor (RESCOPED 2026-04-15 — Plan 04.2)
+**Status**: Architecture reset complete. Scope shrinks to two responsibilities: (1) composite a static per-variant chrome PNG over a Phase 5 scene PNG, (2) overlay headline + body text into variant-specific VARIANT_SLOTS coordinates. No programmatic chrome, no avatars, no emoji pipeline, no tweet card renderer. Plan 04.2 pending against the new contract. Prior work (plans 04-01..04-03) preserved as audit trail and on `archive/phase-4-programmatic-chrome` branch in mirror-post.
+**Goal (current)**: A Phase 5 scene PNG + one of 4 static chrome PNGs + Post Brief v2 can be composited into a final 1920×1080 PNG with headline + body text rendered into VARIANT_SLOTS — byte-identical given identical inputs.
+**Depends on**: Phase 3 (visual grammar + prompt builder survives as upstream), Phase 5a (at least one scene PNG fixture required before golden test can be built)
+**Requirements**: REQ-M-041 (text overlay), REQ-M-042 (gradient readability), REQ-X-052b (overlay determinism, newly split from REQ-X-052), REQ-X-060 (1920×1080 output), REQ-X-061..066 (visual identity aspects preserved in chrome PNG authoring)
+**Retired from scope**: REQ-M-040 (chrome compositing — moves to chrome PNG authoring), REQ-M-043 (tweet embed card — becomes part of chrome PNG if it appears at all), REQ-M-044 (engagement metrics render — part of chrome PNG)
 **Patterns**: None specific
-**Enforces**: REQ-X-027 (compositor renders headline, body, tweet card, engagement text — props text remains IN the hero image), REQ-X-026 (two-stage pipeline), REQ-X-050 (fixed input dimensions), REQ-X-051 (compositor template is fixed asset), REQ-X-052 (deterministic output)
+**Enforces**: REQ-X-027 narrowed (compositor renders headline + body only), REQ-X-051 (chrome PNG + VARIANT_SLOTS become the fixed assets), REQ-X-052b (deterministic overlay composite)
 **Success Criteria** (what must be TRUE):
-  1. Sharp + node-canvas hybrid compositor takes a hero image + Post Brief and outputs a single 1920x1080 PNG
-  2. LinkedIn chrome (top nav, profile bar with avatar/name/title, engagement bar with reactions and comment count) renders consistently regardless of the underlying hero image
-  3. Headline + body text overlay on the left ~40% with semi-transparent dark gradient renders readably against any hero background
-  4. Tweet embed card renders correctly as a white rounded card (lower-right) when present in the Post Brief, and is omitted cleanly when absent
-  5. Output is byte-identical given identical Post Brief + identical hero image (REQ-X-052 pixel-comparison test)
-**Plans**: 2 plans in 2 waves
+  1. Compositor accepts Post Brief v2 (with `image_output.scene_png` field) + returns a 1920×1080 PNG buffer
+  2. Composite layering: scene PNG (Phase 5 output) → chrome PNG (variant-{a|b|c|d}.png) → text overlay into VARIANT_SLOTS[variant]
+  3. 4 chrome PNGs (1920×1080 RGBA, scene zone transparent, chrome opaque) exist at `mirror-post/src/compositor/chrome-assets/variant-{a,b,c,d}.png`
+  4. `constants.js` defines VARIANT_SLOTS for all 4 variants (headline + body coordinates, fontSize, lineHeight, maxLines, fontWeight, color)
+  5. Golden test produces byte-identical output given identical Post Brief v2 + identical scene PNG + identical chrome PNG + pinned VARIANT_SLOTS version (REQ-X-052b)
+  6. Deprecated modules (render-chrome.js, render-engagement-bar.js, render-tweet-card.js, nav-icon module, emoji pipeline, BGRA patch) deleted from `main` after 04.2 plan approval
+**Plans**: 04.2 pending (writeup complete, plan-phase not yet run). Legacy plans preserved as audit trail only.
 **UI hint**: yes
 
 Plans:
-- [x] 04-01-PLAN.md — LinkedIn chrome template + sharp/node-canvas setup (Wave 1)
-- [x] 04-02-PLAN.md — Text overlay gradient zone + tweet embed card renderer (Wave 2)
+- [x] 04-01-PLAN.md — LinkedIn chrome template + sharp/node-canvas setup (LEGACY, superseded by reset)
+- [x] 04-02-PLAN.md — Text overlay gradient zone + tweet embed card renderer (LEGACY, text overlay portion survives)
+- [x] 04-03-PLAN.md — Twemoji COLR swap + nav_easter_eggs removal + BGRA investigation (LEGACY, triggered the reset)
+- [ ] 04.2-PLAN — Chrome PNG authoring, VARIANT_SLOTS definition, text overlay migration, Post Brief v2 sub-plan, legacy module deletion (pending)
 
-### Phase 5: Artifact UI
+### Phase 5: Image Prompt Engine (NEW — split 5a/5b)
+**Status**: New phase, introduced by the 2026-04-15 reset. Owns all pixels of the scene (hero figure + environment/office) excluding the chrome UI zone. Produces transparent-scene-zone-ready PNGs that Phase 4 composites against.
+**Goal**: A Post Brief v2 plus the LinkedIn template variant wrappers produce a deterministic scene PNG (1920×1080) via flux-krea, with placeholder substitution resolved at render time and archetype→variant mapping applied upstream.
+**Depends on**: Phase 3 (image prompt builder, foundation prompt asset, visual grammar), Post Brief schema v2 (sub-plan inside Phase 04.2)
+**Blocks**: Phase 4 golden test (Phase 5a must produce ≥1 variant scene PNG fixture before Phase 04.2 execution can land)
+**Requirements**: REQ-M-020..023 (visual grammar, already satisfied by Phase 3), REQ-M-030..035 (image prompt structure, already satisfied by Phase 3), REQ-X-052a (scene determinism, newly split from REQ-X-052), REQ-X-060 (1920×1080 output dimensions), REQ-X-025 (no flux-krea source modifications), REQ-X-070 (foundation prompt static), REQ-X-071 (deterministic prompt construction)
+**Patterns**: Pattern 11 honored via flux-krea invocation path (no changes to flux-krea core)
+**Enforces**: REQ-X-010 (no MidJourney flags), REQ-X-011 (diffusion describes surfaces), REQ-X-052a (byte-identical scene output for same Post Brief + same seed)
+**Success Criteria** (what must be TRUE):
+  1. 4 variant prompt templates (A/B/C/D) + master wrapper already committed at `.planning/phases/05-image-prompt-engine/templates/` — engine consumes these
+  2. Placeholder substitution (`[Profile Name]`, `[Board Title]`, etc.) resolves at render time from Post Brief v2 fields
+  3. Archetype → variant static mapping (fallback B) produces a deterministic variant selection per Post Brief
+  4. Scene PNG output is 1920×1080, chrome zone left intentionally unoccupied (compositor owns chrome)
+  5. Phase 5a delivers variant A end-to-end with at least one committed scene PNG fixture suitable for Phase 04.2 golden test
+  6. Phase 5b delivers variants B/C/D + any remaining engine scope not needed by 5a
+**Plans**: TBD during plan-phase; anticipated 2 plans minimum (5a, 5b)
+**UI hint**: no
+
+Plans:
+- [ ] 05a-PLAN — Variant A end-to-end (prompt engine core + variant A scene generator + first scene PNG fixture)
+- [ ] 05b-PLAN — Variants B/C/D + remaining Image Prompt Engine scope
+
+### Phase 6: Artifact UI (was Phase 5, shifted by 2026-04-15 renumbering)
 **Goal**: Users can input a scenario or browse archetypes, generate and edit a Post Brief, and produce a copy-ready image prompt — all within a Claude Desktop React artifact with Obsidian dark-mode aesthetic
 **Depends on**: Phase 3
 **Requirements**: REQ-M-050, REQ-M-051, REQ-M-052, REQ-M-054, REQ-M-055
@@ -124,25 +151,25 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 05-01: Input form + archetype browser + sliders
-- [ ] 05-02: Brief display with inline editing + image prompt output
+- [ ] 06-01: Input form + archetype browser + sliders
+- [ ] 06-02: Brief display with inline editing + image prompt output
 
-### Phase 6: Integration + End-to-End
-**Goal**: The complete pipeline — input → Post Brief → image prompt → flux-krea → compositor → final PNG — works end-to-end and produces structurally matching outputs for all 4 reference posts plus a freeform original scenario
-**Depends on**: Phase 4, Phase 5
+### Phase 7: Integration + End-to-End (was Phase 6, shifted by 2026-04-15 renumbering)
+**Goal**: The complete pipeline — input → Post Brief → image prompt → flux-krea (Phase 5) → compositor (Phase 4) → final PNG — works end-to-end and produces structurally matching outputs for all 4 reference posts plus a freeform original scenario
+**Depends on**: Phase 4, Phase 5, Phase 6
 **Requirements**: REQ-M-060, REQ-M-061, REQ-M-062
 **Patterns**: All patterns validated end-to-end
-**Enforces**: REQ-X-002 (Post Brief contract never bypassed), REQ-X-003 (prompt-file contract between Mirror Post and flux-krea)
+**Enforces**: REQ-X-002 (Post Brief v2 contract never bypassed), REQ-X-003 (prompt-file contract between Mirror Post and flux-krea)
 **Success Criteria** (what must be TRUE):
-  1. Pipeline test runs input → Post Brief → image prompt → flux-krea → compositor → final PNG without manual intervention
+  1. Pipeline test runs input → Post Brief v2 → Phase 5 scene PNG → Phase 4 compositor → final PNG without manual intervention
   2. All 4 reference post roundtrips (Brent Vellum, Trevor B. hustle, Trevor B. closer, Pete C. titles) produce structurally matching outputs
   3. A freeform original scenario produces a coherent end-to-end output with original character and props
   4. Edit flow works: generate brief → edit a field → regenerate prompt → updated prompt reflects the edit
-  5. Compositor produces byte-identical output given identical Post Brief + identical hero image
+  5. Determinism contract holds end-to-end: identical Post Brief v2 → identical scene PNG (REQ-X-052a) → identical final PNG (REQ-X-052b)
 **Plans**: TBD
 
 Plans:
-- [ ] 06-01: End-to-end pipeline wiring and 4-post roundtrip validation
+- [ ] 07-01: End-to-end pipeline wiring and 4-post roundtrip validation
 
 ### Parallel: flux-krea Optimization
 **Goal**: Generation latency drops from 60-90 seconds to 30-45 seconds on M4 Pro, with --prompt-file flag enabling structured input from Mirror Post
@@ -215,20 +242,22 @@ These constraints apply across ALL phases. Any phase output that violates these 
 | REQ-M-033 | Phase 3 | Visual Grammar + Image Prompt Builder |
 | REQ-M-034 | Phase 3 | Visual Grammar + Image Prompt Builder |
 | REQ-M-035 | Phase 3 | Visual Grammar + Image Prompt Builder |
-| REQ-M-040 | Phase 4 | Compositor |
-| REQ-M-041 | Phase 4 | Compositor |
-| REQ-M-042 | Phase 4 | Compositor |
-| REQ-M-043 | Phase 4 | Compositor |
-| REQ-M-044 | Phase 4 | Compositor |
-| REQ-M-050 | Phase 5 | Artifact UI |
-| REQ-M-051 | Phase 5 | Artifact UI |
-| REQ-M-052 | Phase 5 | Artifact UI |
+| REQ-M-040 | RETIRED from Phase 4 | Chrome compositing — now part of chrome PNG authoring, owned by operator task inside Phase 04.2 plan |
+| REQ-M-041 | Phase 4 | Text overlay (SURVIVES after 04.2 reset) |
+| REQ-M-042 | Phase 4 | Gradient readability (if gradient is part of chrome PNG, else compositor) |
+| REQ-M-043 | RETIRED from Phase 4 | Tweet embed card — becomes part of chrome PNG if it appears at all |
+| REQ-M-044 | RETIRED from Phase 4 | Engagement metrics render — part of chrome PNG |
+| REQ-X-052a | Phase 5 | Scene determinism (newly split 2026-04-15) |
+| REQ-X-052b | Phase 4 | Overlay determinism (newly split 2026-04-15) |
+| REQ-M-050 | Phase 6 | Artifact UI (shifted from Phase 5 by 2026-04-15 renumbering) |
+| REQ-M-051 | Phase 6 | Artifact UI (shifted from Phase 5) |
+| REQ-M-052 | Phase 6 | Artifact UI (shifted from Phase 5) |
 | REQ-M-053 | DEFERRED | Artifact UI (stretch) |
-| REQ-M-054 | Phase 5 | Artifact UI |
-| REQ-M-055 | Phase 5 | Artifact UI |
-| REQ-M-060 | Phase 6 | Integration |
-| REQ-M-061 | Phase 6 | Integration |
-| REQ-M-062 | Phase 6 | Integration |
+| REQ-M-054 | Phase 6 | Artifact UI (shifted from Phase 5) |
+| REQ-M-055 | Phase 6 | Artifact UI (shifted from Phase 5) |
+| REQ-M-060 | Phase 7 | Integration (shifted from Phase 6 by 2026-04-15 renumbering) |
+| REQ-M-061 | Phase 7 | Integration (shifted from Phase 6) |
+| REQ-M-062 | Phase 7 | Integration (shifted from Phase 6) |
 | REQ-X-070 | Phase 3 | Foundation prompt is static asset, loaded once |
 | REQ-X-071 | Phase 3 | Image prompt construction is deterministic, no LLM |
 | REQ-F-010 | Parallel | flux-krea Optimization |
@@ -248,15 +277,17 @@ These constraints apply across ALL phases. Any phase output that violates these 
 ## Progress
 
 **Execution Order:**
-Phases 1-6 execute sequentially. Phase 5 (Artifact UI) may run in parallel with Phase 4 (Compositor) since both depend on Phase 3.
+Phases 1-7 execute with the 2026-04-15 renumbering. Phase 4 (Compositor, rescoped) now blocks on Phase 5a (first scene PNG fixture). Phase 6 (Artifact UI) may run in parallel with Phase 4 and Phase 5 since it depends only on Phase 3. Phase 7 (Integration) depends on Phases 4+5+6.
 Parallel work stream executes independently in flux-krea/ repo.
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Scaffolding | 3/3 | COMPLETE | 2026-04-14 |
 | 2. Post Brief Generator | 8/8 | COMPLETE | 2026-04-14 |
-| 3. Visual Grammar + Image Prompt Builder | 2/2 | Complete   | 2026-04-14 |
-| 4. Compositor | 2/2 | Complete   | 2026-04-15 |
-| 5. Artifact UI | 0/2 | Not started | - |
-| 6. Integration | 0/1 | Not started | - |
+| 3. Visual Grammar + Image Prompt Builder | 2/2 | COMPLETE | 2026-04-14 |
+| 4. Compositor (legacy plans 04-01..04-03) | 3/3 | LEGACY — superseded by 04.2 reset | 2026-04-15 |
+| 4.2 Compositor (rescoped) | 0/1 | Context captured, plan pending | - |
+| 5. Image Prompt Engine (NEW, split 5a/5b) | 0/2 | Not started | - |
+| 6. Artifact UI (was Phase 5) | 0/2 | Not started | - |
+| 7. Integration (was Phase 6) | 0/1 | Not started | - |
 | P. flux-krea Optimization | 0/6 | Not started | - |

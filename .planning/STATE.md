@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: decisions_captured_pending_writeup
-stopped_at: /gsd:discuss-phase 04.2 complete — two decisions captured in .continue-here.md; 04-CONTEXT.md and 04-DISCUSSION-LOG.md deferred to next session
-last_updated: "2026-04-15T16:42:00.000Z"
+status: context_captured_ready_for_plan
+stopped_at: Phase 04.2 context writeup complete — 04-CONTEXT.md, 04-DISCUSSION-LOG.md, ROADMAP.md (renumbered), and STATE.md updated in one atomic commit. Operator can run /gsd:plan-phase 04.2 next.
+last_updated: "2026-04-15T19:00:00.000Z"
 last_activity: 2026-04-15
 progress:
-  total_phases: 6
-  completed_phases: 2
-  total_plans: 13
+  total_phases: 7
+  completed_phases: 3
+  total_plans: 14
   completed_plans: 5
-  percent: 50
+  percent: 36
 ---
 
 # Project State
@@ -29,13 +29,13 @@ Phase 0 (Bootstrap): COMPLETE
 Phase 1 (Mirror Post Scaffolding): COMPLETE
 Phase 2 (Post Brief Generator): COMPLETE
 Phase 3 (Visual Grammar + Image Prompt Builder): COMPLETE
-Phase: 04 (compositor) — RESET IN PROGRESS
-Plan: pivot to 04.2 (architecture reset)
-Status: Programmatic chrome abandoned. Compositor scope = text overlay only onto Phase-5-generated scene screenshots. Prior work preserved on archive/phase-4-programmatic-chrome (mirror-post SHA c25d88a). BGRA channel-swap fix STOPPED — will not merge. See 04-CONTEXT-RESET.md.
+Phase: 04 (compositor) — RESCOPED, context captured, plan pending
+Plan: 04.2 writeup complete; `/gsd:plan-phase 04.2` is the next command
+Status: Phase 04.2 CONTEXT.md, DISCUSSION-LOG.md, and ROADMAP renumbering committed atomically. 14 decisions frozen (D-NEW-01..14). Compositor scope = static per-variant chrome PNG overlay + text overlay onto Phase 5 scene PNG. Post Brief bumps to v2 (migration lives as sub-plan inside 04.2). ROADMAP renumbered: Phase 5 Image Prompt Engine (split 5a/5b) / Phase 6 Artifact UI / Phase 7 Integration. Prior work preserved on archive/phase-4-programmatic-chrome (mirror-post SHA c25d88a). Deprecated modules stay on main until 04.2 plan approved. See .planning/phases/04-compositor/04-CONTEXT.md.
 Last activity: 2026-04-15
 Branch: main (Krea-AI workspace) | mirror-post repo: main + archive/phase-4-programmatic-chrome
 
-Progress: [#####░░░░░] 50%
+Progress: [####░░░░░░] 36% (3 phases complete out of 7 new-numbering phases; Phase 4 legacy plans count as done but 04.2 re-plan pending)
 
 ## Performance Metrics
 
@@ -129,13 +129,18 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-15T14:30:08.316Z
-Stopped at: Completed 04-compositor/04-03-PLAN.md — awaiting human UAT (Task 12 checkpoint)
-Note: Both plans executed in parallel (worktree isolation). 03-01: 21 tests (image prompt builder). 03-02: 22 tests (grammar module). Full regression: 153/153 green. Verification: 14/14 must-haves passed. 3 human items deferred (visual quality, compositor chrome, engagement feel).
-Next: `/gsd:discuss-phase 4` (Compositor) — /clear first for fresh context.
+Last session: 2026-04-15T19:00:00.000Z
+Stopped at: Phase 04.2 context writeup complete — atomic commit in progress
+Next: `/gsd:plan-phase 04.2` — chrome PNG authoring (D-NEW-09) becomes a task inside that plan; operator generates 4 chrome PNGs via flux-krea between plan-phase and execute-phase.
 
 ---
 
 Resume (2026-04-15): Session resumed, proceeding to Wave 2 (04-02 text overlay + tweet embed + golden PNG test). HANDOFF.json is authoritative. `/gsd:execute-phase 4` will auto-skip 04-01 (has_summary=true).
 
 Reset (2026-04-15 PM): Phase 4 architecture reset. Programmatic LinkedIn chrome rendering abandoned. New contract: compositor overlays text only onto AI-generated full-scene LinkedIn screenshots produced by Phase 5 (Image Prompt Engine, `.planning/phases/05-image-prompt-engine/`). Five template variant prompts committed at 45dfdfa (4 variants A/B/C/D + master wrapper). Prior compositor work preserved on `archive/phase-4-programmatic-chrome` in mirror-post (SHA c25d88a) — no commits reverted. BGRA channel-swap fix STOPPED, will not merge. Five new decisions captured in `04-CONTEXT-RESET.md` (D-NEW-01 through D-NEW-05) plus three discussion-surfaced decisions (D-NEW-06 schema bump, D-NEW-07 legacy disposition, D-NEW-08 nav_easter_eggs retro-justification). Six risks flagged including ROADMAP renumbering collision (current "Phase 5: Artifact UI" vs new `05-image-prompt-engine/` directory). HOLD: do not invoke `/gsd:plan-phase 04.2` until operator approves the CONTEXT.
+
+Discuss-phase 04.2 (2026-04-15 AM): 3 advisor-researcher subagents (A/B/C). Operator made DECISION 1 (A+B compositing boundary — compositor owns chrome PNG, scene owns scene) and DECISION 2 (Post Brief schema v2 bundle — nullable override fields, Phase-5-render-time placeholder substitution, `image_output.scene_png`). D-NEW-01 revised; D-NEW-06 resolved.
+
+Resume-work (2026-04-15 PM): Operator resolved all six carry-over blockers inline (FROZEN-01..06), birthing D-NEW-09..14. Paused at 87% context. Writeup handoff via `.continue-here.md`.
+
+Writeup (2026-04-15 PM, this session): Fresh context resumed, 9-step writeup executed per checkpoint. 04-CONTEXT.md, 04-DISCUSSION-LOG.md, ROADMAP.md renumbering (P4 rescoped / P5 Image Prompt Engine split 5a/5b / P6 Artifact UI shifted / P7 Integration shifted), and STATE.md updated atomically. Checkpoint (`.continue-here.md`) and `HANDOFF.json` deleted as consumed one-shot artifacts. Status: context_captured_ready_for_plan. Next: `/gsd:plan-phase 04.2`.
