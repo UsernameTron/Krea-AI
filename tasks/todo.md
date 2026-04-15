@@ -47,12 +47,19 @@
 - [x] /gsd:execute-phase 3 — 2 plans parallel (Wave 1), 43 new tests, 153 total green
 - [x] /gsd:verify-work — 14/14 must-haves verified, 19/19 REQs accounted for
 
-## Phase 4 Compositor — NOT STARTED
+## Phase 3 Prompt Artifact Build (Product Reset 2, 2026-04-15 evening)
 
-- [ ] /gsd:discuss-phase 4 — gather context for compositor (LinkedIn chrome, text overlay, tweet embed, engagement bar)
-- [ ] /gsd:plan-phase 4 — create plans
-- [ ] /gsd:execute-phase 4 — build compositor
-- [ ] /gsd:verify-work — validate
+Build happens in a separate Claude Desktop chat with artifact support. Do NOT run `/gsd:execute-phase`.
+
+- [ ] Build React artifact in Claude Desktop chat: idea textarea, 4 voice sliders (sarcasm, cynicism, warmth, satirical_intensity), archetype dropdown (17 archetypes + auto-assign), generate button, copy-to-clipboard on output
+- [ ] Artifact calls `window.claude.complete` with persona distillate + archetype + sliders + idea
+- [ ] Parse response into Post Brief JSON
+- [ ] Map archetype → variant (A/B/C/D) via D-NEW-05 table; load variant template from `.planning/phases/05-image-prompt-engine/templates/`
+- [ ] Fill variant template by substituting `{{placeholders}}` with Post Brief fields
+- [ ] Display: filled prompt text (copy button), Post Brief JSON preview, archetype match confidence
+- [ ] Obsidian dark-mode aesthetic (deep navy, gold accents, cream text)
+- [ ] When artifact satisfies, commit to `mirror-post/artifact/MirrorPoster.jsx`
+- [ ] Optional later: promote to deployed web app (Vercel)
 
 ## Session Handoff
 
@@ -76,19 +83,8 @@
 5. Before `/gsd:plan-phase 04.2`: get operator confirmation on D-NEW-01 walk-back and chrome PNG authoring contract (4 human-authored PNGs required)
 6. Still-open carry-over gaps: ROADMAP renumbering, Phase 5 split (5a/5b), deprecated module deletion timing, Phase 2 v2 migration scope
 
-## Variant Asset Delivery (Path 2)
-- [ ] Generate 3-5 sub-variants per letter (A/B/C/D), 12-20 total
-- [ ] Same prompt per letter, vary seed only (keeps layout stable)
-- [ ] 1920x1080 RGB, full opaque, no transparency
-- [ ] Commit to mirror-post/src/compositor/variant-assets/{a,b,c,d}/
-- [ ] Measure VARIANT_SLOTS coords from one reference per letter, update mirror-post/src/compositor/constants.js
-
-## Deferred follow-ups (Path 2 amendment, 2026-04-15)
-- [x] REQUIREMENTS.md REQ-X-052a retarget, ROADMAP Phase 5 collapse, STATE.md note, DISCUSSION-LOG appendix, D-NEW-09 revision — done 2026-04-15 evening (6c16097)
-
-## Phase 5 Preconditions (captured 2026-04-15)
-- [ ] Update flux-krea/CLAUDE.md Python requirement to "3.10-3.12" (currently says "3.10+" which is misleading — torch 2.7 wheels don't exist for Python 3.14)
-- [ ] First task of Phase 5 execution: onboarding runbook (homebrew python@3.11, venv creation, pip install -r requirements.txt, HF token setup, one-shot verification render). Saves 30+ min of rediscovery.
+## Retired by Product Reset 2 (2026-04-15 evening)
+All Variant Asset Delivery / Scene Asset Delivery / Phase 5 Preconditions / Path 2 / Path C items retired. See `.planning/PRODUCT-RESET-2.md`.
 
 ## flux-krea Technical Debt (external audit, 2026-04-15)
 Audit flagged 6 findings — none block Phase 4.2 Path 2 (Mirror Post runtime doesn't call flux-krea). Track for future flux-krea maintenance phase.

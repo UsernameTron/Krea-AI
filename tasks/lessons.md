@@ -21,6 +21,9 @@
   Layer 2: Per-post generation (Post Brief supplies text content; image prompt = foundation prefix + character/scene/props delta built via mirror-vision-prompt-crafter logic adapted for Flux; flux-krea generates full-bleed hero image locally).
   Layer 3: Compositor assembly (hero image + headline/body text overlay with left-side gradient + LinkedIn chrome + tweet embed card + engagement bar = final PNG).
   The hero image is full-bleed — character sits IN the scene with props that have text rendered by Flux. Compositor overlays text and chrome ON TOP of the hero image. Props with text (mug labels, nameplates, whiteboard content) are IN the diffusion output, not compositor overlays.
+- [2026-04-15] [Scope Discipline]: When a phase's architecture has cycled through 3+ revisions in 24 hours without a shippable artifact, STOP all architectural work and re-interrogate scope at the product level. Ask "what does the user actually need?" before asking "how do we build the planned thing?" Phase 4 compositor went through programmatic chrome → BGRA bug → RESET 1 → Path 2 → Path 2b → Path C before operator pulled scope to a simple prompt-filler artifact. Signal for architecture rethink was "I could have built this app 3 times over in the time we've spent arguing about pixel layering."
+  Why: 24+ hours of architectural churn on a feature the operator didn't actually need. The real product was always "prompt generator with sliders." The compositor existed because scope hadn't been re-examined.
+  How to apply: Every time an architecture decision triggers a re-plan, count. At three re-plans within the same phase without a shippable artifact, the prompt to the operator must include "is this feature actually load-bearing for the product?"
 
 ## Archived
 <!-- Rules that no longer apply -->

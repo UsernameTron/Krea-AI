@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: plans_approved_pending_execution
-stopped_at: Phase 04.2 — Path 2 critical-path amendment committed (c9ca02a). CONTEXT + plans 04/05 + todo updated. Waiting on operator handoff: variant assets (12-20 PNGs) + VARIANT_SLOTS coords. Doc-hygiene follow-ups deferred to next session.
-last_updated: "2026-04-15T20:00:00.000Z"
+status: product_reset_2_scope_reduction
+stopped_at: Product Reset 2 (2026-04-15 evening) — Compositor and image generation work abandoned. Scope collapsed to a single Claude Desktop React artifact (Phase 3: Prompt Artifact). Build proceeds in Claude Desktop directly, not via /gsd:execute-phase. Planning docs reset atomically. See .planning/PRODUCT-RESET-2.md.
+last_updated: "2026-04-15T23:00:00.000Z"
 last_activity: 2026-04-15
 progress:
-  total_phases: 7
-  completed_phases: 3
-  total_plans: 14
-  completed_plans: 5
-  percent: 36
+  total_phases: 3
+  completed_phases: 2
+  total_plans: 0
+  completed_plans: 0
+  percent: 67
 ---
 
 # Project State
@@ -21,21 +21,28 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** The Post Brief is the product -- a single structured JSON document containing every element of a satirical LinkedIn post, all satirically coherent from one voice-aware pass.
-**Current focus:** Phase 04 — compositor
+**Current focus:** Phase 3 — Prompt Artifact (Claude Desktop build)
 
 ## Current Position
 
 Phase 0 (Bootstrap): COMPLETE
 Phase 1 (Mirror Post Scaffolding): COMPLETE
 Phase 2 (Post Brief Generator): COMPLETE
-Phase 3 (Visual Grammar + Image Prompt Builder): COMPLETE
-Phase: 04 (compositor) — RESCOPED, context captured, plan pending
-Plan: 04.2 writeup complete; `/gsd:plan-phase 04.2` is the next command
-Status: Phase 04.2 CONTEXT.md, DISCUSSION-LOG.md, and ROADMAP renumbering committed atomically. 14 decisions frozen (D-NEW-01..14). Compositor scope = static per-variant chrome PNG overlay + text overlay onto Phase 5 scene PNG. Post Brief bumps to v2 (migration lives as sub-plan inside 04.2). ROADMAP renumbered: Phase 5 Image Prompt Engine (split 5a/5b) / Phase 6 Artifact UI / Phase 7 Integration. Prior work preserved on archive/phase-4-programmatic-chrome (mirror-post SHA c25d88a). Deprecated modules stay on main until 04.2 plan approved. See .planning/phases/04-compositor/04-CONTEXT.md.
-Last activity: 2026-04-15
-Branch: main (Krea-AI workspace) | mirror-post repo: main + archive/phase-4-programmatic-chrome
+Phase 3 (Prompt Artifact): NOT STARTED — build proceeds in Claude Desktop, not Claude Code
 
-Progress: [####░░░░░░] 36% (3 phases complete out of 7 new-numbering phases; Phase 4 legacy plans count as done but 04.2 re-plan pending)
+Status: **Product Reset 2 (2026-04-15 evening)**. Scope reduced. Compositor, scene generation, chrome authoring, byte-identical output — all abandoned. New scope is a single Claude Desktop React artifact that generates filled-in image prompts from user input (idea + voice sliders + archetype). App ends at prompt text; user pastes into whatever image tool they want.
+
+Prior work preserved:
+- `mirror-post` `archive/phase-4-programmatic-chrome` (SHA c25d88a) — original programmatic compositor
+- `mirror-post` `archive/phase-4.2-path-c-abandoned` — placeholder marker branch for Path C pivot (work lived in Krea-AI `.planning/`, not mirror-post source)
+- `.planning/phases/04-compositor/` and `.planning/phases/05-image-prompt-engine/` — historical plans + variant templates (templates survive and feed Phase 3)
+
+See `.planning/PRODUCT-RESET-2.md` for the full rationale. Build happens in a separate Claude Desktop chat. Do NOT run `/gsd:execute-phase 3` — there are no plans because the artifact is built interactively.
+
+Last activity: 2026-04-15
+Branch: docs/path-c-pivot (Krea-AI workspace — Product Reset 2 commit pending) | mirror-post: main + 2 archive branches
+
+Progress: [#######░░░] 67% (2 of 3 active phases complete — Phase 3 artifact build pending in Claude Desktop)
 
 ## Performance Metrics
 
@@ -129,9 +136,9 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-15T19:00:00.000Z
-Stopped at: Phase 04.2 context writeup complete — atomic commit in progress
-Next: `/gsd:plan-phase 04.2` — chrome PNG authoring (D-NEW-09) becomes a task inside that plan; operator generates 4 chrome PNGs via flux-krea between plan-phase and execute-phase.
+Last session: 2026-04-15T23:00:00.000Z
+Stopped at: Product Reset 2 commit — planning docs reset to Phase 3 Prompt Artifact scope.
+Next: Build React artifact in a separate Claude Desktop chat (artifact support required). When satisfied, commit to `mirror-post/artifact/MirrorPoster.jsx`.
 
 ---
 
