@@ -110,7 +110,11 @@ Plans:
 - [x] 04-01-PLAN.md — LinkedIn chrome template + sharp/node-canvas setup (LEGACY, superseded by reset)
 - [x] 04-02-PLAN.md — Text overlay gradient zone + tweet embed card renderer (LEGACY, text overlay portion survives)
 - [x] 04-03-PLAN.md — Twemoji COLR swap + nav_easter_eggs removal + BGRA investigation (LEGACY, triggered the reset)
-- [ ] 04.2-PLAN — Chrome PNG authoring, VARIANT_SLOTS definition, text overlay migration, Post Brief v2 sub-plan, legacy module deletion (pending)
+- [ ] 04.2-01-PLAN.md — Post Brief v2 schema migration (D-NEW-06, D-NEW-14) [Wave 1]
+  - [ ] 04.2-02-PLAN.md — VARIANT_SLOTS + barrel rewrite (D-NEW-03) [Wave 1]
+  - [ ] 04.2-03-PLAN.md — Legacy module deletion (D-NEW-07, D-NEW-13) [Wave 3, blocked on all others]
+  - [ ] 04.2-04-PLAN.md — compositePost() rewrite (D-NEW-01, D-NEW-02, D-NEW-05) [Wave 2]
+  - [ ] 04.2-05-PLAN.md — Golden test (REQ-X-052b) [Wave 2]
 
 ### Phase 5: Image Prompt Engine (NEW — split 5a/5b)
 **Status**: New phase, introduced by the 2026-04-15 reset. Owns all pixels of the scene (hero figure + environment/office) excluding the chrome UI zone. Produces transparent-scene-zone-ready PNGs that Phase 4 composites against.
@@ -286,7 +290,7 @@ Parallel work stream executes independently in flux-krea/ repo.
 | 2. Post Brief Generator | 8/8 | COMPLETE | 2026-04-14 |
 | 3. Visual Grammar + Image Prompt Builder | 2/2 | COMPLETE | 2026-04-14 |
 | 4. Compositor (legacy plans 04-01..04-03) | 3/3 | LEGACY — superseded by 04.2 reset | 2026-04-15 |
-| 4.2 Compositor (rescoped) | 0/1 | Context captured, plan pending | - |
+| 4.2 Compositor (rescoped) | 0/5 | 5 plans written, 3 waves | - |
 | 5. Image Prompt Engine (NEW, split 5a/5b) | 0/2 | Not started | - |
 | 6. Artifact UI (was Phase 5) | 0/2 | Not started | - |
 | 7. Integration (was Phase 6) | 0/1 | Not started | - |
