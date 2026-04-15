@@ -67,8 +67,15 @@
 5. Before `/gsd:plan-phase 04.2`: get operator confirmation on D-NEW-01 walk-back and chrome PNG authoring contract (4 human-authored PNGs required)
 6. Still-open carry-over gaps: ROADMAP renumbering, Phase 5 split (5a/5b), deprecated module deletion timing, Phase 2 v2 migration scope
 
-## Phase 5a Handoff (captured 2026-04-15)
-- [ ] When Phase 5a delivers real variant-a.png, regenerate brent-vellum-v2-golden.png. Use REGENERATE_GOLDEN=1 flag documented in 04.2-05-PLAN.md. Commit new golden to mirror-post/test/fixtures/golden-outputs/.
+## Variant Asset Delivery (Path 2)
+- [ ] Generate 3-5 sub-variants per letter (A/B/C/D), 12-20 total
+- [ ] Same prompt per letter, vary seed only (keeps layout stable)
+- [ ] 1920x1080 RGB, full opaque, no transparency
+- [ ] Commit to mirror-post/src/compositor/variant-assets/{a,b,c,d}/
+- [ ] Measure VARIANT_SLOTS coords from one reference per letter, update mirror-post/src/compositor/constants.js
+
+## Deferred follow-ups (Path 2 amendment, 2026-04-15)
+- [ ] REQUIREMENTS.md REQ-X-052a retarget, ROADMAP Phase 5 collapse, STATE.md note, DISCUSSION-LOG appendix, D-NEW-09 revision (tracked as one item — next session)
 
 ## Phase 5 Preconditions (captured 2026-04-15)
 - [ ] Update flux-krea/CLAUDE.md Python requirement to "3.10-3.12" (currently says "3.10+" which is misleading — torch 2.7 wheels don't exist for Python 3.14)

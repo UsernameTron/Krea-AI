@@ -28,7 +28,10 @@ Composite a **static per-variant LinkedIn chrome PNG** over a **Phase-5-generate
 <decisions>
 ## Implementation Decisions
 
-### D-NEW-01 (REVISED 2026-04-15 PM) — A+B compositing boundary: Phase 4 owns chrome PNG
+### D-NEW-01 (SECOND REVISION 2026-04-15 PM/Path 2) — Variant PNGs are pre-authored composite assets
+Variant PNGs are pre-authored assets containing both scene and chrome, committed to `mirror-post/src/compositor/variant-assets/{a,b,c,d}/`. No per-post scene generation. Phase 5 per-post rendering eliminated. Phase 4 selects a sub-variant asset, overlays text into `VARIANT_SLOTS` coordinates, and exports. There is no runtime scene layer, no runtime chrome layer — the full background (scene + chrome) is a single committed PNG.
+
+### D-NEW-01 (REVISED 2026-04-15 PM — SUPERSEDED by Path 2 above, retained for audit) — A+B compositing boundary: Phase 4 owns chrome PNG
 Phase 5 generates **scene-only** PNG (hero figure + office environment; NO chrome, NO nav, NO mini post card, NO reaction row, NO comment group). Phase 4 composites a **static per-variant chrome PNG** (A/B/C/D, transparent where scene shows through) over the Phase 5 scene, then overlays text into `VARIANT_SLOTS` coordinates.
 - **Revision history:** Original D-NEW-01 (2026-04-15 AM, in `04-CONTEXT-RESET.md`) said "scene generation belongs to Phase 5" including chrome. Afternoon session walked back chrome ownership from Phase 5 to Phase 4 as static PNG asset (FROZEN-01). Rationale: diffusion cannot bake LinkedIn chrome cleanly enough to not require iterative fixups; a one-time human-authored chrome asset per variant is deterministic, auditable, and decouples chrome from scene prompt churn.
 - **Why (net):** Programmatic Cairo/node-canvas chrome produced fragile output (Twemoji COLR swap, BGRA channel mismatch, golden-PNG churn). Diffusion-baked chrome couples chrome fidelity to prompt tuning. Static transparent-PNG chrome is the minimum-surface, maximum-determinism option.
@@ -102,6 +105,9 @@ Phases renumber to reflect the architecture reset:
 
 ### D-NEW-13 (NEW — FROZEN-05) — Deprecated module deletion timing
 Modules listed in D-NEW-07 are deleted from `main` **after** Phase 04.2 plan approval, not before. Preserved on archive branch in the meantime. See D-NEW-07.
+
+### D-NEW-15 (NEW 2026-04-15 Path 2) — Sub-variant pool
+3-5 scenes per letter. Selection via `SHA-256(character.name + post.headline.text) mod pool_size`. Same brief always picks same sub-variant. `VARIANT_SLOTS` coords are per-letter, not per-sub-variant — operator generates sub-variants with seed-only variation to keep layout stable. Pool size per letter is stored alongside assets (e.g., directory listing of `variant-assets/{letter}/`).
 
 ### D-NEW-14 (NEW — FROZEN-06) — Phase 2 v2 migration lives inside Phase 04.2 execution
 Post Brief v2 schema bump (D-NEW-06) runs as a **sub-plan inside Phase 04.2 execution**, not as a separate Phase 02-revisit.
