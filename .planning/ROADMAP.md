@@ -103,7 +103,7 @@ Plans:
 **UI hint**: yes
 
 Plans:
-- [ ] 04-01-PLAN.md — LinkedIn chrome template + sharp/node-canvas setup (Wave 1)
+- [x] 04-01-PLAN.md — LinkedIn chrome template + sharp/node-canvas setup (Wave 1)
 - [ ] 04-02-PLAN.md — Text overlay gradient zone + tweet embed card renderer (Wave 2)
 
 ### Phase 5: Artifact UI
@@ -255,7 +255,7 @@ Parallel work stream executes independently in flux-krea/ repo.
 | 1. Scaffolding | 3/3 | COMPLETE | 2026-04-14 |
 | 2. Post Brief Generator | 8/8 | COMPLETE | 2026-04-14 |
 | 3. Visual Grammar + Image Prompt Builder | 2/2 | Complete   | 2026-04-14 |
-| 4. Compositor | 0/2 | Not started | - |
+| 4. Compositor | 1/2 | In Progress|  |
 | 5. Artifact UI | 0/2 | Not started | - |
 | 6. Integration | 0/1 | Not started | - |
 | P. flux-krea Optimization | 0/6 | Not started | - |
