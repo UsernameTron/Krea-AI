@@ -56,10 +56,12 @@
 
 ## Session Handoff
 
-**Last session:** 2026-04-15 PM (Path 2 critical-path amendment — c9ca02a)
+**Last session:** 2026-04-15 evening (Path 2 doc hygiene — 6c16097)
 **Branch:** main (clean)
-**State:** CONTEXT.md carries D-NEW-01 SECOND REVISION + D-NEW-15; plans 04.2-04 and 04.2-05 rewritten to 2-layer pipeline with SHA-256 sub-variant selection; synthetic-scene fallback removed. Operator needs to deliver variant assets (12-20 PNGs under mirror-post/src/compositor/variant-assets/{a,b,c,d}/) and measure VARIANT_SLOTS coords per letter.
-**Pick up with:** Doc-hygiene follow-ups in one session — REQUIREMENTS.md REQ-X-052a retarget, ROADMAP Phase 5 collapse, STATE.md cleanup, 04-DISCUSSION-LOG.md appendix, D-NEW-09 revision. Then variant-asset delivery, then `/gsd:execute-phase 04.2`.
+**State:** Doc-hygiene follow-ups complete. REQUIREMENTS.md REQ-X-052a retargeted to variant asset authoring determinism. ROADMAP.md Phase 5 collapsed to single Variant Asset Library phase (blocks on operator delivery, not engineering). STATE.md progress note appended. 04-CONTEXT.md D-NEW-09 marked superseded by D-NEW-15. 04-DISCUSSION-LOG.md Path 2 appendix added. All Path 2 documentation drift closed.
+**Pick up with:** Operator variant-asset delivery (12-20 PNGs under mirror-post/src/compositor/variant-assets/{a,b,c,d}/ + VARIANT_SLOTS measurement) → `/gsd:execute-phase 04.2`.
+
+**Prior session:** 2026-04-15 PM (Path 2 critical-path amendment — c9ca02a)
 
 ---
 
@@ -82,7 +84,7 @@
 - [ ] Measure VARIANT_SLOTS coords from one reference per letter, update mirror-post/src/compositor/constants.js
 
 ## Deferred follow-ups (Path 2 amendment, 2026-04-15)
-- [ ] REQUIREMENTS.md REQ-X-052a retarget, ROADMAP Phase 5 collapse, STATE.md note, DISCUSSION-LOG appendix, D-NEW-09 revision (tracked as one item — next session)
+- [x] REQUIREMENTS.md REQ-X-052a retarget, ROADMAP Phase 5 collapse, STATE.md note, DISCUSSION-LOG appendix, D-NEW-09 revision — done 2026-04-15 evening (6c16097)
 
 ## Phase 5 Preconditions (captured 2026-04-15)
 - [ ] Update flux-krea/CLAUDE.md Python requirement to "3.10-3.12" (currently says "3.10+" which is misleading — torch 2.7 wheels don't exist for Python 3.14)
