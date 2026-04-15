@@ -1,43 +1,41 @@
 {
   "version": "1.0",
-  "timestamp": "2026-04-15T13:04:57.348Z",
-  "phase": "04",
-  "phase_name": "compositor",
+  "timestamp": "2026-04-15T14:06:59.924Z",
+  "phase": "04.1",
+  "phase_name": "Compositor Gap Closure (post-UAT)",
   "phase_dir": ".planning/phases/04-compositor",
-  "plan": "04-02",
+  "plan": "04-03-PLAN.md",
   "task": 1,
-  "total_tasks": 3,
-  "status": "wave_1_complete_paused_before_wave_2",
-  "stage": "execute-phase — Wave 1 shipped green (04-01 complete), paused before spawning Wave 2 (04-02)",
+  "total_tasks": 12,
+  "status": "paused_before_execution",
   "completed_tasks": [
-    {"id": "discuss", "name": "Phase 4 discuss-phase (4 advisor agents, 15 decisions D-01..D-15)", "status": "done", "commit": "016f8df"},
-    {"id": "plan", "name": "Phase 4 plan-phase (2 plans, 2 waves, 15/15 REQ coverage)", "status": "done", "commit": "6c4b78f"},
-    {"id": "plan-patch", "name": "Close Phase 4 determinism gaps — pin renderers + golden PNG", "status": "done", "commit": "973d4a0"},
-    {"id": "04-01", "name": "Plan 04-01 — compositor chrome layer (constants, fonts, SVG assets, renderers, compositePost, 10/10 tests, sharp@0.34.5/canvas@3.2.3 pinned, determinism verified)", "status": "done", "commits": ["mirror-post:267bd30", "Krea-AI:e68ee3b"]}
+    {"id": 0, "name": "Plan written (04-03-PLAN.md)", "status": "done", "commit": "44201f8"},
+    {"id": 0, "name": "Plan amended — golden-regen commit msg explicit", "status": "done", "commit": "bd3cd12"}
   ],
   "remaining_tasks": [
-    {"id": "04-02", "name": "Plan 04-02 — text overlay (gradient + headline with gold highlights + body with inline bold/italic + hashtags), tweet embed card renderer, golden PNG determinism test (3 tasks, 18 tests)", "status": "not_started"},
-    {"id": "regression-gate", "name": "Run prior phase tests to confirm no cross-phase regressions", "status": "not_started"},
-    {"id": "phase-verify", "name": "Spawn gsd-verifier to validate phase 4 goal achievement against 15 REQ-IDs", "status": "not_started"},
-    {"id": "phase-complete", "name": "Mark phase 04 complete via phase complete 04, update ROADMAP/STATE/PROJECT.md", "status": "not_started"}
+    {"id": 1, "name": "Wave 1 T1: LinkedIn blue palette + avatar (Bugs 1, 4)", "status": "not_started"},
+    {"id": 2, "name": "Wave 1 T2: LinkedIn in logo asset + render (Bug 2)", "status": "not_started"},
+    {"id": 3, "name": "Wave 1 T3: Bundle Noto Color Emoji + fix emoji render (Bug 3)", "status": "not_started"},
+    {"id": 4, "name": "Wave 2 T4: Remove nav_easter_eggs from fixtures", "status": "not_started"},
+    {"id": 5, "name": "Wave 2 T5: Remove nav_easter_eggs from brief schemas", "status": "not_started"},
+    {"id": 6, "name": "Wave 2 T6: Strip nav misspelling guidance from persona distillate", "status": "not_started"},
+    {"id": 7, "name": "Wave 2 T7: Clean brief generator prompts + system-prompt-builder", "status": "not_started"},
+    {"id": 8, "name": "Wave 2 T8: Verify REQUIREMENTS.md clean (planner confirmed 0 matches)", "status": "not_started"},
+    {"id": 9, "name": "Wave 3 T9: Hardcode standard LinkedIn nav labels in render-chrome.js", "status": "not_started"},
+    {"id": 10, "name": "Wave 3 T10: Update chrome test assertions", "status": "not_started"},
+    {"id": 11, "name": "Wave 4 T11: Regenerate golden PNG + npm run test:all (x2)", "status": "not_started"},
+    {"id": 12, "name": "Wave 5 T12: Human UAT gate — operator reviews golden", "status": "not_started"}
   ],
   "blockers": [],
-  "human_actions_pending": [],
-  "decisions": [
-    {"decision": "Phase 4 sequential 2-wave execution", "rationale": "04-02 imports and extends compositePost built in 04-01", "phase": "04"},
-    {"decision": "Exact-version pin sharp@0.34.5 + canvas@3.2.3 (no ^/~)", "rationale": "REQ-X-052 byte-identical determinism demands locked renderer versions", "phase": "04"},
-    {"decision": "Inter TTF fonts committed to repo, not runtime-fetched (D-08)", "rationale": "Runtime font download is non-deterministic and network-dependent", "phase": "04"}
+  "human_actions_pending": [
+    {"action": "Operator visual UAT on regenerated brent-vellum-golden.png", "context": "Wave 5 gate — Phase 4 stays OPEN until approval", "blocking": true}
   ],
-  "uncommitted_files": [".planning/STATE.md", ".planning/HANDOFF.json", ".planning/phases/04-compositor/.continue-here.md"],
-  "wave_1_results": {
-    "plan": "04-01",
-    "status": "complete",
-    "tests": "10/10 compositor + 163/163 total regression",
-    "commits": {"mirror-post": "267bd30", "workspace": "e68ee3b"},
-    "pins_verified": {"sharp": "0.34.5", "canvas": "3.2.3"},
-    "determinism_verified": true,
-    "agent_duration_sec": 439
-  },
-  "next_action": "/clear → /gsd:resume-work → /gsd:execute-phase 4. phase-plan-index will skip 04-01 (has_summary=true) and proceed directly to Wave 2 (04-02: text overlay + tweet embed + golden PNG test).",
-  "context_notes": "Phase 4 compositor. Wave 1 (04-01 chrome + compositePost) shipped clean while the pause-work command was in flight — 10/10 tests passing, sharp/canvas pinned, Buffer.compare determinism test green. Wave 2 (04-02) layers text overlays and tweet card on top of 04-01's pipeline, then validates byte-for-byte determinism against a committed golden PNG. No blockers, no human actions pending. Resume session can go straight to /gsd:execute-phase 4 — the has_summary gate will skip 04-01 automatically."
+  "decisions": [
+    {"decision": "Bundle NotoColorEmoji.ttf in src/compositor/fonts/", "rationale": "REQ-X-052 determinism — node-canvas/Cairo has no system font fallback for color emoji; Inter has no emoji glyphs so fillText silently drops them", "phase": "04.1"},
+    {"decision": "Golden regen commit message made explicit about destructive overwrite", "rationale": "Audit trail clarity — replaces prior approved baseline", "phase": "04.1"},
+    {"decision": "Task F (REQUIREMENTS.md) is verify-only no-op", "rationale": "Planner grepped and found zero nav_easter_eggs references in REQUIREMENTS.md", "phase": "04.1"}
+  ],
+  "uncommitted_files": [],
+  "next_action": "Re-run /gsd:execute-phase 04.1 — executor was stopped mid-read before any file modifications. Plan file 04-03-PLAN.md is source of truth. Clean restart.",
+  "context_notes": "Executor agent was launched (agentId a92073d9b7f315082) and stopped by user via /gsd:pause-work before any code changes. Plan has 12 tasks across 5 waves. Tasks 2, 3, 9 all touch render-chrome.js — must be serialized. Golden-regen commit message (Task 11) MUST be: 'test(golden): regenerate compositor golden PNG — replaces prior broken baseline (wrong chrome color, bare nav icons); new PNG is the approved baseline as of 04.1 UAT'. Run npm run test:all TWICE in Wave 4 for cross-run determinism on bundled Noto Color Emoji."
 }
