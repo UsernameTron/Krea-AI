@@ -87,6 +87,8 @@ Four chrome PNG assets (one per variant) are the new static foundation for compo
 - **Authoring sequence:** authoring is a **task inside the Phase 04.2 plan** — operator generates the 4 PNGs via flux-krea and hands them off during plan execution, between `/gsd:plan-phase 04.2` and `/gsd:execute-phase 04.2`.
 - **Regeneration trigger:** only if a variant prompt changes substantively. Otherwise frozen.
 
+**REVISION (2026-04-15 evening — Path 2):** Superseded by D-NEW-15. Variant assets are full 1920×1080 opaque RGB PNGs. No scene-zone transparency, no masking step, no alpha channel. Operator generates directly, commits as-is.
+
 ### D-NEW-10 (NEW — DECISION 2 C2) — Placeholder substitution is Phase 5 responsibility
 `[Profile Name]`, `[Board Title]`, and all other placeholder tokens in variant prompts are substituted at Phase 5 render time. Phase 4 receives finished scene pixels; Phase 4 never sees a placeholder token.
 

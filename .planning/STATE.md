@@ -144,3 +144,5 @@ Discuss-phase 04.2 (2026-04-15 AM): 3 advisor-researcher subagents (A/B/C). Oper
 Resume-work (2026-04-15 PM): Operator resolved all six carry-over blockers inline (FROZEN-01..06), birthing D-NEW-09..14. Paused at 87% context. Writeup handoff via `.continue-here.md`.
 
 Writeup (2026-04-15 PM, this session): Fresh context resumed, 9-step writeup executed per checkpoint. 04-CONTEXT.md, 04-DISCUSSION-LOG.md, ROADMAP.md renumbering (P4 rescoped / P5 Image Prompt Engine split 5a/5b / P6 Artifact UI shifted / P7 Integration shifted), and STATE.md updated atomically. Checkpoint (`.continue-here.md`) and `HANDOFF.json` deleted as consumed one-shot artifacts. Status: context_captured_ready_for_plan. Next: `/gsd:plan-phase 04.2`.
+
+Path 2 simplification locked 2026-04-15 evening. Phase 5 per-post scene generation eliminated. Variant assets become pre-authored library. See D-NEW-01 second revision and D-NEW-15 in Phase 4 CONTEXT.md. REQUIREMENTS.md REQ-X-052a retargeted to variant asset authoring determinism. ROADMAP.md Phase 5 collapsed.

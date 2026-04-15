@@ -184,7 +184,7 @@ These are hard constraints that apply across the entire workspace. Violations ar
 |--------|-----------|-------------|--------|
 | REQ-X-050 | flux-krea output dimensions MUST be exactly 1920x1080 or a defined hero zone dimension. Compositor depends on fixed input dimensions. | Pipeline config validation, compositor input check | PROJECT.md, PLAN_02 Module 4 |
 | REQ-X-051 | Compositor template (LinkedIn chrome) is a FIXED asset — PNG/SVG overlay with text injection points. It is never generated, only applied. | Template stored as static asset, not generated per-run | PLAN_02 Module 4 |
-| REQ-X-052a | Scene rendering (Phase 5) must be seed-deterministic: same seed + same variant prompt = same scene pixels. | Phase 5 fixture hash comparison | Visual identity spec |
+| REQ-X-052a | Variant asset authoring determinism. Operator records seed per variant PNG at generation time for reproducibility. Applies to one-time asset authoring, not per-post rendering. | Seed recorded in variant-assets manifest at authoring time | Visual identity spec |
 | REQ-X-052b | Overlay composition (Phase 4) must be byte-identical against committed golden PNG fixture given identical Post Brief + identical scene PNG. | Phase 4 golden test via Buffer.compare | Visual identity spec |
 
 ### 3.8 Visual Identity Spec

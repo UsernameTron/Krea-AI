@@ -236,3 +236,7 @@ No open blockers. Classic scope cuts (most inherited from Section A):
 - Tweet timestamp and engagement counts — moot if not in chrome PNGs
 - Source Sans Pro alternative — Inter stays; moot for text overlay scope
 - Dynamic zone computation — replaced by static VARIANT_SLOTS per variant
+
+## Appendix: Path 2 Amendment (2026-04-15 evening)
+
+Operator chose Path 2 (fixed-per-variant) after validating variant renders from flux-krea looked production-quality. Per-post Phase 5 scene generation eliminated. Compositor simplified to variant-asset lookup + text overlay. Sub-variant pool (D-NEW-15) added for visual diversity within each letter. See D-NEW-01 second revision and D-NEW-15 in CONTEXT.md for architectural implications. REQUIREMENTS and ROADMAP amended in follow-up commit.

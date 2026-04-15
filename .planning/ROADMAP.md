@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Post Brief Generator** - Input classifier, system prompt builder, LLM generation, Brief Validator
 - [x] **Phase 3: Visual Grammar + Image Prompt Builder** - Foundation prompt asset, deterministic prompt builder, zone spec, engagement generator (completed 2026-04-14)
 - [~] **Phase 4: Compositor (RESCOPED)** - Plan 04.2 pending. Static chrome PNG overlay + text overlay onto Phase 5 scene PNG. Programmatic LinkedIn chrome rendering abandoned 2026-04-15; prior work preserved on `archive/phase-4-programmatic-chrome` (mirror-post repo). See `.planning/phases/04-compositor/04-CONTEXT.md`. Blocks on Phase 5a (first scene PNG fixture).
-- [ ] **Phase 5: Image Prompt Engine (NEW, split 5a/5b)** - Archetype→variant mapping, scene prompt expansion with Phase-5-render-time placeholder substitution, flux-krea invocation, scene PNG output. Split: **5a** variant A end-to-end (unblocks Phase 04.2 golden test), **5b** variants B/C/D + remaining engine scope. See `.planning/phases/05-image-prompt-engine/`.
+- [ ] **Phase 5: Variant Asset Library** - Operator-authored PNG library (12-20 variant PNGs under `mirror-post/src/compositor/variant-assets/`) generated via flux-krea or equivalent. Frozen on commit, maintained as needed. Path 2 simplification (2026-04-15) eliminated the per-post Image Prompt Engine; Phase 5 now blocks on operator delivery, not engineering. See `.planning/phases/04-compositor/04-CONTEXT.md` D-NEW-15.
 - [ ] **Phase 6: Artifact UI** (was Phase 5) - Input form, brief display/edit, image prompt output
 - [ ] **Phase 7: Integration** (was Phase 6) - End-to-end pipeline testing and 4-post roundtrip validation
 - [ ] **Parallel: flux-krea Optimization** - Scheduler, MPS tuning, torch.compile, --prompt-file
@@ -116,27 +116,25 @@ Plans:
   - [ ] 04.2-04-PLAN.md — compositePost() rewrite (D-NEW-01, D-NEW-02, D-NEW-05) [Wave 2]
   - [ ] 04.2-05-PLAN.md — Golden test (REQ-X-052b) [Wave 2]
 
-### Phase 5: Image Prompt Engine (NEW — split 5a/5b)
-**Status**: New phase, introduced by the 2026-04-15 reset. Owns all pixels of the scene (hero figure + environment/office) excluding the chrome UI zone. Produces transparent-scene-zone-ready PNGs that Phase 4 composites against.
-**Goal**: A Post Brief v2 plus the LinkedIn template variant wrappers produce a deterministic scene PNG (1920×1080) via flux-krea, with placeholder substitution resolved at render time and archetype→variant mapping applied upstream.
-**Depends on**: Phase 3 (image prompt builder, foundation prompt asset, visual grammar), Post Brief schema v2 (sub-plan inside Phase 04.2)
-**Blocks**: Phase 4 golden test (Phase 5a must produce ≥1 variant scene PNG fixture before Phase 04.2 execution can land)
-**Requirements**: REQ-M-020..023 (visual grammar, already satisfied by Phase 3), REQ-M-030..035 (image prompt structure, already satisfied by Phase 3), REQ-X-052a (scene determinism, newly split from REQ-X-052), REQ-X-060 (1920×1080 output dimensions), REQ-X-025 (no flux-krea source modifications), REQ-X-070 (foundation prompt static), REQ-X-071 (deterministic prompt construction)
-**Patterns**: Pattern 11 honored via flux-krea invocation path (no changes to flux-krea core)
-**Enforces**: REQ-X-010 (no MidJourney flags), REQ-X-011 (diffusion describes surfaces), REQ-X-052a (byte-identical scene output for same Post Brief + same seed)
+### Phase 5: Variant Asset Library (COLLAPSED 2026-04-15 evening — Path 2 simplification)
+**Status**: Collapsed from the earlier two-wave Image Prompt Engine (5a/5b) into a single small phase. Path 2 (fixed-per-variant) eliminates per-post scene generation. Phase 5 now consists of operator-authored variant PNGs committed once and maintained as needed — no engineering scope, no runtime flux-krea invocation from Mirror Post. See `.planning/phases/04-compositor/04-CONTEXT.md` D-NEW-01 second revision and D-NEW-15.
+**Goal**: 12-20 variant PNGs (1920×1080 opaque RGB) exist under `mirror-post/src/compositor/variant-assets/`, organized as a sub-variant pool per letter (A/B/C/D) for visual diversity. Operator generates via flux-krea (or equivalent), commits as-is.
+**Depends on**: Operator delivery (blocks on asset generation, not engineering)
+**Blocks**: Phase 4 golden test (needs ≥1 committed variant PNG before Phase 04.2 execution can land)
+**Requirements**: REQ-X-052a (variant asset authoring determinism — operator records seed per PNG at generation time), REQ-X-060 (1920×1080 output dimensions)
+**Retired from scope**: REQ-M-030..035 (Image Prompt Engine — eliminated by Path 2), per-post scene generation, archetype→variant runtime mapping, placeholder substitution, flux-krea runtime invocation from Mirror Post
+**Patterns**: None (asset authoring phase)
+**Enforces**: REQ-X-052a (seed recorded in variant-assets manifest at authoring time)
 **Success Criteria** (what must be TRUE):
-  1. 4 variant prompt templates (A/B/C/D) + master wrapper already committed at `.planning/phases/05-image-prompt-engine/templates/` — engine consumes these
-  2. Placeholder substitution (`[Profile Name]`, `[Board Title]`, etc.) resolves at render time from Post Brief v2 fields
-  3. Archetype → variant static mapping (fallback B) produces a deterministic variant selection per Post Brief
-  4. Scene PNG output is 1920×1080, chrome zone left intentionally unoccupied (compositor owns chrome)
-  5. Phase 5a delivers variant A end-to-end with at least one committed scene PNG fixture suitable for Phase 04.2 golden test
-  6. Phase 5b delivers variants B/C/D + any remaining engine scope not needed by 5a
-**Plans**: TBD during plan-phase; anticipated 2 plans minimum (5a, 5b)
+  1. `mirror-post/src/compositor/variant-assets/` contains 12-20 PNGs organized by letter (A/B/C/D) with sub-variants per letter
+  2. Each PNG is 1920×1080 opaque RGB (no alpha, no scene-zone transparency — full-frame)
+  3. A manifest records seed + prompt per PNG for reproducibility (REQ-X-052a)
+  4. At least one variant PNG exists committed so Phase 04.2 golden test can be built
+**Plans**: None (operator task, not engineering plan)
 **UI hint**: no
 
 Plans:
-- [ ] 05a-PLAN — Variant A end-to-end (prompt engine core + variant A scene generator + first scene PNG fixture)
-- [ ] 05b-PLAN — Variants B/C/D + remaining Image Prompt Engine scope
+- [ ] 05-OPERATOR — Variant asset library authoring (operator task, blocks on operator delivery)
 
 ### Phase 6: Artifact UI (was Phase 5, shifted by 2026-04-15 renumbering)
 **Goal**: Users can input a scenario or browse archetypes, generate and edit a Post Brief, and produce a copy-ready image prompt — all within a Claude Desktop React artifact with Obsidian dark-mode aesthetic
@@ -251,7 +249,7 @@ These constraints apply across ALL phases. Any phase output that violates these 
 | REQ-M-042 | Phase 4 | Gradient readability (if gradient is part of chrome PNG, else compositor) |
 | REQ-M-043 | RETIRED from Phase 4 | Tweet embed card — becomes part of chrome PNG if it appears at all |
 | REQ-M-044 | RETIRED from Phase 4 | Engagement metrics render — part of chrome PNG |
-| REQ-X-052a | Phase 5 | Scene determinism (newly split 2026-04-15) |
+| REQ-X-052a | Phase 5 | Variant asset authoring determinism (retargeted 2026-04-15 evening — Path 2) |
 | REQ-X-052b | Phase 4 | Overlay determinism (newly split 2026-04-15) |
 | REQ-M-050 | Phase 6 | Artifact UI (shifted from Phase 5 by 2026-04-15 renumbering) |
 | REQ-M-051 | Phase 6 | Artifact UI (shifted from Phase 5) |
@@ -291,7 +289,7 @@ Parallel work stream executes independently in flux-krea/ repo.
 | 3. Visual Grammar + Image Prompt Builder | 2/2 | COMPLETE | 2026-04-14 |
 | 4. Compositor (legacy plans 04-01..04-03) | 3/3 | LEGACY — superseded by 04.2 reset | 2026-04-15 |
 | 4.2 Compositor (rescoped) | 0/5 | 5 plans written, 3 waves | - |
-| 5. Image Prompt Engine (NEW, split 5a/5b) | 0/2 | Not started | - |
+| 5. Variant Asset Library (COLLAPSED — Path 2) | 0/1 | Blocks on operator delivery, not engineering | - |
 | 6. Artifact UI (was Phase 5) | 0/2 | Not started | - |
 | 7. Integration (was Phase 6) | 0/1 | Not started | - |
 | P. flux-krea Optimization | 0/6 | Not started | - |
