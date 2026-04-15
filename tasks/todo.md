@@ -63,10 +63,12 @@ Build happens in a separate Claude Desktop chat with artifact support. Do NOT ru
 
 ## Session Handoff
 
-**Last session:** 2026-04-15 evening (Path 2 doc hygiene — 6c16097)
-**Branch:** main (clean)
-**State:** Doc-hygiene follow-ups complete. REQUIREMENTS.md REQ-X-052a retargeted to variant asset authoring determinism. ROADMAP.md Phase 5 collapsed to single Variant Asset Library phase (blocks on operator delivery, not engineering). STATE.md progress note appended. 04-CONTEXT.md D-NEW-09 marked superseded by D-NEW-15. 04-DISCUSSION-LOG.md Path 2 appendix added. All Path 2 documentation drift closed.
-**Pick up with:** Operator variant-asset delivery (12-20 PNGs under mirror-post/src/compositor/variant-assets/{a,b,c,d}/ + VARIANT_SLOTS measurement) → `/gsd:execute-phase 04.2`.
+**Last session:** 2026-04-15 evening (Product Reset 2 — eb96874)
+**Branch:** docs/path-c-pivot (clean)
+**State:** Scope collapsed. Compositor/chrome/scene/FLUX-integration work abandoned. New Phase 3 = single Claude Desktop React artifact (prompt generator). Archive branches preserved in mirror-post. See .planning/PRODUCT-RESET-2.md.
+**Pick up with:** Build React artifact in a separate Claude Desktop chat with artifact support. When satisfied, commit to `mirror-post/artifact/MirrorPoster.jsx`. Do NOT run `/gsd:execute-phase`.
+
+**Prior session:** 2026-04-15 evening (Path 2 doc hygiene — 6c16097)
 
 **Prior session:** 2026-04-15 PM (Path 2 critical-path amendment — c9ca02a)
 
