@@ -85,7 +85,7 @@ The Post Brief is the product. A single structured JSON document that contains e
 
 **Architecture:** Mirror Post generates a Post Brief (structured JSON) → Image Prompt Engine translates it to a diffusion prompt → flux-krea generates the hero image → Compositor overlays LinkedIn UI chrome + text + tweet embed. Systems are fully decoupled — flux-krea requires zero source code changes for Mirror Post (only a `--prompt-file` flag addition).
 
-**Key design insight:** The diffusion model does NOT render text. All text on mugs, whiteboards, sticky notes, and overlays is handled by the compositor layer. The image prompt describes surfaces and objects that will receive text — not the text itself.
+**Key design insight:** Props with text (mugs, whiteboards, nameplates, business cards) ARE rendered by Flux in the hero image. The compositor handles headline, body, tweet embed card, and engagement bar overlays — not prop text. The image prompt describes objects with their text content for Flux to render.
 
 **Performance target:** Generation latency on M4 Pro needs to drop from 60-90 seconds to 30-45 seconds. Primary lever: scheduler optimization + step reduction (28 → 20 steps).
 
@@ -129,4 +129,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-13 after initialization*
+*Last updated: 2026-04-15 after Phase 3 completion — Visual Grammar + Image Prompt Builder shipped*
