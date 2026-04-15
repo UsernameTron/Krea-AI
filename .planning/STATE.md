@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-compositor/04-01-PLAN.md
-last_updated: "2026-04-15T13:07:20.299Z"
+stopped_at: Completed 04-compositor/04-02-PLAN.md
+last_updated: "2026-04-15T13:34:01.111Z"
 last_activity: 2026-04-15
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 12
-  completed_plans: 3
+  completed_plans: 4
   percent: 50
 ---
 
@@ -60,6 +60,7 @@ Progress: [#####░░░░░] 50%
 | Phase 03-visual-grammar-image-prompt-builder P02 | 3 min | 2 tasks | 6 files |
 | Phase 03-visual-grammar-image-prompt-builder P01 | 4 | 2 tasks | 9 files |
 | Phase 04-compositor P01 | 15 | 1 tasks | 15 files |
+| Phase 04-compositor P02 | 7 | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -80,6 +81,9 @@ Recent decisions affecting current work:
 - [Phase 03-01]: Props with text described in positive_prompt per D-14 — Flux renders hero image prop text; compositor owns headline/body text overlays
 - [Phase 04-compositor]: sharp+canvas compositor: exact-version pins (0.34.5/3.2.3) enforce REQ-X-052 byte-identical PNG output
 - [Phase 04-compositor]: REACTION_EMOJI map uses dual-case keys (lowercase + Title-case) to handle both Post Brief fixture values and engagement.js REACTION_TYPES without normalization
+- [Phase 04-compositor]: buildStyledSegments() tokenizer: bold wins over italic when phrases overlap
+- [Phase 04-compositor]: Golden PNG committed via git update-index (hook false-positive for outputs/ pattern) — tracked test fixture not a generated output
+- [Phase 04-compositor]: renderTweetCard returns null (not empty buffer) for absent tweet_embed — composite layer cleanly skipped
 
 ### Pending Todos
 
@@ -121,8 +125,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-04-15T13:07:20.297Z
-Stopped at: Completed 04-compositor/04-01-PLAN.md
+Last session: 2026-04-15T13:34:01.107Z
+Stopped at: Completed 04-compositor/04-02-PLAN.md
 Note: Both plans executed in parallel (worktree isolation). 03-01: 21 tests (image prompt builder). 03-02: 22 tests (grammar module). Full regression: 153/153 green. Verification: 14/14 must-haves passed. 3 human items deferred (visual quality, compositor chrome, engagement feel).
 Next: `/gsd:discuss-phase 4` (Compositor) — /clear first for fresh context.
 

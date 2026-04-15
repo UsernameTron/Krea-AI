@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Mirror Post Scaffolding** - Directory structure, persona assets, Post Brief schema, test fixtures
 - [x] **Phase 2: Post Brief Generator** - Input classifier, system prompt builder, LLM generation, Brief Validator
 - [x] **Phase 3: Visual Grammar + Image Prompt Builder** - Foundation prompt asset, deterministic prompt builder, zone spec, engagement generator (completed 2026-04-14)
-- [ ] **Phase 4: Compositor** - LinkedIn chrome, text overlay, tweet embed, engagement bar over hero image
+- [x] **Phase 4: Compositor** - LinkedIn chrome, text overlay, tweet embed, engagement bar over hero image (completed 2026-04-15)
 - [ ] **Phase 5: Artifact UI** - Input form, brief display/edit, image prompt output
 - [ ] **Phase 6: Integration** - End-to-end pipeline testing and 4-post roundtrip validation
 - [ ] **Parallel: flux-krea Optimization** - Scheduler, MPS tuning, torch.compile, --prompt-file
@@ -104,7 +104,7 @@ Plans:
 
 Plans:
 - [x] 04-01-PLAN.md — LinkedIn chrome template + sharp/node-canvas setup (Wave 1)
-- [ ] 04-02-PLAN.md — Text overlay gradient zone + tweet embed card renderer (Wave 2)
+- [x] 04-02-PLAN.md — Text overlay gradient zone + tweet embed card renderer (Wave 2)
 
 ### Phase 5: Artifact UI
 **Goal**: Users can input a scenario or browse archetypes, generate and edit a Post Brief, and produce a copy-ready image prompt — all within a Claude Desktop React artifact with Obsidian dark-mode aesthetic
@@ -255,7 +255,7 @@ Parallel work stream executes independently in flux-krea/ repo.
 | 1. Scaffolding | 3/3 | COMPLETE | 2026-04-14 |
 | 2. Post Brief Generator | 8/8 | COMPLETE | 2026-04-14 |
 | 3. Visual Grammar + Image Prompt Builder | 2/2 | Complete   | 2026-04-14 |
-| 4. Compositor | 1/2 | In Progress|  |
+| 4. Compositor | 2/2 | Complete   | 2026-04-15 |
 | 5. Artifact UI | 0/2 | Not started | - |
 | 6. Integration | 0/1 | Not started | - |
 | P. flux-krea Optimization | 0/6 | Not started | - |
