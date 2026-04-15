@@ -1,74 +1,43 @@
 {
   "version": "1.0",
-  "timestamp": "2026-04-15T12:35:28.075Z",
+  "timestamp": "2026-04-15T13:04:57.348Z",
   "phase": "04",
   "phase_name": "compositor",
   "phase_dir": ".planning/phases/04-compositor",
-  "plan": null,
-  "task": null,
-  "total_tasks": null,
-  "status": "paused",
-  "stage": "plan-phase workflow COMPLETE — paused at boundary before /gsd:execute-phase 4",
+  "plan": "04-02",
+  "task": 1,
+  "total_tasks": 3,
+  "status": "wave_1_complete_paused_before_wave_2",
+  "stage": "execute-phase — Wave 1 shipped green (04-01 complete), paused before spawning Wave 2 (04-02)",
   "completed_tasks": [
-    {"id": "research-gate", "name": "Research gate answered (--skip-research; 4 advisor agents already ran in discuss)", "status": "done"},
-    {"id": "ui-spec-gate", "name": "UI-SPEC gate answered ('Not a frontend phase' — compositor is static PNG generation)", "status": "done"},
-    {"id": "spawn-planner", "name": "gsd-planner returned PLANNING COMPLETE — 2 plans, 2 waves, 15/15 REQ coverage", "status": "done", "commit": "6c4b78f"},
-    {"id": "spawn-verifier", "name": "gsd-verifier (scope: plan) returned VERIFICATION PASSED — all 10 dimensions pass (Nyquist skipped, N/A for no-research path)", "status": "done", "agent_id": "a87f14b43313caa70"},
-    {"id": "coverage-gate", "name": "Requirements Coverage Gate — 15/15 REQ-IDs covered by plans (11 in 04-01, 4 in 04-02, union = 15, zero orphans)", "status": "done"}
+    {"id": "discuss", "name": "Phase 4 discuss-phase (4 advisor agents, 15 decisions D-01..D-15)", "status": "done", "commit": "016f8df"},
+    {"id": "plan", "name": "Phase 4 plan-phase (2 plans, 2 waves, 15/15 REQ coverage)", "status": "done", "commit": "6c4b78f"},
+    {"id": "plan-patch", "name": "Close Phase 4 determinism gaps — pin renderers + golden PNG", "status": "done", "commit": "973d4a0"},
+    {"id": "04-01", "name": "Plan 04-01 — compositor chrome layer (constants, fonts, SVG assets, renderers, compositePost, 10/10 tests, sharp@0.34.5/canvas@3.2.3 pinned, determinism verified)", "status": "done", "commits": ["mirror-post:267bd30", "Krea-AI:e68ee3b"]}
   ],
   "remaining_tasks": [
-    {"id": "execute-phase", "name": "Execute Phase 4 — run /gsd:execute-phase 4 to build compositor (wave 1: 04-01 chrome + sharp/canvas setup; wave 2: 04-02 text overlay + tweet embed)", "status": "not_started"}
+    {"id": "04-02", "name": "Plan 04-02 — text overlay (gradient + headline with gold highlights + body with inline bold/italic + hashtags), tweet embed card renderer, golden PNG determinism test (3 tasks, 18 tests)", "status": "not_started"},
+    {"id": "regression-gate", "name": "Run prior phase tests to confirm no cross-phase regressions", "status": "not_started"},
+    {"id": "phase-verify", "name": "Spawn gsd-verifier to validate phase 4 goal achievement against 15 REQ-IDs", "status": "not_started"},
+    {"id": "phase-complete", "name": "Mark phase 04 complete via phase complete 04, update ROADMAP/STATE/PROJECT.md", "status": "not_started"}
   ],
   "blockers": [],
   "human_actions_pending": [],
   "decisions": [
-    {"decision": "Research gate answered --skip-research", "rationale": "Discuss-phase already dispatched 4 parallel advisor-researcher agents; CONTEXT.md has 15 locked decisions; additional RESEARCH.md would be duplicative", "phase": "04"},
-    {"decision": "UI-SPEC gate answered 'Not a frontend phase'", "rationale": "Compositor is a deterministic image generation pipeline (1920x1080 PNG output). No interactive UI, no React components. Visual design locked in CONTEXT.md D-04 through D-15.", "phase": "04"},
-    {"decision": "Plans split: 04-01 (chrome + sharp/canvas setup, 11 REQs) + 04-02 (text overlay + tweet embed, 4 REQs)", "rationale": "Matches ROADMAP §Phase 4 breakdown. 04-02 depends on 04-01 — chrome layer lays down baseline canvas before text overlays on top. Wave 1 → Wave 2 dependency preserves determinism.", "phase": "04"},
-    {"decision": "Verifier confirmed PASSED on all 10 dimensions", "rationale": "All locked decisions from CONTEXT.md appear verbatim in plan actions (#0b5ca8 chrome blue, #FFD700 gold, Inter font bundled, sharp+node-canvas hybrid, initials avatar, emoji reaction circles, 1920x1080 canvas, PNG determinism settings). must_haves traced to 5 phase success criteria. No subjective language in acceptance criteria. No re-decisions of locked items.", "phase": "04"}
+    {"decision": "Phase 4 sequential 2-wave execution", "rationale": "04-02 imports and extends compositePost built in 04-01", "phase": "04"},
+    {"decision": "Exact-version pin sharp@0.34.5 + canvas@3.2.3 (no ^/~)", "rationale": "REQ-X-052 byte-identical determinism demands locked renderer versions", "phase": "04"},
+    {"decision": "Inter TTF fonts committed to repo, not runtime-fetched (D-08)", "rationale": "Runtime font download is non-deterministic and network-dependent", "phase": "04"}
   ],
-  "uncommitted_files": [".planning/HANDOFF.json"],
-  "init_state": {
-    "phase_found": true,
-    "has_context": true,
-    "has_research": false,
-    "has_plans": true,
-    "plan_count": 2,
-    "phase_req_ids": "REQ-M-040, REQ-M-041, REQ-M-042, REQ-M-043, REQ-M-044, REQ-X-050, REQ-X-051, REQ-X-052, REQ-X-060, REQ-X-061, REQ-X-062, REQ-X-063, REQ-X-064, REQ-X-065, REQ-X-066",
-    "research_enabled": true,
-    "nyquist_validation_enabled": true,
-    "ui_phase_enabled": true,
-    "ui_safety_gate_enabled": true
+  "uncommitted_files": [".planning/STATE.md", ".planning/HANDOFF.json", ".planning/phases/04-compositor/.continue-here.md"],
+  "wave_1_results": {
+    "plan": "04-01",
+    "status": "complete",
+    "tests": "10/10 compositor + 163/163 total regression",
+    "commits": {"mirror-post": "267bd30", "workspace": "e68ee3b"},
+    "pins_verified": {"sharp": "0.34.5", "canvas": "3.2.3"},
+    "determinism_verified": true,
+    "agent_duration_sec": 439
   },
-  "planner_output_summary": {
-    "status": "PLANNING COMPLETE",
-    "plans_created": [
-      {"plan": "04-01", "objective": "LinkedIn chrome template + sharp/node-canvas setup + compositePost entry point", "wave": 1, "tasks": 1, "files_modified_count": 15, "test_count": 10, "requirements": ["REQ-M-040", "REQ-M-043", "REQ-M-044", "REQ-X-050", "REQ-X-051", "REQ-X-052", "REQ-X-060", "REQ-X-061", "REQ-X-064", "REQ-X-065", "REQ-X-066"]},
-      {"plan": "04-02", "objective": "Text overlay (gradient + headline/body with inline formatting) + tweet embed card renderer", "wave": 2, "depends_on": ["04-01"], "tasks": 2, "files_modified_count": 6, "test_count": 18, "requirements": ["REQ-M-041", "REQ-M-042", "REQ-X-062", "REQ-X-063"]}
-    ],
-    "coverage": "15/15 REQ-IDs",
-    "commit": "6c4b78f"
-  },
-  "verifier_output_summary": {
-    "status": "VERIFICATION PASSED",
-    "dimensions": {
-      "1_frontmatter_schema": "PASS",
-      "2_task_xml_structure": "PASS",
-      "3_acceptance_verifiability": "PASS",
-      "4_action_concreteness": "PASS",
-      "5_req_coverage": "PASS (15/15, zero orphans)",
-      "6_context_decision_fidelity": "PASS (15/15 CONTEXT.md decisions honored)",
-      "7_dependency_correctness": "PASS",
-      "8_nyquist_compliance": "SKIPPED (no RESEARCH.md, no VALIDATION.md — N/A for no-research path)",
-      "9_must_haves_goal_backward": "PASS (all 5 phase success criteria traced to must_haves)",
-      "10_claude_md_compliance": "PASS"
-    },
-    "observations": [
-      "04-01 files_modified = 15 but effectively ~6 substantive JS files (6 SVG + 3 fonts are assets)",
-      "Determinism test coverage thorough (Buffer.compare on raw pixels + end-to-end PNG byte-equality)",
-      "Font download step has multiple fallback strategies (network resilience)"
-    ]
-  },
-  "next_action": "/gsd:execute-phase 4 — all gates passed, plans are execution-ready. Consider /clear first for a fresh context window before execute-phase (it's the highest-context-burn step — spawns wave-based executor agents that write code).",
-  "context_notes": "Phase 4 (Compositor) is fully planned and verified. 2 plans committed (6c4b78f), 15/15 REQ-ID coverage confirmed, all 10 verification dimensions passed. Wave 1 (04-01) builds chrome template + sharp/canvas setup + compositePost entry point (15 files modified, 10 tests). Wave 2 (04-02) adds text overlay renderer + tweet embed card (6 files, 18 tests). Expected compositor output: 1920x1080 PNG, byte-identical for same inputs (REQ-X-052). No blockers, no human actions pending. Safe to invoke /gsd:execute-phase 4 directly on resume."
+  "next_action": "/clear → /gsd:resume-work → /gsd:execute-phase 4. phase-plan-index will skip 04-01 (has_summary=true) and proceed directly to Wave 2 (04-02: text overlay + tweet embed + golden PNG test).",
+  "context_notes": "Phase 4 compositor. Wave 1 (04-01 chrome + compositePost) shipped clean while the pause-work command was in flight — 10/10 tests passing, sharp/canvas pinned, Buffer.compare determinism test green. Wave 2 (04-02) layers text overlays and tweet card on top of 04-01's pipeline, then validates byte-for-byte determinism against a committed golden PNG. No blockers, no human actions pending. Resume session can go straight to /gsd:execute-phase 4 — the has_summary gate will skip 04-01 automatically."
 }
