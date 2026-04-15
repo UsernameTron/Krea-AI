@@ -89,3 +89,13 @@
 ## Phase 5 Preconditions (captured 2026-04-15)
 - [ ] Update flux-krea/CLAUDE.md Python requirement to "3.10-3.12" (currently says "3.10+" which is misleading — torch 2.7 wheels don't exist for Python 3.14)
 - [ ] First task of Phase 5 execution: onboarding runbook (homebrew python@3.11, venv creation, pip install -r requirements.txt, HF token setup, one-shot verification render). Saves 30+ min of rediscovery.
+
+## flux-krea Technical Debt (external audit, 2026-04-15)
+Audit flagged 6 findings — none block Phase 4.2 Path 2 (Mirror Post runtime doesn't call flux-krea). Track for future flux-krea maintenance phase.
+- [ ] HIGH: Config validation runs before command overrides — --width/--steps reach pipeline unvalidated (config.py:278, main.py:227, pipeline.py:287)
+- [ ] HIGH: Optimization fallback chain doesn't unload failed model — OOM spiral risk on large model (pipeline.py:103, pipeline.py:134). WORKAROUND during variant gen: small batches, --optimization standard, restart on failure
+- [ ] MED-HIGH: Web UI signal-based timeout silently no-ops off-main-thread (app.py:113-115)
+- [ ] MED-HIGH: Neural Engine path is dead — compile_vae_decoder saves .mlpackage but pipeline never calls it, optimize_pipeline returns pipeline unchanged, MAXIMUM mode only invokes Metal (neural_engine.py:162, :366, pipeline.py:213). Tests lock in broken behavior (test_neural_engine.py:297)
+- [ ] MEDIUM: Profiler reports fake stage timings — callback never wired, falls back to synthetic breakdowns (profiler.py:79, :124)
+- [ ] MEDIUM: ThermalManager produces profile fields that pipeline never applies (only inference_steps_scale used; max_cpu_threads, max_gpu_utilization, memory_fraction ignored — thermal.py:44, pipeline.py:229, :299)
+- [ ] BLOCKER for re-running audit: torch not installed in audit workspace (Python 3.14 vs required 3.10-3.12). Re-run audit after venv setup (already tracked under Phase 5 Preconditions)
