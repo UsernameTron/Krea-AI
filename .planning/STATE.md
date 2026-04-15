@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: reset_in_progress
-stopped_at: Phase 4 architecture reset — programmatic chrome abandoned, awaiting operator approval of 04-CONTEXT-RESET.md before /gsd:plan-phase 04.2
-last_updated: "2026-04-15T15:30:00.000Z"
+status: decisions_captured_pending_writeup
+stopped_at: /gsd:discuss-phase 04.2 complete — two decisions captured in .continue-here.md; 04-CONTEXT.md and 04-DISCUSSION-LOG.md deferred to next session
+last_updated: "2026-04-15T16:42:00.000Z"
 last_activity: 2026-04-15
 progress:
   total_phases: 6

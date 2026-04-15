@@ -56,12 +56,16 @@
 
 ## Session Handoff
 
-**Last session:** 2026-04-15
-**Branch:** main (clean)
-**State:** Phase 3 complete, verified. 50% through milestone. 153 tests across 10 suites.
+**Last session:** 2026-04-15 (discuss-phase 04.2 — decisions captured, writeup deferred)
+**Branch:** main (commit 8567444 — wip handoff)
+**State:** Phase 04.2 discussion complete. Two architecture amendments captured in .continue-here.md but not yet written to 04-CONTEXT.md. D-NEW-01 REVISED (chrome ownership: Phase 5 → Phase 4). D-NEW-06 RESOLVED (Post Brief v2 bump).
 **Pick up with:**
-1. `/clear` then `/gsd:discuss-phase 4` (Compositor — LinkedIn chrome + text overlay + tweet embed + engagement bar over hero image)
-2. 3 human verification items from Phase 3 deferred (visual quality, compositor chrome, engagement feel) — naturally addressed in Phase 4+6
+1. `/clear` then read `.planning/phases/04-compositor/.continue-here.md` + `04-CONTEXT-RESET.md` + original `04-CONTEXT.md` + `$HOME/.claude/get-shit-done/templates/context.md`
+2. Write `.planning/phases/04-compositor/04-CONTEXT.md` (supersedes both prior CONTEXT files; annotate D-NEW-01 as REVISED and D-NEW-06 as RESOLVED)
+3. Write `.planning/phases/04-compositor/04-DISCUSSION-LOG.md` (advisor A/B/C summaries + collision + user picks)
+4. Commit both, update STATE.md to `context_captured_ready_for_plan`
+5. Before `/gsd:plan-phase 04.2`: get operator confirmation on D-NEW-01 walk-back and chrome PNG authoring contract (4 human-authored PNGs required)
+6. Still-open carry-over gaps: ROADMAP renumbering, Phase 5 split (5a/5b), deprecated module deletion timing, Phase 2 v2 migration scope
 
 ## Phase 5 Preconditions (captured 2026-04-15)
 - [ ] Update flux-krea/CLAUDE.md Python requirement to "3.10-3.12" (currently says "3.10+" which is misleading — torch 2.7 wheels don't exist for Python 3.14)
