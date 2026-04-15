@@ -42,7 +42,10 @@ Phase 4 renders the satirical post's headline and body text into fixed per-varia
 - **Why:** FLUX text fidelity is good for short labels but unreliable for multi-sentence satirical body copy with punctuation and brand names. Text overlay is the one job the compositor must own.
 - **How to apply:** `render-text-overlay.js` and `buildStyledSegments` survive. All chrome rendering modules (`render-chrome.js`, `render-engagement-bar.js`, `render-tweet-card.js`, nav-icon module, Twemoji COLR pipeline, BGRA channel-swap patch, `NAV_LABELS`, `REACTION_EMOJI`) are deprecated — their scope is fully absorbed by the Phase 5 scene render + the chrome PNG asset.
 
-### D-NEW-03 — VARIANT_SLOTS coordinates per variant, in code
+### D-NEW-03 (SUPERSEDED 2026-04-15 evening by Path C / D-NEW-17) — VARIANT_SLOTS coordinates per variant, in code
+**SUPERSEDED:** VARIANT_SLOTS coordinates are no longer needed. Path C replaces the canvas text-overlay compositor with an HTML template (`linkedin-post.html`) rendered by Puppeteer. Text positioning is handled by CSS layout via `{{placeholder}}` substitution — no measured rectangles, no coordinate constants. See D-NEW-17. Original text retained below for audit.
+
+
 Each variant (A/B/C/D) gets a fixed slot block for headline + body stored as a `VARIANT_SLOTS` constant in `mirror-post/src/compositor/constants.js`. Selection driven by `post_brief.image_seed.scene_template`.
 - **Slot schema:** `{ headline: {x, y, width, height, fontSize, lineHeight, maxLines, fontWeight, color}, body: {x, y, width, height, fontSize, lineHeight, maxLines, fontWeight, color} }`.
 - **Why:** Scene-aware CV positioning (option b) and flux-krea sidecar JSON (option c) were both rejected during the AM reset session — too unreliable, too coupled. Static constants match the fact that each variant has a fixed UI shell by template + chrome PNG design. Versioning slots alongside the chrome PNG makes them a coherent unit.
@@ -108,8 +111,27 @@ Phases renumber to reflect the architecture reset:
 ### D-NEW-13 (NEW — FROZEN-05) — Deprecated module deletion timing
 Modules listed in D-NEW-07 are deleted from `main` **after** Phase 04.2 plan approval, not before. Preserved on archive branch in the meantime. See D-NEW-07.
 
-### D-NEW-15 (NEW 2026-04-15 Path 2) — Sub-variant pool
-3-5 scenes per letter. Selection via `SHA-256(character.name + post.headline.text) mod pool_size`. Same brief always picks same sub-variant. `VARIANT_SLOTS` coords are per-letter, not per-sub-variant — operator generates sub-variants with seed-only variation to keep layout stable. Pool size per letter is stored alongside assets (e.g., directory listing of `variant-assets/{letter}/`).
+### D-NEW-15 (REVISED 2026-04-15 evening Path C) — Sub-variant pool applies to SCENE PNGs only
+Sub-variant pool now applies to **scene PNGs**, not full variant images. 3-5 scene PNGs per letter (A/B/C/D) live at `mirror-post/src/compositor/scene-assets/{a,b,c,d}/scene-{1..N}.png`. Scenes are FLUX-generated, **scene-only** content: office environment, person, props, lighting. **No LinkedIn UI, no chrome, no text, no nav bar** — just the hero scene.
+
+Selection is deterministic: `sub_n = SHA-256(character.name + post.headline.text) mod pool_size_for_letter`. Same brief always picks the same scene. Pool size is discovered by directory listing of `scene-assets/{letter}/`.
+
+The selected scene PNG is then composited by `sharp` into the `hero-zone` rectangle of the Puppeteer-rendered LinkedIn post HTML (see D-NEW-16, D-NEW-17).
+
+### D-NEW-16 (NEW 2026-04-15 evening Path C) — Puppeteer renders the LinkedIn chrome HTML template
+Puppeteer with a **pinned-version Chromium** renders the LinkedIn chrome HTML template to a PNG. This is the determinism mechanism for REQ-X-052b.
+
+- **Chromium pin:** Puppeteer's bundled Chromium version is pinned via an **exact** `puppeteer` version in `mirror-post/package.json` (no caret, no tilde). Upgrading Puppeteer is an explicit, deliberate act that invalidates golden fixtures.
+- **Fonts:** Bundled Inter TTFs (`Inter-Regular.ttf`, `Inter-SemiBold.ttf`, `Inter-Bold.ttf`) from earlier Phase 4 work live at `mirror-post/src/compositor/fonts/`. The template's CSS declares them via `@font-face` pointing at local relative paths — never system fonts.
+- **Determinism stack:** pinned Chromium + bundled fonts + PNG-buffer compositing (no raw BGRA) is the three-legged stool of REQ-X-052b.
+
+### D-NEW-17 (NEW 2026-04-15 evening Path C) — ONE shared LinkedIn post HTML template
+A single shared LinkedIn post HTML template serves all variants A/B/C/D. The LinkedIn **chrome** (top nav, post header with profile, mini tweet-style card, engagement row, action buttons) is **identical** across variants. Variants differ **only** in the hero SCENE content — a FLUX-generated scene PNG composited into the template's `hero-zone` div at render time.
+
+- **Template location:** `mirror-post/src/compositor/templates/linkedin-post.html`
+- **Placeholders:** Text zones use `{{placeholder}}` variables substituted at render time from Post Brief fields: `{{profile_name}}`, `{{profile_title}}`, `{{post_label}}`, `{{headline}}`, `{{body}}`, `{{hashtags}}`, `{{mini_profile_name}}`, `{{mini_handle}}`, `{{mini_body}}`, `{{mini_hashtags}}`, `{{reaction_count}}`, `{{comment_count}}`.
+- **Hero zone:** The template exports a `HERO_ZONE = { x, y, width, height }` constant describing the scene rectangle in pixel coordinates, used by `sharp` for the scene composite.
+- **Simplification from Path 2:** Replaces the earlier sub-variant pool of full 1920×1080 variant PNGs. One HTML template + per-letter scene PNG pools is dramatically simpler and eliminates text garbling (FLUX never renders UI text).
 
 ### D-NEW-14 (NEW — FROZEN-06) — Phase 2 v2 migration lives inside Phase 04.2 execution
 Post Brief v2 schema bump (D-NEW-06) runs as a **sub-plan inside Phase 04.2 execution**, not as a separate Phase 02-revisit.
