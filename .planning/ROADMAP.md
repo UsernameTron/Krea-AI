@@ -94,17 +94,17 @@ Plans:
 **Patterns**: None specific
 **Enforces**: REQ-X-027 (compositor renders headline, body, tweet card, engagement text — props text remains IN the hero image), REQ-X-026 (two-stage pipeline), REQ-X-050 (fixed input dimensions), REQ-X-051 (compositor template is fixed asset), REQ-X-052 (deterministic output)
 **Success Criteria** (what must be TRUE):
-  1. HTML-to-PNG compositor (Canvas API or Puppeteer) takes a hero image + Post Brief and outputs a single 1920x1080 PNG
+  1. Sharp + node-canvas hybrid compositor takes a hero image + Post Brief and outputs a single 1920x1080 PNG
   2. LinkedIn chrome (top nav, profile bar with avatar/name/title, engagement bar with reactions and comment count) renders consistently regardless of the underlying hero image
   3. Headline + body text overlay on the left ~40% with semi-transparent dark gradient renders readably against any hero background
   4. Tweet embed card renders correctly as a white rounded card (lower-right) when present in the Post Brief, and is omitted cleanly when absent
   5. Output is byte-identical given identical Post Brief + identical hero image (REQ-X-052 pixel-comparison test)
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 **UI hint**: yes
 
 Plans:
-- [ ] 04-01: LinkedIn chrome template + Canvas/Puppeteer setup
-- [ ] 04-02: Text overlay (gradient zone) + tweet embed card renderer
+- [ ] 04-01-PLAN.md — LinkedIn chrome template + sharp/node-canvas setup (Wave 1)
+- [ ] 04-02-PLAN.md — Text overlay gradient zone + tweet embed card renderer (Wave 2)
 
 ### Phase 5: Artifact UI
 **Goal**: Users can input a scenario or browse archetypes, generate and edit a Post Brief, and produce a copy-ready image prompt — all within a Claude Desktop React artifact with Obsidian dark-mode aesthetic
