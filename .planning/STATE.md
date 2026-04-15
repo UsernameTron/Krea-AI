@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Completed 04-compositor/04-03-PLAN.md — awaiting human UAT (Task 12 checkpoint)
-last_updated: "2026-04-15T14:30:08.318Z"
+status: reset_in_progress
+stopped_at: Phase 4 architecture reset — programmatic chrome abandoned, awaiting operator approval of 04-CONTEXT-RESET.md before /gsd:plan-phase 04.2
+last_updated: "2026-04-15T15:30:00.000Z"
 last_activity: 2026-04-15
 progress:
   total_phases: 6
@@ -29,11 +29,11 @@ Phase 0 (Bootstrap): COMPLETE
 Phase 1 (Mirror Post Scaffolding): COMPLETE
 Phase 2 (Post Brief Generator): COMPLETE
 Phase 3 (Visual Grammar + Image Prompt Builder): COMPLETE
-Phase: 04 (compositor) — EXECUTING
-Plan: 2 of 2
-Status: Phase complete — ready for verification
+Phase: 04 (compositor) — RESET IN PROGRESS
+Plan: pivot to 04.2 (architecture reset)
+Status: Programmatic chrome abandoned. Compositor scope = text overlay only onto Phase-5-generated scene screenshots. Prior work preserved on archive/phase-4-programmatic-chrome (mirror-post SHA c25d88a). BGRA channel-swap fix STOPPED — will not merge. See 04-CONTEXT-RESET.md.
 Last activity: 2026-04-15
-Branch: main
+Branch: main (Krea-AI workspace) | mirror-post repo: main + archive/phase-4-programmatic-chrome
 
 Progress: [#####░░░░░] 50%
 
@@ -137,3 +137,5 @@ Next: `/gsd:discuss-phase 4` (Compositor) — /clear first for fresh context.
 ---
 
 Resume (2026-04-15): Session resumed, proceeding to Wave 2 (04-02 text overlay + tweet embed + golden PNG test). HANDOFF.json is authoritative. `/gsd:execute-phase 4` will auto-skip 04-01 (has_summary=true).
+
+Reset (2026-04-15 PM): Phase 4 architecture reset. Programmatic LinkedIn chrome rendering abandoned. New contract: compositor overlays text only onto AI-generated full-scene LinkedIn screenshots produced by Phase 5 (Image Prompt Engine, `.planning/phases/05-image-prompt-engine/`). Five template variant prompts committed at 45dfdfa (4 variants A/B/C/D + master wrapper). Prior compositor work preserved on `archive/phase-4-programmatic-chrome` in mirror-post (SHA c25d88a) — no commits reverted. BGRA channel-swap fix STOPPED, will not merge. Five new decisions captured in `04-CONTEXT-RESET.md` (D-NEW-01 through D-NEW-05) plus three discussion-surfaced decisions (D-NEW-06 schema bump, D-NEW-07 legacy disposition, D-NEW-08 nav_easter_eggs retro-justification). Six risks flagged including ROADMAP renumbering collision (current "Phase 5: Artifact UI" vs new `05-image-prompt-engine/` directory). HOLD: do not invoke `/gsd:plan-phase 04.2` until operator approves the CONTEXT.

@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Mirror Post Scaffolding** - Directory structure, persona assets, Post Brief schema, test fixtures
 - [x] **Phase 2: Post Brief Generator** - Input classifier, system prompt builder, LLM generation, Brief Validator
 - [x] **Phase 3: Visual Grammar + Image Prompt Builder** - Foundation prompt asset, deterministic prompt builder, zone spec, engagement generator (completed 2026-04-14)
-- [x] **Phase 4: Compositor** - LinkedIn chrome, text overlay, tweet embed, engagement bar over hero image (completed 2026-04-15)
+- [~] **Phase 4: Compositor** - RESET IN PROGRESS (2026-04-15). Programmatic LinkedIn chrome rendering abandoned. Scope shrinks to text overlay only onto Phase 5 scene screenshots. See `.planning/phases/04-compositor/04-CONTEXT-RESET.md`. Prior work preserved on `archive/phase-4-programmatic-chrome` (mirror-post repo). Phase 5 (Image Prompt Engine) is now blocking. **ROADMAP RENUMBERING NEEDED** — current "Phase 5: Artifact UI" collides with the new `05-image-prompt-engine/` directory; flagged for operator decision.
 - [ ] **Phase 5: Artifact UI** - Input form, brief display/edit, image prompt output
 - [ ] **Phase 6: Integration** - End-to-end pipeline testing and 4-post roundtrip validation
 - [ ] **Parallel: flux-krea Optimization** - Scheduler, MPS tuning, torch.compile, --prompt-file
@@ -87,8 +87,9 @@ Plans:
 - [x] 03-01-PLAN.md — Foundation prompt loader, scene templates, and image prompt builder (Wave 1)
 - [x] 03-02-PLAN.md — Compositor zone spec, prop taxonomy, and engagement generator (Wave 1)
 
-### Phase 4: Compositor
-**Goal**: A flux-krea hero image plus a Post Brief can be assembled into a final 1920x1080 PNG with LinkedIn UI chrome, left-side gradient text overlay, tweet embed card, and engagement metrics — chrome layout consistent across any hero image
+### Phase 4: Compositor (RESET IN PROGRESS 2026-04-15)
+**Status**: Architecture pivot. Goal/criteria below are the OLD contract — preserved for audit. New contract in `04-CONTEXT-RESET.md`. Sub-phase 04.2 will replan against the new contract pending operator approval. Phase 5 now blocks Phase 4.
+**Goal (deprecated)**: A flux-krea hero image plus a Post Brief can be assembled into a final 1920x1080 PNG with LinkedIn UI chrome, left-side gradient text overlay, tweet embed card, and engagement metrics — chrome layout consistent across any hero image
 **Depends on**: Phase 3
 **Requirements**: REQ-M-040, REQ-M-041, REQ-M-042, REQ-M-043, REQ-M-044, REQ-X-050, REQ-X-051, REQ-X-052, REQ-X-060, REQ-X-061, REQ-X-062, REQ-X-063, REQ-X-064, REQ-X-065, REQ-X-066
 **Patterns**: None specific
