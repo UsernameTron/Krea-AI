@@ -56,7 +56,14 @@
 
 ## Session Handoff
 
-**Last session:** 2026-04-15 (discuss-phase 04.2 — decisions captured, writeup deferred)
+**Last session:** 2026-04-15 PM (Path 2 critical-path amendment — c9ca02a)
+**Branch:** main (clean)
+**State:** CONTEXT.md carries D-NEW-01 SECOND REVISION + D-NEW-15; plans 04.2-04 and 04.2-05 rewritten to 2-layer pipeline with SHA-256 sub-variant selection; synthetic-scene fallback removed. Operator needs to deliver variant assets (12-20 PNGs under mirror-post/src/compositor/variant-assets/{a,b,c,d}/) and measure VARIANT_SLOTS coords per letter.
+**Pick up with:** Doc-hygiene follow-ups in one session — REQUIREMENTS.md REQ-X-052a retarget, ROADMAP Phase 5 collapse, STATE.md cleanup, 04-DISCUSSION-LOG.md appendix, D-NEW-09 revision. Then variant-asset delivery, then `/gsd:execute-phase 04.2`.
+
+---
+
+**Prior session:** 2026-04-15 (discuss-phase 04.2 — decisions captured, writeup deferred)
 **Branch:** main (commit 8567444 — wip handoff)
 **State:** Phase 04.2 discussion complete. Two architecture amendments captured in .continue-here.md but not yet written to 04-CONTEXT.md. D-NEW-01 REVISED (chrome ownership: Phase 5 → Phase 4). D-NEW-06 RESOLVED (Post Brief v2 bump).
 **Pick up with:**

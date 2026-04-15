@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: plans_approved_pending_execution
-stopped_at: Phase 04.2 — 5 plans approved, verifier PASSED 50/50. Waiting on operator handoff: chrome PNGs (D-NEW-09), VARIANT_SLOTS coordinates, Phase 5a scene fixture decision.
-last_updated: "2026-04-15T19:00:00.000Z"
+stopped_at: Phase 04.2 — Path 2 critical-path amendment committed (c9ca02a). CONTEXT + plans 04/05 + todo updated. Waiting on operator handoff: variant assets (12-20 PNGs) + VARIANT_SLOTS coords. Doc-hygiene follow-ups deferred to next session.
+last_updated: "2026-04-15T20:00:00.000Z"
 last_activity: 2026-04-15
 progress:
   total_phases: 7
